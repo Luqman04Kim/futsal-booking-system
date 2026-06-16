@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
@@ -248,33 +248,42 @@
                                         data-bs-ride="carousel">
                                         <div class="carousel-inner h-100">
                                             <div class="carousel-item active h-100">
-                                                <img th:src="${field.imageUrl != null ? field.imageUrl : 'https://images.unsplash.com/photo-1556056504-5c7696c4c28d'}"
+                                                <img th:src="${field.imageUrl != null and field.imageUrl != '' ? field.imageUrl : 'https://images.unsplash.com/photo-1556056504-5c7696c4c28d'}"
+                                                    onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1556056504-5c7696c4c28d';"
                                                     class="card-img-top"
                                                     style="height:200px;object-fit:cover;width:100%;" alt="Field">
                                             </div>
-                                            <div th:if="${field.imageUrl2 != null}" class="carousel-item h-100">
-                                                <img th:src="${field.imageUrl2}" class="card-img-top"
+                                            <div th:if="${field.imageUrl2 != null and field.imageUrl2 != ''}" class="carousel-item h-100">
+                                                <img th:src="${field.imageUrl2}"
+                                                    onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1556056504-5c7696c4c28d';"
+                                                    class="card-img-top"
                                                     style="height:200px;object-fit:cover;width:100%;" alt="2">
                                             </div>
-                                            <div th:if="${field.imageUrl3 != null}" class="carousel-item h-100">
-                                                <img th:src="${field.imageUrl3}" class="card-img-top"
+                                            <div th:if="${field.imageUrl3 != null and field.imageUrl3 != ''}" class="carousel-item h-100">
+                                                <img th:src="${field.imageUrl3}"
+                                                    onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1556056504-5c7696c4c28d';"
+                                                    class="card-img-top"
                                                     style="height:200px;object-fit:cover;width:100%;" alt="3">
                                             </div>
-                                            <div th:if="${field.imageUrl4 != null}" class="carousel-item h-100">
-                                                <img th:src="${field.imageUrl4}" class="card-img-top"
+                                            <div th:if="${field.imageUrl4 != null and field.imageUrl4 != ''}" class="carousel-item h-100">
+                                                <img th:src="${field.imageUrl4}"
+                                                    onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1556056504-5c7696c4c28d';"
+                                                    class="card-img-top"
                                                     style="height:200px;object-fit:cover;width:100%;" alt="4">
                                             </div>
-                                            <div th:if="${field.imageUrl5 != null}" class="carousel-item h-100">
-                                                <img th:src="${field.imageUrl5}" class="card-img-top"
+                                            <div th:if="${field.imageUrl5 != null and field.imageUrl5 != ''}" class="carousel-item h-100">
+                                                <img th:src="${field.imageUrl5}"
+                                                    onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1556056504-5c7696c4c28d';"
+                                                    class="card-img-top"
                                                     style="height:200px;object-fit:cover;width:100%;" alt="5">
                                             </div>
                                         </div>
-                                        <button th:if="${field.imageUrl2 != null}" class="carousel-control-prev"
+                                        <button th:if="${field.imageUrl2 != null and field.imageUrl2 != ''}" class="carousel-control-prev"
                                             type="button" th:data-bs-target="'#mCarousel' + ${field.fieldId}"
                                             data-bs-slide="prev">
                                             <span class="carousel-control-prev-icon"></span>
                                         </button>
-                                        <button th:if="${field.imageUrl2 != null}" class="carousel-control-next"
+                                        <button th:if="${field.imageUrl2 != null and field.imageUrl2 != ''}" class="carousel-control-next"
                                             type="button" th:data-bs-target="'#mCarousel' + ${field.fieldId}"
                                             data-bs-slide="next">
                                             <span class="carousel-control-next-icon"></span>

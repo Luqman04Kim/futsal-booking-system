@@ -629,7 +629,7 @@
         <div class="ticket-card w-100">
             <!-- LEFT: Visual -->
             <div class="ticket-visual"
-                th:style="|background-image: url('${field.imageUrl != null ? field.imageUrl : 'https://images.unsplash.com/photo-1556056504-5c7696c4c28d'}');|">
+                th:style="|background-image: url('${field.imageUrl != null and field.imageUrl != '' ? field.imageUrl : 'https://images.unsplash.com/photo-1556056504-5c7696c4c28d'}'), url('https://images.unsplash.com/photo-1556056504-5c7696c4c28d');|">
                 <div class="visual-content mt-4">
                     <span class="badge bg-warning text-dark mb-2">PREMIUM PITCH</span>
                     <h1 class="field-name" th:text="${field.name}">Field Name</h1>
