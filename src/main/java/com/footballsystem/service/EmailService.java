@@ -70,13 +70,18 @@ public class EmailService {
             String fieldName = booking.getField() != null ? booking.getField().getName() : "N/A";
             DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("hh:mm a");
 
+            String dateStr = booking.getDate() != null ? booking.getDate().toString() : "N/A";
+            String timeStr = "N/A";
+            if (booking.getStartTime() != null && booking.getEndTime() != null) {
+                timeStr = booking.getStartTime().format(timeFormat) + " - " + booking.getEndTime().format(timeFormat);
+            }
+
             String body = "Dear " + userName + ",\n\n" +
                     "Your booking has been successfully confirmed.\n\n" +
                     "   Booking ID: #" + booking.getBookingId() + "\n" +
                     "   Field: " + fieldName + "\n" +
-                    "   Date: " + booking.getDate() + "\n" +
-                    "   Time: " + booking.getStartTime().format(timeFormat) + " - "
-                    + booking.getEndTime().format(timeFormat) + "\n" +
+                    "   Date: " + dateStr + "\n" +
+                    "   Time: " + timeStr + "\n" +
                     "   Total Paid: RM " + String.format("%.2f", booking.getPrice()) + "\n\n" +
                     "Your receipt is attached to this email.\n" +
                     "Please present the receipt at the counter upon arrival.\n\n" +
@@ -94,6 +99,7 @@ public class EmailService {
         } catch (Exception e) {
             System.err.println("Error sending email with receipt: " + e.getMessage());
             e.printStackTrace();
+            throw new RuntimeException("Failed to send receipt email: " + e.getMessage(), e);
         }
     }
 
