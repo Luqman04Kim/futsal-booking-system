@@ -154,6 +154,15 @@ public class PaymentController {
                         .toInstant()
                         .toEpochMilli();
                 model.addAttribute("bookingCreatedAtMillis", epochMillis);
+
+                // Calculate remaining seconds for the 10-minute timer dynamically
+                java.time.LocalDateTime now = java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Kuala_Lumpur"));
+                java.time.Duration duration = java.time.Duration.between(booking.getCreatedAt(), now);
+                long elapsedSeconds = Math.max(0, duration.getSeconds());
+                long remainingSeconds = Math.max(0, (10 * 60) - elapsedSeconds);
+                model.addAttribute("remainingSeconds", remainingSeconds);
+            } else {
+                model.addAttribute("remainingSeconds", 600);
             }
 
             boolean isOverduePayment = "APPROVED".equals(booking.getStatus())
