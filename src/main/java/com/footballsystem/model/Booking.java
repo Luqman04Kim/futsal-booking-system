@@ -71,7 +71,7 @@ public class Booking {
         this.endTime = endTime;
         this.price = price;
         this.status = status;
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = LocalDateTime.now(java.time.ZoneId.of("Asia/Kuala_Lumpur"));
         this.qrToken = UUID.randomUUID().toString();
     }
 
@@ -87,7 +87,7 @@ public class Booking {
         this.price = price;
         this.hirePhotographer = hirePhotographer;
         this.rentJersey = rentJersey;
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = LocalDateTime.now(java.time.ZoneId.of("Asia/Kuala_Lumpur"));
         this.qrToken = UUID.randomUUID().toString();
     }
 

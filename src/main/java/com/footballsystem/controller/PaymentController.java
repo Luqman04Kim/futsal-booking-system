@@ -148,6 +148,14 @@ public class PaymentController {
             model.addAttribute("totalPrice", totalPrice);
             model.addAttribute("fieldPrice", fieldPrice);
 
+            if (booking.getCreatedAt() != null) {
+                long epochMillis = booking.getCreatedAt()
+                        .atZone(java.time.ZoneId.of("Asia/Kuala_Lumpur"))
+                        .toInstant()
+                        .toEpochMilli();
+                model.addAttribute("bookingCreatedAtMillis", epochMillis);
+            }
+
             boolean isOverduePayment = "APPROVED".equals(booking.getStatus())
                     && "Pay Deposit".equals(booking.getPaymentStatus());
             model.addAttribute("isOverduePayment", isOverduePayment);

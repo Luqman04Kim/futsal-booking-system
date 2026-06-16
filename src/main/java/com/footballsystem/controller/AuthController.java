@@ -53,9 +53,12 @@ public class AuthController {
             HttpSession session,
             Model model) {
 
-        String cleanEmail = email.trim().toLowerCase();
+        String input = email.trim();
+        Optional<User> userOptional = userRepository.findByEmail(input.toLowerCase());
 
-        Optional<User> userOptional = userRepository.findByEmail(cleanEmail);
+        if (userOptional.isEmpty()) {
+            userOptional = userRepository.findByUsernameIgnoreCase(input);
+        }
 
         if (userOptional.isPresent()) {
             User user = userOptional.get();
@@ -81,7 +84,7 @@ public class AuthController {
             }
         }
 
-        model.addAttribute("error", "Invalid email or password");
+        model.addAttribute("error", "Invalid email/username or password");
         return "login";
     }
 

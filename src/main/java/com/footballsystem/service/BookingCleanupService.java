@@ -18,7 +18,7 @@ public class BookingCleanupService {
     // Run every minute
     @Scheduled(fixedRate = 60000)
     public void cleanupExpiredBookings() {
-        LocalDateTime expirationTime = LocalDateTime.now().minusMinutes(10);
+        LocalDateTime expirationTime = LocalDateTime.now(java.time.ZoneId.of("Asia/Kuala_Lumpur")).minusMinutes(10);
 
         List<Booking> pendingBookings = bookingRepository.findAll();
 

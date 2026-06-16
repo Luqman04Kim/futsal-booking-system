@@ -16,6 +16,7 @@ import com.footballsystem.repository.UserRepository;
 import com.footballsystem.repository.PriceMatrixRepository;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -66,26 +67,16 @@ public class CustomerController {
         return roleObj != null && "CUSTOMER".equals(roleObj.toString());
     }
 
-    // Helper: Get project root dynamically
-    private Path getProjectRoot() {
-        try {
-            String classPath = getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
-            String decodedPath = java.net.URLDecoder.decode(classPath, "UTF-8");
-            Path path = Paths.get(decodedPath);
-            while (path != null) {
-                if (Files.exists(path.resolve("pom.xml"))) {
-                    return path;
-                }
-                path = path.getParent();
-            }
-        } catch (Exception e) {
-            // Ignore
+    @Value("${upload.dir:uploads}")
+    private String uploadDirProperty;
+
+    // Helper: Resolve the absolute upload directory
+    private Path getUploadDir() throws Exception {
+        Path dir = Paths.get(uploadDirProperty).toAbsolutePath();
+        if (!Files.exists(dir)) {
+            Files.createDirectories(dir);
         }
-        Path cwd = Paths.get("").toAbsolutePath();
-        if (Files.exists(cwd.resolve("FYP3").resolve("pom.xml"))) {
-            return cwd.resolve("FYP3");
-        }
-        return cwd;
+        return dir;
     }
 
     // Helper: Save Image
@@ -93,23 +84,13 @@ public class CustomerController {
         if (file.isEmpty())
             return null;
         try {
-            Path projectRoot = getProjectRoot();
-            Path uploadPath = projectRoot.resolve("src/main/resources/static/img");
-            if (!Files.exists(uploadPath)) {
-                Files.createDirectories(uploadPath);
-            }
+            Path uploadDir = getUploadDir();
             String fileName = prefix + "_" + UUID.randomUUID().toString() + ".png";
-            Path path = uploadPath.resolve(fileName);
-            Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-
-            // Copy to target for immediate display
-            Path targetPath = projectRoot.resolve("target/classes/static/img").resolve(fileName);
-            if (!Files.exists(targetPath.getParent()))
-                Files.createDirectories(targetPath.getParent());
-            Files.copy(file.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
-
-            return "/img/" + fileName;
+            Path dest = uploadDir.resolve(fileName);
+            Files.copy(file.getInputStream(), dest, StandardCopyOption.REPLACE_EXISTING);
+            return "/uploads/" + fileName;
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -659,7 +640,7 @@ public class CustomerController {
                 vipTransaction.setDate(java.time.LocalDate.now());
                 vipTransaction.setStartTime(java.time.LocalTime.now());
                 vipTransaction.setEndTime(java.time.LocalTime.now());
-                vipTransaction.setCreatedAt(java.time.LocalDateTime.now());
+                vipTransaction.setCreatedAt(java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Kuala_Lumpur")));
 
                 bookingRepository.save(vipTransaction);
 
