@@ -628,8 +628,11 @@
 
         <div class="ticket-card w-100">
             <!-- LEFT: Visual -->
-            <div class="ticket-visual"
+            <div class="ticket-visual" id="ticketVisual"
                 th:style="|background-image: url('${field.imageUrl != null and field.imageUrl != '' ? field.imageUrl : 'https://images.unsplash.com/photo-1556056504-5c7696c4c28d'}'), url('https://images.unsplash.com/photo-1556056504-5c7696c4c28d');|">
+                <!-- Hidden img to trigger fallback if field.imageUrl fails to load -->
+                <img th:if="${field.imageUrl != null and field.imageUrl != ''}" th:src="${field.imageUrl}" style="display:none;"
+                    onerror="document.getElementById('ticketVisual').style.backgroundImage = 'url(\'https://images.unsplash.com/photo-1556056504-5c7696c4c28d\')';">
                 <div class="visual-content mt-4">
                     <span class="badge bg-warning text-dark mb-2">PREMIUM PITCH</span>
                     <h1 class="field-name" th:text="${field.name}">Field Name</h1>

@@ -796,8 +796,7 @@
                         <a href="#" class="dropdown-toggle"
                             th:classappend="${session.loggedUser.vip ? 'vip-dropdown-toggle' : ''}"
                             data-bs-toggle="dropdown">
-                            <img th:src="${session.loggedUser.imageUrl != null and session.loggedUser.imageUrl != '' ? session.loggedUser.imageUrl : 'https://ui-avatars.com/api/?name=' + session.loggedUser.username}"
-                                th:onerror="|this.onerror=null; this.src='https://ui-avatars.com/api/?name=' + '${session.loggedUser.username}';|"
+                            <img th:src="${session.loggedUser.imageUrl != null ? session.loggedUser.imageUrl : 'https://ui-avatars.com/api/?name=' + session.loggedUser.username}"
                                 class="profile-avatar">
                             <span th:text="${session.loggedUser.username}">User</span>
                         </a>
@@ -864,29 +863,29 @@
 
         <!-- 3. Field Grid -->
         <div class="row g-4" th:if="${selectedBranchId != null}">
-            <div class="col-6 col-sm-6 col-md-6 col-lg-4" th:each="field : ${fields}">
+            <div class="col-12 col-sm-6 col-md-6 col-lg-4" th:each="field : ${fields}">
                 <div class="ticket-card h-100">
                     <div class="card-img-wrapper">
                         <div th:id="'carousel' + ${field.fieldId}" class="carousel slide h-100" data-bs-ride="carousel">
                             <div class="carousel-inner h-100">
                                 <div class="carousel-item active h-100">
-                                    <img th:src="${field.imageUrl != null and field.imageUrl != '' ? field.imageUrl : 'https://images.unsplash.com/photo-1556056504-5c7696c4c28d'}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1556056504-5c7696c4c28d';" class="card-img-top" style="height:220px;object-fit:cover;width:100%;" alt="Field">
+                                    <img th:src="${field.imageUrl != null ? field.imageUrl : 'https://images.unsplash.com/photo-1556056504-5c7696c4c28d'}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1556056504-5c7696c4c28d';" class="card-img-top" style="height:220px;object-fit:cover;width:100%;" alt="Field">
                                 </div>
-                                <div th:if="${field.imageUrl2 != null and field.imageUrl2 != ''}" class="carousel-item h-100">
+                                <div th:if="${field.imageUrl2 != null}" class="carousel-item h-100">
                                     <img th:src="${field.imageUrl2}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1556056504-5c7696c4c28d';" class="card-img-top" style="height:220px;object-fit:cover;width:100%;" alt="Photo 2">
                                 </div>
-                                <div th:if="${field.imageUrl3 != null and field.imageUrl3 != ''}" class="carousel-item h-100">
+                                <div th:if="${field.imageUrl3 != null}" class="carousel-item h-100">
                                     <img th:src="${field.imageUrl3}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1556056504-5c7696c4c28d';" class="card-img-top" style="height:220px;object-fit:cover;width:100%;" alt="Photo 3">
                                 </div>
-                                <div th:if="${field.imageUrl4 != null and field.imageUrl4 != ''}" class="carousel-item h-100">
+                                <div th:if="${field.imageUrl4 != null}" class="carousel-item h-100">
                                     <img th:src="${field.imageUrl4}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1556056504-5c7696c4c28d';" class="card-img-top" style="height:220px;object-fit:cover;width:100%;" alt="Photo 4">
                                 </div>
-                                <div th:if="${field.imageUrl5 != null and field.imageUrl5 != ''}" class="carousel-item h-100">
+                                <div th:if="${field.imageUrl5 != null}" class="carousel-item h-100">
                                     <img th:src="${field.imageUrl5}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1556056504-5c7696c4c28d';" class="card-img-top" style="height:220px;object-fit:cover;width:100%;" alt="Photo 5">
                                 </div>
                             </div>
-                            <button th:if="${field.imageUrl2 != null and field.imageUrl2 != ''}" class="carousel-control-prev" type="button" th:data-bs-target="'#carousel' + ${field.fieldId}" data-bs-slide="prev"><span class="carousel-control-prev-icon"></span></button>
-                            <button th:if="${field.imageUrl2 != null and field.imageUrl2 != ''}" class="carousel-control-next" type="button" th:data-bs-target="'#carousel' + ${field.fieldId}" data-bs-slide="next"><span class="carousel-control-next-icon"></span></button>
+                            <button th:if="${field.imageUrl2 != null}" class="carousel-control-prev" type="button" th:data-bs-target="'#carousel' + ${field.fieldId}" data-bs-slide="prev"><span class="carousel-control-prev-icon"></span></button>
+                            <button th:if="${field.imageUrl2 != null}" class="carousel-control-next" type="button" th:data-bs-target="'#carousel' + ${field.fieldId}" data-bs-slide="next"><span class="carousel-control-next-icon"></span></button>
                         </div>
                         <span class="badge-branch"
                             th:text="${field.branch != null ? field.branch.name : 'Main Hub'}">Branch</span>
