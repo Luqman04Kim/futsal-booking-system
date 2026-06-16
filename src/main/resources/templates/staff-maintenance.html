@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
@@ -816,7 +816,7 @@
 
         /* ---- Mobile sidebar toggle ---- */
         function toggleSidebar() {
-            var sidebar = document.getElementById('sidebar');
+            var sidebar = document.querySelector('.sidebar');
             var overlay = document.getElementById('sidebarOverlay');
             if (sidebar) sidebar.classList.toggle('show');
             if (overlay) overlay.classList.toggle('show');

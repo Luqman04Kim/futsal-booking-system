@@ -78,17 +78,18 @@ img {
     /* --- Sidebar --- */
     .sidebar {
         position: fixed !important;
-        left: -260px !important;
+        left: 0 !important;
         top: 0 !important;
         height: 100vh !important;
         width: 248px !important;
-        transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        transform: translateX(-100%) !important;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
         z-index: 1150 !important;
         overflow-y: auto !important;
     }
 
     .sidebar.show {
-        left: 0 !important;
+        transform: translateX(0) !important;
         box-shadow: 6px 0 30px rgba(0, 0, 0, 0.4) !important;
     }
 
