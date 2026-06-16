@@ -110,11 +110,30 @@ public class ToyyibPayService {
         form.add("billReturnUrl", returnUrl);
         form.add("billCallbackUrl", callbackUrl);
         form.add("billExternalReferenceNo", externalRef);
-        form.add("billTo", booking.getUser() != null ? booking.getUser().getUsername() : "Customer");
-        form.add("billEmail", booking.getUser() != null && booking.getUser().getEmail() != null
-                ? booking.getUser().getEmail() : "");
-        form.add("billPhone", booking.getUser() != null && booking.getUser().getPhoneNumber() != null
-                ? booking.getUser().getPhoneNumber() : "");
+        String billTo = booking.getUser() != null ? booking.getUser().getUsername() : "Customer";
+        if (billTo == null || billTo.trim().isEmpty()) {
+            billTo = "Customer";
+        }
+
+        String rawEmail = booking.getUser() != null ? booking.getUser().getEmail() : null;
+        String billEmail = (rawEmail != null && rawEmail.contains("@")) ? rawEmail.trim() : "customer@footballhub.com";
+
+        String rawPhone = booking.getUser() != null ? booking.getUser().getPhoneNumber() : null;
+        String billPhone = "";
+        if (rawPhone != null) {
+            billPhone = rawPhone.replaceAll("[^0-9]", "");
+        }
+        if (billPhone.isEmpty() || billPhone.length() < 9 || billPhone.length() > 13) {
+            billPhone = "0123456789";
+        } else {
+            if (!billPhone.startsWith("60") && !billPhone.startsWith("0")) {
+                billPhone = "0" + billPhone;
+            }
+        }
+
+        form.add("billTo", billTo);
+        form.add("billEmail", billEmail);
+        form.add("billPhone", billPhone);
         form.add("billSplitPayment", "0");        // no split
         form.add("billSplitPaymentArgs", "");
         form.add("billPaymentChannel", "0");      // 0 = all channels (FPX + Card)
@@ -133,18 +152,34 @@ public class ToyyibPayService {
         String responseBody = response.getBody();
         System.out.println("ToyyibPay Response: " + responseBody);
 
-        // Response is a JSON array: [{"BillCode":"abc123"}]
         ObjectMapper mapper = new ObjectMapper();
-        List<Map<String, Object>> result = mapper.readValue(responseBody,
-                mapper.getTypeFactory().constructCollectionType(List.class, Map.class));
+        com.fasterxml.jackson.databind.JsonNode rootNode = mapper.readTree(responseBody != null ? responseBody : "");
 
-        if (result == null || result.isEmpty() || !result.get(0).containsKey("BillCode")) {
+        String billCode = null;
+        if (rootNode.isObject()) {
+            if (rootNode.has("status") && "error".equals(rootNode.get("status").asText())) {
+                String errMsg = rootNode.has("msg") ? rootNode.get("msg").asText() : "Unknown error";
+                throw new RuntimeException("ToyyibPay error: " + errMsg);
+            }
+            if (rootNode.has("BillCode")) {
+                billCode = rootNode.get("BillCode").asText();
+            }
+        } else if (rootNode.isArray() && rootNode.size() > 0) {
+            com.fasterxml.jackson.databind.JsonNode firstItem = rootNode.get(0);
+            if (firstItem.has("status") && "error".equals(firstItem.get("status").asText())) {
+                String errMsg = firstItem.has("msg") ? firstItem.get("msg").asText() : "Unknown error";
+                throw new RuntimeException("ToyyibPay error: " + errMsg);
+            }
+            if (firstItem.has("BillCode")) {
+                billCode = firstItem.get("BillCode").asText();
+            }
+        }
+
+        if (billCode == null || billCode.trim().isEmpty()) {
             throw new RuntimeException("ToyyibPay did not return a BillCode. Response: " + responseBody);
         }
 
-        String billCode = (String) result.get(0).get("BillCode");
         System.out.println("ToyyibPay BillCode: " + billCode);
-
         return toyyibPayBaseUrl + "/" + billCode;
     }
 }
