@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FOOTBALLHUB - Use Case Diagram</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #FFFFFF;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .diagram-container {
+            width: 600px;
+            position: relative;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 30px;
+            font-weight: bold;
+        }
+
+        .diagram {
+            position: relative;
+            width: 100%;
+            height: 1000px;
+        }
+
+        /* Actor styling */
+        .actor {
+            position: absolute;
+            text-align: center;
+            width: 80px;
+        }
+
+        .actor-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #FFFFFF;
+            border: 2px solid #000000;
+            margin: 0 auto 3px;
+        }
+
+        .actor-body {
+            width: 2px;
+            height: 30px;
+            background-color: #000000;
+            margin: 0 auto;
+        }
+
+        .actor-arms {
+            width: 35px;
+            height: 2px;
+            background-color: #000000;
+            margin: 8px auto 0;
+        }
+
+        .actor-legs {
+            width: 30px;
+            height: 25px;
+            position: relative;
+            margin: 0 auto;
+        }
+
+        .actor-legs::before,
+        .actor-legs::after {
+            content: '';
+            position: absolute;
+            width: 2px;
+            height: 18px;
+            background-color: #000000;
+            top: 0;
+        }
+
+        .actor-legs::before {
+            left: 10px;
+            transform: rotate(-15deg);
+            transform-origin: top;
+        }
+
+        .actor-legs::after {
+            right: 10px;
+            transform: rotate(15deg);
+            transform-origin: top;
+        }
+
+        .actor-name {
+            margin-top: 5px;
+            font-size: 12px;
+            font-weight: normal;
+        }
+
+        /* Position actors */
+        .customer {
+            left: 20px;
+            top: 100px;
+        }
+
+        .staff {
+            left: 20px;
+            top: 600px;
+        }
+
+        .admin {
+            right: 20px;
+            top: 350px;
+        }
+
+        /* System rectangle */
+        .system-box {
+            position: absolute;
+            left: 150px;
+            top: 50px;
+            width: 320px;
+            height: 900px;
+            border: 2px solid #000000;
+            background-color: #FFFFFF;
+            padding: 20px;
+        }
+
+        .system-title {
+            text-align: center;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        /* Use case styling */
+        .usecase {
+            position: relative;
+            width: 280px;
+            height: 50px;
+            border: 2px solid #000000;
+            border-radius: 25px;
+            background-color: #D3D3D3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            font-size: 11px;
+        }
+
+        /* Connection lines */
+        svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        line {
+            stroke: #000000;
+            stroke-width: 1.5;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="diagram-container">
+        <h1>FOOTBALLHUB - Use Case Diagram</h1>
+
+        <div class="diagram">
+            <!-- Actors -->
+            <div class="actor customer">
+                <div class="actor-icon"></div>
+                <div class="actor-body"></div>
+                <div class="actor-arms"></div>
+                <div class="actor-legs"></div>
+                <div class="actor-name">Customer</div>
+            </div>
+
+            <div class="actor staff">
+                <div class="actor-icon"></div>
+                <div class="actor-body"></div>
+                <div class="actor-arms"></div>
+                <div class="actor-legs"></div>
+                <div class="actor-name">Staff</div>
+            </div>
+
+            <div class="actor admin">
+                <div class="actor-icon"></div>
+                <div class="actor-body"></div>
+                <div class="actor-arms"></div>
+                <div class="actor-legs"></div>
+                <div class="actor-name">Admin</div>
+            </div>
+
+            <!-- System Box -->
+            <div class="system-box">
+                <div class="system-title">FOOTBALLHUB System</div>
+
+                <div class="usecase" id="uc1">UC1: Manage User</div>
+                <div class="usecase" id="uc2">UC2: Manage Branch</div>
+                <div class="usecase" id="uc3">UC3: Manage Field</div>
+                <div class="usecase" id="uc4">UC4: Manage Booking</div>
+                <div class="usecase" id="uc5">UC5: Manage Staff</div>
+                <div class="usecase" id="uc6">UC6: Manage Task</div>
+                <div class="usecase" id="uc7">UC7: Manage Maintenance</div>
+                <div class="usecase" id="uc8">UC8: Manage Payment</div>
+            </div>
+
+            <!-- Connection Lines (SVG) -->
+            <svg>
+                <!-- Customer connections (left side to UC1, UC4, UC8) -->
+                <line x1="60" y1="120" x2="190" y2="115" />
+                <line x1="60" y1="120" x2="190" y2="340" />
+                <line x1="60" y1="120" x2="190" y2="790" />
+
+                <!-- Staff connections (left side to UC1, UC6, UC7) -->
+                <line x1="60" y1="620" x2="190" y2="115" />
+                <line x1="60" y1="620" x2="190" y2="565" />
+                <line x1="60" y1="620" x2="190" y2="640" />
+
+                <!-- Admin connections (right side to all UCs) -->
+                <line x1="500" y1="380" x2="450" y2="115" />
+                <line x1="500" y1="380" x2="450" y2="190" />
+                <line x1="500" y1="380" x2="450" y2="265" />
+                <line x1="500" y1="380" x2="450" y2="340" />
+                <line x1="500" y1="380" x2="450" y2="415" />
+                <line x1="500" y1="380" x2="450" y2="490" />
+                <line x1="500" y1="380" x2="450" y2="565" />
+                <line x1="500" y1="380" x2="450" y2="640" />
+            </svg>
+        </div>
+    </div>
+</body>
+
+</html>

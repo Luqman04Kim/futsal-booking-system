@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Maintenance Log - FOOTBALLHUB</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/mobile-responsive.css">
+    <style>
+        :root {
+            --primary-color: #0f172a;
+            --secondary-color: #334155;
+            --accent-color: #3b82f6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Inter', sans-serif;
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            height: 100vh;
+            background-color: var(--primary-color);
+            color: white;
+            position: fixed;
+            width: 240px;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+            overflow-y: scroll;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 0;
+        }
+
+        .sidebar-header h3 {
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        .sidebar-submenu a {
+            padding-left: 45px;
+            font-size: 0.88rem;
+        }
+
+        .sidebar-parent {
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-parent.active {
+            color: #0d6efd;
+            background: rgba(13, 110, 253, 0.1);
+        }
+
+        .sidebar-chevron {
+            transition: transform 0.3s;
+            font-size: 0.75rem;
+            opacity: 0.6;
+        }
+
+        .sidebar-parent[aria-expanded="false"] .sidebar-chevron {
+            transform: rotate(-90deg);
+        }
+
+        .sidebar a {
+            color: #cbd5e1;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 12px 25px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+
+        .sidebar a.active {
+            border-left-color: var(--accent-color);
+            background: linear-gradient(90deg, rgba(59, 130, 246, 0.1) 0%, transparent 100%);
+        }
+
+        .sidebar a i {
+            width: 20px;
+            margin-right: 10px;
+            text-align: center;
+        }
+
+        /* Content */
+        .content {
+            margin-left: 240px;
+            padding: 25px;
+        }
+
+        /* Stat Cards */
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 22px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, 0.03);
+            height: 100%;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .stat-icon-bg {
+            position: absolute;
+            right: -10px;
+            bottom: -10px;
+            font-size: 4.5rem;
+            opacity: 0.06;
+            transform: rotate(-15deg);
+        }
+
+        /* Table Container */
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table thead th {
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #eee;
+            color: var(--secondary-color);
+            font-weight: 600;
+            padding: 15px 18px;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .table tbody td {
+            padding: 14px 18px;
+            vertical-align: middle;
+            border-bottom: 1px solid #eee;
+            font-size: 0.9rem;
+        }
+
+        .table tbody tr {
+            transition: background-color 0.15s;
+        }
+
+        .table tbody tr:hover {
+            background-color: #f8fafc;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-reported {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-maintenance {
+            background-color: #cfe2ff;
+            color: #084298;
+        }
+
+        .status-fixed {
+            background-color: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .status-review {
+            background-color: #e2d9f3;
+            color: #6f42c1;
+        }
+
+        /* Priority Badges */
+        .priority-badge {
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .priority-low { background: #e8f5e9; color: #2e7d32; }
+        .priority-medium { background: #fff8e1; color: #f57f17; }
+        .priority-high { background: #fce4ec; color: #c62828; }
+        .priority-critical { background: #c62828; color: #fff; }
+
+        /* Action Buttons */
+        .btn-action {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            transition: all 0.2s ease;
+            border: none;
+        }
+
+        .btn-update {
+            background: #e8f4fd;
+            color: #0284c7;
+        }
+
+        .btn-update:hover {
+            background: #0284c7;
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(2, 132, 199, 0.3);
+        }
+
+        .btn-delete {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .btn-delete:hover {
+            background: #dc2626;
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(220, 38, 38, 0.3);
+        }
+
+        /* Report Image */
+        .report-img {
+            width: 55px;
+            height: 55px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 2px solid #e2e8f0;
+        }
+
+        .report-img:hover {
+            transform: scale(1.15);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Maintenance Type Cards */
+        .maint-type-card {
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid #e2e8f0 !important;
+        }
+
+        .maint-type-card:hover {
+            border-color: #3b82f6 !important;
+            background: #eff6ff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(59, 130, 246, 0.1);
+        }
+
+        .maint-type-card.selected {
+            border-color: #10b981 !important;
+            background: #f0fdf4;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            background: white;
+            border-radius: 12px;
+            padding: 16px 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+        }
+
+        /* Image Lightbox */
+        .lightbox-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .lightbox-overlay.show {
+            display: flex;
+        }
+
+        .lightbox-overlay img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Smooth animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .stat-card { animation: fadeInUp 0.4s ease forwards; }
+        .stat-card:nth-child(1) { animation-delay: 0s; }
+        .stat-card:nth-child(2) { animation-delay: 0.1s; }
+        .stat-card:nth-child(3) { animation-delay: 0.2s; }
+        .stat-card:nth-child(4) { animation-delay: 0.3s; }
+
+        /* Scrollbar */
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
+    </style>
+</head>
+
+<body>
+
+    <!-- Mobile Menu Button -->
+    <button class="mobile-menu-btn" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3><img src="/favicon.png" style="height:28px;width:28px;object-fit:contain;margin-right:8px;border-radius:4px;">FOOTBALLHUB</h3>
+        </div>
+        <div class="mt-3">
+            <a href="/manager/dashboard"><i class="fas fa-th-large"></i> Dashboard</a>
+            <a href="/manager/bookings"><i class="fas fa-calendar-check"></i> Bookings</a>
+            <a href="/manager/payment-field"><i class="fas fa-credit-card"></i> Payments</a>
+            <a href="/manager/transactions"><i class="fas fa-exchange-alt"></i> Transactions</a>
+            <a href="/manager/performance"><i class="fas fa-chart-line"></i> Performance</a>
+            <a href="#branchMenu" data-bs-toggle="collapse" role="button" aria-expanded="false" class="sidebar-parent d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-building"></i> Branches</span>
+                <i class="fas fa-chevron-down sidebar-chevron"></i>
+            </a>
+            <div class="collapse" id="branchMenu">
+                <div class="sidebar-submenu">
+                    <a href="/manager/branches"><i class="fas fa-code-branch"></i> Branch List</a>
+                    <a href="/manager/fields"><i class="fas fa-map-marker-alt"></i> Fields</a>
+                    <a href="/manager/inventory"><i class="fas fa-boxes"></i> Inventory</a>
+                </div>
+            </div>
+            <a href="#usersMenu" data-bs-toggle="collapse" role="button" aria-expanded="false" class="sidebar-parent d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-users"></i> Users</span>
+                <i class="fas fa-chevron-down sidebar-chevron"></i>
+            </a>
+            <div class="collapse" id="usersMenu">
+                <div class="sidebar-submenu">
+                    <a href="/manager/users"><i class="fas fa-user-circle"></i> User List</a>
+                    <a href="/manager/staff"><i class="fas fa-user-tie"></i> Staff</a>
+                    <a href="/manager/memberships"><i class="fas fa-crown" style="color:#FFD700;"></i> Memberships</a>
+                </div>
+            </div>
+            <a href="#maintMenu" data-bs-toggle="collapse" role="button" aria-expanded="true" class="sidebar-parent active d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-tools"></i> Maintenance</span>
+                <i class="fas fa-chevron-down sidebar-chevron"></i>
+            </a>
+            <div class="collapse show" id="maintMenu">
+                <div class="sidebar-submenu">
+                    <a href="/manager/maintenance" class="active"><i class="fas fa-wrench"></i> Maintenance Log</a>
+                    <a href="/manager/reports"><i class="fas fa-chart-bar"></i> Reports</a>
+                </div>
+            </div>
+        </div>
+        <div style="margin-top:auto;padding-bottom:20px;">
+            <a href="/logout" class="text-danger"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+    </div>
+
+    <!-- Image Lightbox -->
+    <div class="lightbox-overlay" id="lightbox" onclick="closeLightbox()">
+        <img id="lightboxImg" src="" alt="Full size image">
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold text-primary mb-1">
+                    <i class="fas fa-tools me-2"></i>Maintenance Logs
+                </h2>
+                <p class="text-muted mb-0">Manage maintenance records and assign tasks to staff</p>
+            </div>
+            <button class="btn btn-success px-4 py-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#addMaintenanceModal" style="border-radius:10px;">
+                <i class="fas fa-plus me-2"></i>Add Maintenance
+            </button>
+        </div>
+
+        <!-- Flash Messages -->
+        <div th:if="${param.deleted != null}" class="alert alert-success alert-dismissible fade show shadow-sm" role="alert" style="border-radius:10px;">
+            <i class="fas fa-check-circle me-2"></i>Maintenance record deleted successfully!
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${param.updated != null}" class="alert alert-success alert-dismissible fade show shadow-sm" role="alert" style="border-radius:10px;">
+            <i class="fas fa-check-circle me-2"></i>Maintenance status updated successfully!
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${param.added != null}" class="alert alert-success alert-dismissible fade show shadow-sm" role="alert" style="border-radius:10px;">
+            <i class="fas fa-check-circle me-2"></i>Maintenance task assigned to staff successfully!
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-label">Total Records</div>
+                    <div class="stat-value" th:text="${reports.size()}">0</div>
+                    <i class="fas fa-clipboard-list stat-icon-bg text-primary"></i>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-label">Reported</div>
+                    <div class="stat-value" id="reportedCount">0</div>
+                    <i class="fas fa-exclamation-circle stat-icon-bg" style="color:var(--warning-color);"></i>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-label">In Progress</div>
+                    <div class="stat-value" id="maintenanceCount">0</div>
+                    <i class="fas fa-cogs stat-icon-bg" style="color:var(--accent-color);"></i>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-label">Fixed</div>
+                    <div class="stat-value" id="fixedCount">0</div>
+                    <i class="fas fa-check-circle stat-icon-bg" style="color:var(--success-color);"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search & Filter Bar -->
+        <div class="filter-bar mb-4">
+            <form method="GET" th:action="@{/manager/maintenance}" class="row g-2 align-items-end">
+                <div class="col-md-5">
+                    <label class="form-label fw-semibold small text-secondary mb-1">
+                        <i class="fas fa-search me-1"></i>Search
+                    </label>
+                    <input type="text" name="search" class="form-control" placeholder="Search by ID, description..."
+                           th:value="${param.search != null ? param.search[0] : ''}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold small text-secondary mb-1">
+                        <i class="fas fa-filter me-1"></i>Branch
+                    </label>
+                    <select name="branchId" class="form-select">
+                        <option value="">All Branches</option>
+                        <option th:each="branch : ${branches}"
+                                th:value="${branch.branchId}"
+                                th:text="${branch.name}"
+                                th:selected="${param.branchId != null && param.branchId[0] == branch.branchId.toString()}">Branch</option>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary flex-grow-1" style="border-radius:8px;">
+                        <i class="fas fa-search me-1"></i>Filter
+                    </button>
+                    <a href="/manager/maintenance" class="btn btn-outline-secondary" style="border-radius:8px;" title="Clear filters">
+                        <i class="fas fa-undo"></i>
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Maintenance Table -->
+        <div class="table-container">
+            <div class="table-responsive">
+                <table class="table table-hover" id="maintenanceTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Date</th>
+                            <th>Location</th>
+                            <th>Issue</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>Assigned To</th>
+                            <th>Manager Notes</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${reports.isEmpty()}">
+                            <td colspan="9" class="text-center py-5 text-muted">
+                                <i class="fas fa-tools fa-3x mb-3 d-block" style="opacity:0.3;"></i>
+                                <p class="fw-semibold mb-1">No maintenance records found</p>
+                                <p class="small">Click "Add Maintenance" to create a new record</p>
+                            </td>
+                        </tr>
+                        <tr th:each="report : ${reports}" class="maintenance-row"
+                            th:attr="data-status=${report.status}">
+                            <td>
+                                <span class="badge bg-dark px-2 py-1" th:text="${report.formattedMaintenanceId}" style="font-size:0.82rem;">M1</span>
+                            </td>
+                            <td>
+                                <span th:text="${report.timestamp != null ? #temporals.format(report.timestamp, 'dd MMM yyyy') : 'N/A'}" class="text-nowrap">12 Jan 2026</span>
+                                <div th:if="${report.timestamp != null}" class="text-muted small" th:text="${#temporals.format(report.timestamp, 'hh:mm a')}">2:30 PM</div>
+                            </td>
+                            <td>
+                                <div th:if="${report.branch != null}">
+                                    <strong th:text="${report.branch.name}">Branch A</strong>
+                                    <div th:if="${report.field != null}" class="text-muted small">
+                                        <i class="fas fa-map-marker-alt me-1"></i>
+                                        <span th:text="${report.field.name}">Field 1</span>
+                                    </div>
+                                </div>
+                                <span th:if="${report.branch == null}" class="text-muted">N/A</span>
+                            </td>
+                            <td style="max-width:220px;">
+                                <span th:text="${report.description != null ? report.description : 'No description'}">Issue</span>
+                                <div th:if="${report.imageUrl != null && !report.imageUrl.isEmpty()}" class="mt-2">
+                                    <img th:src="${report.imageUrl}" class="report-img" alt="Issue Image"
+                                         onclick="openLightbox(this.src)">
+                                </div>
+                            </td>
+                            <td>
+                                <span th:if="${report.priority != null}"
+                                      th:class="'priority-badge priority-' + ${report.priority.toLowerCase()}"
+                                      th:text="${report.priority}">MEDIUM</span>
+                                <span th:if="${report.priority == null}" class="text-muted small">—</span>
+                            </td>
+                            <td>
+                                <span th:if="${report.status == 'REPORTED'}" class="status-badge status-reported">
+                                    <i class="fas fa-exclamation-circle"></i> Reported
+                                </span>
+                                <span th:if="${report.status == 'MAINTENANCE'}" class="status-badge status-maintenance">
+                                    <i class="fas fa-wrench"></i> In Progress
+                                </span>
+                                <span th:if="${report.status == 'FIXED'}" class="status-badge status-fixed">
+                                    <i class="fas fa-check-circle"></i> Fixed
+                                </span>
+                                <span th:if="${report.status == 'REVIEW'}" class="status-badge status-review">
+                                    <i class="fas fa-eye"></i> Review
+                                </span>
+                                <span th:if="${report.status != 'REPORTED' && report.status != 'MAINTENANCE' && report.status != 'FIXED' && report.status != 'REVIEW'}"
+                                      class="status-badge status-reported"
+                                      th:text="${report.status}">Unknown</span>
+                            </td>
+                            <td>
+                                <div th:if="${report.assignedStaff != null}" class="d-flex align-items-center gap-2">
+                                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width:30px;height:30px;font-size:0.75rem;">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <span class="small fw-semibold" th:text="${report.assignedStaff.username}">Staff</span>
+                                </div>
+                                <span th:if="${report.assignedStaff == null}" class="text-muted small">Unassigned</span>
+                            </td>
+                            <td style="max-width:180px;">
+                                <span th:if="${report.notes != null && !report.notes.isEmpty()}" th:text="${report.notes}" class="small">Notes</span>
+                                <span th:if="${report.notes == null || report.notes.isEmpty()}" class="text-muted small">—</span>
+                            </td>
+                            <td class="text-center text-nowrap">
+                                <button class="btn btn-sm btn-action btn-update me-1" data-bs-toggle="modal"
+                                    th:attr="data-bs-target='#maintenanceModal' + ${report.reportId}"
+                                    title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <a th:href="@{/manager/maintenance/delete/{id}(id=${report.reportId})}"
+                                   class="btn btn-sm btn-action btn-delete"
+                                   onclick="confirmAction(this, 'this maintenance record'); return false;"
+                                   title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Maintenance Modals (one per report) -->
+    <div th:each="report : ${reports}">
+        <div class="modal fade" th:id="'maintenanceModal' + ${report.reportId}" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg" style="border-radius:16px;overflow:hidden;">
+                    <form th:action="@{/manager/update-report-status}" method="POST">
+                        <div class="modal-header text-white" style="background:linear-gradient(135deg,#0f172a,#1e3a5f);">
+                            <h5 class="modal-title fw-bold">
+                                <i class="fas fa-edit me-2"></i>Update — <span th:text="${report.formattedMaintenanceId}">M1</span>
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body p-4">
+                            <input type="hidden" name="reportId" th:value="${report.reportId}">
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small text-secondary">Issue Description</label>
+                                <p class="form-control-plaintext border rounded px-3 py-2 bg-light" th:text="${report.description}" style="font-size:0.9rem;">Issue description</p>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small text-secondary">
+                                    <i class="fas fa-signal me-1"></i>Status
+                                </label>
+                                <select name="status" class="form-select" required>
+                                    <option value="REPORTED" th:selected="${report.status == 'REPORTED'}">Reported</option>
+                                    <option value="MAINTENANCE" th:selected="${report.status == 'MAINTENANCE'}">Under Maintenance</option>
+                                    <option value="REVIEW" th:selected="${report.status == 'REVIEW'}">Review</option>
+                                    <option value="FIXED" th:selected="${report.status == 'FIXED'}">Fixed</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small text-secondary">
+                                    <i class="fas fa-sticky-note me-1"></i>Manager Notes
+                                </label>
+                                <textarea name="notes" class="form-control" rows="3" th:text="${report.notes}"
+                                    placeholder="Add notes about maintenance work..." style="border-radius:10px;"></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-0 pt-0 px-4 pb-4">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" style="border-radius:8px;">Cancel</button>
+                            <button type="submit" class="btn btn-primary px-4" style="border-radius:8px;">
+                                <i class="fas fa-save me-1"></i>Update
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden field data for JS field picker -->
+    <div id="allFieldsData" style="display:none;">
+        <span th:each="f : ${fields}"
+              th:if="${f.branch != null}"
+              th:attr="data-field-id=${f.fieldId}, data-field-name=${f.name}, data-branch-id=${f.branch.branchId}">
+        </span>
+    </div>
+
+    <!-- ========================================
+         ADD MAINTENANCE MODAL
+         ======================================== -->
+    <div class="modal fade" id="addMaintenanceModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius:16px;overflow:hidden;">
+                <form th:action="@{/manager/add-maintenance-task}" method="POST">
+                    <div class="modal-header text-white" style="background:linear-gradient(135deg,#0f172a,#1e3a5f);">
+                        <h5 class="modal-title fw-bold">
+                            <i class="fas fa-tools me-2 text-warning"></i> Add Maintenance Task
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body p-4">
+
+                        <!-- Step 1: Maintenance Type -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-list-check me-1 text-primary"></i>
+                                Type of Maintenance <span class="text-danger">*</span>
+                            </label>
+                            <div class="row g-2">
+                                <div class="col-md-4">
+                                    <div class="maint-type-card border rounded p-3 text-center"
+                                         onclick="toggleMaintType(this, 'typeCutGrass')">
+                                        <input class="form-check-input me-2" type="checkbox"
+                                               name="maintenanceTypes" value="Cut Grass"
+                                               id="typeCutGrass" onclick="event.stopPropagation();">
+                                        <label class="form-check-label fw-semibold" for="typeCutGrass">
+                                            <i class="fas fa-leaf me-1 text-success"></i> Cut Grass
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="maint-type-card border rounded p-3 text-center"
+                                         onclick="toggleMaintType(this, 'typeMarkingLine')">
+                                        <input class="form-check-input me-2" type="checkbox"
+                                               name="maintenanceTypes" value="Repair Marking Line"
+                                               id="typeMarkingLine" onclick="event.stopPropagation();">
+                                        <label class="form-check-label fw-semibold" for="typeMarkingLine">
+                                            <i class="fas fa-paint-roller me-1 text-warning"></i> Repair Marking Line
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="maint-type-card border rounded p-3 text-center"
+                                         onclick="toggleMaintType(this, 'typeFertilise')">
+                                        <input class="form-check-input me-2" type="checkbox"
+                                               name="maintenanceTypes" value="Fertilise Field"
+                                               id="typeFertilise" onclick="event.stopPropagation();">
+                                        <label class="form-check-label fw-semibold" for="typeFertilise">
+                                            <i class="fas fa-seedling me-1 text-success"></i> Fertilise Field
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Branch & Field -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-building me-1 text-secondary"></i> Branch
+                                </label>
+                                <select name="branchId" id="addMaintBranchSelect" class="form-select"
+                                        onchange="loadAddMaintFields(this.value); refreshAddMaintStaffBtn(this.value)">
+                                    <option value="">-- Select Branch --</option>
+                                    <option th:each="branch : ${branches}"
+                                            th:value="${branch.branchId}"
+                                            th:text="${branch.name}">Branch</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-map-marker-alt me-1 text-secondary"></i> Field (Optional)
+                                </label>
+                                <select name="fieldId" id="addMaintFieldSelect" class="form-select">
+                                    <option value="">-- General / All Fields --</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Due Date -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-calendar-alt me-1 text-secondary"></i> Due Date (Optional)
+                            </label>
+                            <input type="date" name="dueDate" class="form-control">
+                        </div>
+
+                        <!-- Assign Staff -->
+                        <div class="mb-2">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <label class="form-label fw-bold mb-0">
+                                    <i class="fas fa-hard-hat me-1 text-warning"></i> Assign Maintenance Staff
+                                </label>
+                                <button type="button" id="addMaintViewStaffBtn"
+                                        class="btn btn-sm btn-info text-white py-1 px-3"
+                                        onclick="openAddMaintStaff()" disabled
+                                        style="border-radius:8px;">
+                                    <i class="fas fa-users me-1"></i> View &amp; Select Staff
+                                </button>
+                            </div>
+
+                            <!-- Hidden staff inputs for form submission -->
+                            <div id="addMaintHiddenStaff" style="display:none;">
+                                <div th:each="staff : ${maintenanceStaff}">
+                                    <input type="checkbox"
+                                           name="assignedStaffIds"
+                                           th:value="${staff.userId}"
+                                           th:id="'amStaff_' + ${staff.userId}"
+                                           th:attr="data-name=${staff.username}, data-branch-id=${staff.branch != null ? staff.branch.branchId : ''}">
+                                </div>
+                            </div>
+
+                            <!-- Selected staff badge display -->
+                            <div id="addMaintSelectedDisplay" class="d-flex flex-wrap gap-1 mb-1 min-height-0"></div>
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Select a branch first, then click &ldquo;View &amp; Select Staff&rdquo;.
+                            </small>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 pt-0 px-4 pb-4">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" style="border-radius:8px;">Cancel</button>
+                        <button type="submit" class="btn btn-success px-4" style="border-radius:8px;">
+                            <i class="fas fa-paper-plane me-1"></i> Assign &amp; Create Task
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- View & Select Staff popup for Add Maintenance -->
+    <div class="modal fade" id="addMaintStaffModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius:16px;overflow:hidden;">
+                <div class="modal-header text-white" style="background:linear-gradient(135deg,#0f172a,#1e3a5f);">
+                    <h6 class="modal-title fw-bold mb-0">
+                        <i class="fas fa-hard-hat me-2 text-warning"></i>
+                        Select Staff &mdash; <span id="addMaintBranchLabel"></span>
+                    </h6>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-0" id="addMaintStaffBody">
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-arrow-left fa-2x mb-2 d-block"></i>Select a branch first.
+                    </div>
+                </div>
+                <div class="modal-footer py-2 d-flex justify-content-between align-items-center">
+                    <small class="text-muted"><i class="fas fa-info-circle me-1"></i>Click a row or checkbox to select.</small>
+                    <div>
+                        <button type="button" class="btn btn-secondary btn-sm me-2" data-bs-dismiss="modal" style="border-radius:6px;">Cancel</button>
+                        <button type="button" class="btn btn-success btn-sm" onclick="confirmAddMaintSelection()" style="border-radius:6px;">
+                            <i class="fas fa-check me-1"></i> Confirm Selection
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius:16px;overflow:hidden;">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title"><i class="fas fa-exclamation-triangle me-2"></i>Confirm Action</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <i class="fas fa-trash-alt fa-3x text-danger mb-3"></i>
+                    <p class="mb-0 fs-5">Are you sure you want to delete <strong><span id="deleteItemName">this action</span></strong>?</p>
+                    <p class="text-muted small mt-2">This action cannot be undone.</p>
+                </div>
+                <div class="modal-footer justify-content-center border-0 pb-4">
+                    <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal" style="border-radius:8px;">Cancel</button>
+                    <a href="#" id="confirmDeleteBtn" class="btn btn-danger px-4" style="border-radius:8px;">
+                        <i class="fas fa-trash me-1"></i>Confirm
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        // Thymeleaf-rendered maps for branch-scoped staff and fields
+        var branchMaintStaffMap = /*[[${branchMaintStaffMap}]]*/ {};
+        var fieldsByBranch = /*[[${fieldsByBranch}]]*/ {};
+
+        /* ---- Count stats by status ---- */
+        (function() {
+            var rows = document.querySelectorAll('.maintenance-row');
+            var reported = 0, maintenance = 0, fixed = 0;
+            rows.forEach(function(row) {
+                var status = row.getAttribute('data-status');
+                if (status === 'REPORTED') reported++;
+                else if (status === 'MAINTENANCE' || status === 'REVIEW') maintenance++;
+                else if (status === 'FIXED') fixed++;
+            });
+            document.getElementById('reportedCount').textContent = reported;
+            document.getElementById('maintenanceCount').textContent = maintenance;
+            document.getElementById('fixedCount').textContent = fixed;
+        })();
+
+        /* ---- Image Lightbox ---- */
+        function openLightbox(src) {
+            document.getElementById('lightboxImg').src = src;
+            document.getElementById('lightbox').classList.add('show');
+        }
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.remove('show');
+        }
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeLightbox();
+        });
+
+        /* ---- Maintenance type card toggle ---- */
+        function toggleMaintType(card, checkboxId) {
+            var cb = document.getElementById(checkboxId);
+            if (!cb) return;
+            cb.checked = !cb.checked;
+            card.classList.toggle('selected', cb.checked);
+        }
+
+        /* ---- Load fields for selected branch ---- */
+        function loadAddMaintFields(branchId) {
+            var sel = document.getElementById('addMaintFieldSelect');
+            sel.options.length = 0;
+            sel.add(new Option('-- General / All Fields --', ''));
+            
+            if (!branchId) return;
+
+            var branchFields = fieldsByBranch[String(branchId)] || fieldsByBranch[branchId] || [];
+            if (branchFields.length > 0) {
+                branchFields.forEach(function(field) {
+                    var fName = field.name ? field.name : 'Unnamed Field';
+                    var opt = new Option(fName, field.id);
+                    sel.add(opt);
+                });
+                return;
+            }
+
+            // Fallback for older rendered pages that still rely on hidden DOM data
+            var spans = document.querySelectorAll('#allFieldsData span[data-branch-id="' + branchId + '"]');
+            spans.forEach(function(span) {
+                var fName = span.getAttribute('data-field-name') || 'Unnamed Field';
+                var opt = new Option(fName, span.getAttribute('data-field-id'));
+                sel.add(opt);
+            });
+        }
+
+        /* ---- Enable/disable View Staff button based on branch selection ---- */
+        function refreshAddMaintStaffBtn(branchId) {
+            var btn = document.getElementById('addMaintViewStaffBtn');
+            btn.disabled = !branchId;
+            // Uncheck all staff when branch changes
+            document.querySelectorAll('#addMaintHiddenStaff input[type="checkbox"]').forEach(function(cb) {
+                cb.checked = false;
+            });
+            updateAddMaintBadges();
+        }
+
+        /* ---- Open the staff popup, pre-check already selected staff ---- */
+        function openAddMaintStaff() {
+            var branchSelect = document.getElementById('addMaintBranchSelect');
+            var branchId = parseInt(branchSelect.value);
+            var branchName = branchSelect.options[branchSelect.selectedIndex].text;
+
+            document.getElementById('addMaintBranchLabel').textContent = branchName;
+
+            var staffList = branchMaintStaffMap[branchId] || [];
+            var body = document.getElementById('addMaintStaffBody');
+
+            if (staffList.length === 0) {
+                body.innerHTML = '<div class="text-center text-muted py-5"><i class="fas fa-user-slash fa-2x mb-2 d-block" style="opacity:0.4;"></i><p class="fw-semibold mb-1">No maintenance staff</p><p class="small">No maintenance staff available at this branch.</p></div>';
+            } else {
+                var html = '<table class="table table-hover mb-0" style="font-size:0.92rem;">';
+                html += '<thead style="background:#f1f5f9;"><tr>';
+                html += '<th class="ps-3" style="width:44px;">Assign</th><th>Staff ID</th><th>Name</th><th>Phone</th>';
+                html += '</tr></thead><tbody>';
+                staffList.forEach(function(s) {
+                    var checked = document.getElementById('amStaff_' + s.userId) &&
+                                  document.getElementById('amStaff_' + s.userId).checked;
+                    var rowBg = checked ? 'class="table-success"' : '';
+                    html += '<tr ' + rowBg + ' style="cursor:pointer;" onclick="toggleAddMaintRow(this,' + s.userId + ')">';
+                    html += '<td class="ps-3 text-center"><input type="checkbox" class="form-check-input" ';
+                    html += 'id="amPopup_' + s.userId + '" ';
+                    html += (checked ? 'checked' : '') + ' onclick="event.stopPropagation();toggleAddMaintCheckbox(this,' + s.userId + ')"></td>';
+                    html += '<td><span class="badge bg-secondary">' + (s.staffId || 'N/A') + '</span></td>';
+                    html += '<td><i class="fas fa-user-circle me-1 text-primary"></i>' + s.username + '</td>';
+                    html += '<td class="text-muted">' + (s.phoneNumber || '&mdash;') + '</td>';
+                    html += '</tr>';
+                });
+                html += '</tbody></table>';
+                body.innerHTML = html;
+            }
+
+            new bootstrap.Modal(document.getElementById('addMaintStaffModal')).show();
+        }
+
+        /* ---- Toggle row via row click ---- */
+        function toggleAddMaintRow(row, staffId) {
+            var popupCb = document.getElementById('amPopup_' + staffId);
+            if (!popupCb) return;
+            popupCb.checked = !popupCb.checked;
+            row.classList.toggle('table-success', popupCb.checked);
+        }
+
+        /* ---- Toggle via checkbox click ---- */
+        function toggleAddMaintCheckbox(cb, staffId) {
+            var row = cb.closest('tr');
+            if (row) row.classList.toggle('table-success', cb.checked);
+        }
+
+        /* ---- Confirm selection: copy popup → hidden inputs, update badges, close popup ---- */
+        function confirmAddMaintSelection() {
+            document.querySelectorAll('#addMaintStaffBody input[type="checkbox"]').forEach(function(popupCb) {
+                var staffId = popupCb.id.replace('amPopup_', '');
+                var hidden = document.getElementById('amStaff_' + staffId);
+                if (hidden) hidden.checked = popupCb.checked;
+            });
+            updateAddMaintBadges();
+            var modalEl = document.getElementById('addMaintStaffModal');
+            var modal = bootstrap.Modal.getInstance(modalEl);
+            if (modal) modal.hide();
+        }
+
+        /* ---- Render selected staff badges ---- */
+        function updateAddMaintBadges() {
+            var display = document.getElementById('addMaintSelectedDisplay');
+            if (!display) return;
+            var selected = [];
+            document.querySelectorAll('#addMaintHiddenStaff input[type="checkbox"]:checked').forEach(function(cb) {
+                selected.push(cb.getAttribute('data-name') || cb.value);
+            });
+            if (selected.length === 0) {
+                display.innerHTML = '';
+            } else {
+                display.innerHTML = selected.map(function(n) {
+                    return '<span class="badge bg-success me-1 mb-1" style="font-size:0.82rem;border-radius:8px;padding:6px 10px;"><i class="fas fa-user-check me-1"></i>' + n + '</span>';
+                }).join('');
+            }
+        }
+
+        /* ---- Reset modal state when closed ---- */
+        document.getElementById('addMaintenanceModal').addEventListener('hidden.bs.modal', function() {
+            document.getElementById('addMaintBranchSelect').value = '';
+            var fieldSel = document.getElementById('addMaintFieldSelect');
+            fieldSel.options.length = 0;
+            fieldSel.add(new Option('-- General / All Fields --', ''));
+            document.getElementById('addMaintViewStaffBtn').disabled = true;
+            document.querySelectorAll('#addMaintHiddenStaff input[type="checkbox"]').forEach(function(cb) { cb.checked = false; });
+            document.querySelectorAll('.maint-type-card').forEach(function(c) { c.classList.remove('selected'); });
+            document.querySelectorAll('[id^="typeCut"],[id^="typeMarking"],[id^="typeFert"]').forEach(function(cb) { cb.checked = false; });
+            updateAddMaintBadges();
+        });
+
+        /*]]>*/
+
+        /* ---- Delete confirmation ---- */
+        let formToSubmit = null;
+        function confirmAction(element, itemName) {
+            const confirmBtn = document.getElementById('confirmDeleteBtn');
+            const form = element.closest('form');
+            if (form) {
+                formToSubmit = form;
+                confirmBtn.removeAttribute('href');
+                confirmBtn.onclick = function(e) {
+                    e.preventDefault();
+                    if (formToSubmit) formToSubmit.submit();
+                };
+            } else {
+                formToSubmit = null;
+                confirmBtn.href = element.getAttribute('href') || element.getAttribute('data-url');
+                confirmBtn.onclick = null;
+            }
+            document.getElementById('deleteItemName').textContent = itemName || 'this action';
+            var modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+            modal.show();
+        }
+
+        /* ---- Mobile sidebar toggle ---- */
+        function toggleSidebar() {
+            var sidebar = document.querySelector('.sidebar');
+            var overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('show');
+            overlay.classList.toggle('show');
+        }
+    </script>
+
+</body>
+
+</html>

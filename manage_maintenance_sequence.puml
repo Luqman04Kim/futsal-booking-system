@@ -1,0 +1,96 @@
+@startuml Manage Maintenance Sequence Diagram
+
+!theme plain
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+skinparam backgroundColor #FFFFFF
+skinparam maxMessageSize 200
+skinparam ParticipantPadding 80
+skinparam BoxPadding 30
+skinparam SequenceBoxBorderColor transparent
+hide footbox
+
+title Manage Maintenance Sequence Diagram
+
+actor Manager
+participant "ProblemReport" as Report <<Model>>
+participant "Branch" as Branch <<Model>>
+participant "Field" as Field <<Model>>
+
+== Report Problem ==
+Manager -> Report: create Report
+activate Report
+Report --> Manager: Report created
+deactivate Report
+
+Manager -> Branch: get Branch
+activate Branch
+Branch --> Manager: Branch
+deactivate Branch
+Manager -> Report: setBranch(branch)
+
+alt Report for Specific Field
+    Manager -> Field: get Field
+    activate Field
+    Field --> Manager: Field
+    deactivate Field
+    Manager -> Report: setField(field)
+end
+
+Manager -> Report: save Report
+activate Report
+Report --> Manager: saved successfully
+deactivate Report
+
+== View Report ==
+Manager -> Report: get report details
+activate Report
+Report --> Manager: details
+deactivate Report
+
+Manager -> Report: getBranch()
+activate Report
+Report -> Branch: get Branch
+activate Branch
+Branch --> Report: Branch
+deactivate Branch
+Report --> Manager: Branch details
+deactivate Report
+
+Manager -> Report: getField()
+activate Report
+Report -> Field: get Field
+activate Field
+Field --> Report: Field
+deactivate Field
+Report --> Manager: Field details
+deactivate Report
+
+== Update Report Status ==
+Manager -> Report: get Report
+activate Report
+Report --> Manager: Report found
+deactivate Report
+
+Manager -> Report: setStatus(status)
+activate Report
+Report --> Manager: status updated
+deactivate Report
+
+Manager -> Report: save Report
+activate Report
+Report --> Manager: updated successfully
+deactivate Report
+
+== Mark as Fixed ==
+Manager -> Report: setStatus("FIXED")
+activate Report
+Report --> Manager: status set
+deactivate Report
+
+Manager -> Report: save Report
+activate Report
+Report --> Manager: fixed successfully
+deactivate Report
+
+@enduml

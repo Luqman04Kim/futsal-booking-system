@@ -1,0 +1,94 @@
+@startuml Manage Booking Sequence Diagram
+
+!theme plain
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+skinparam backgroundColor #FFFFFF
+skinparam maxMessageSize 200
+skinparam ParticipantPadding 80
+skinparam BoxPadding 30
+skinparam SequenceBoxBorderColor transparent
+hide footbox
+
+title Manage Booking Sequence Diagram
+
+actor Customer
+participant "Booking" as Booking <<Model>>
+participant "User" as User <<Model>>
+participant "Field" as Field <<Model>>
+
+== Create Booking ==
+Customer -> Booking: create Booking
+activate Booking
+Booking --> Customer: Booking created
+deactivate Booking
+
+Customer -> User: get User
+activate User
+User --> Customer: User
+deactivate User
+Customer -> Booking: setUser(user)
+
+Customer -> Field: get Field
+activate Field
+Field --> Customer: Field
+deactivate Field
+Customer -> Booking: setField(field)
+
+Customer -> Booking: save Booking
+activate Booking
+Booking --> Customer: saved successfully
+deactivate Booking
+
+== View Booking ==
+Customer -> Booking: get booking details
+activate Booking
+Booking --> Customer: details
+deactivate Booking
+
+Customer -> Booking: getUser()
+activate Booking
+Booking -> User: get User
+activate User
+User --> Booking: User
+deactivate User
+Booking --> Customer: User details
+deactivate Booking
+
+Customer -> Booking: getField()
+activate Booking
+Booking -> Field: get Field
+activate Field
+Field --> Booking: Field
+deactivate Field
+Booking --> Customer: Field details
+deactivate Booking
+
+== Update Booking ==
+Customer -> Booking: get Booking
+activate Booking
+Booking --> Customer: Booking found
+deactivate Booking
+
+Customer -> Booking: update details
+activate Booking
+Booking --> Customer: updated
+deactivate Booking
+
+Customer -> Booking: save Booking
+activate Booking
+Booking --> Customer: updated successfully
+deactivate Booking
+
+== Cancel Booking ==
+Customer -> Booking: setStatus("Cancelled")
+activate Booking
+Booking --> Customer: status updated
+deactivate Booking
+
+Customer -> Booking: save Booking
+activate Booking
+Booking --> Customer: cancelled successfully
+deactivate Booking
+
+@enduml

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Result - FOOTBALLHUB</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --barca-blue: #004D98;
+            --barca-red: #A50044;
+            --barca-yellow: #edbb00;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #004d98;
+            background-image: url('https://images.unsplash.com/photo-1560259595-d25dc6470058?q=80&w=2070');
+            background-size: cover;
+            background-position: center;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.72);
+            z-index: -1;
+        }
+
+        .result-card {
+            width: 100%;
+            max-width: 540px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            padding: 40px 36px;
+            text-align: center;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .success-icon {
+            width: 90px; height: 90px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 2.5rem;
+        }
+
+        .success-icon.ok  { background: linear-gradient(135deg,#16a34a,#15803d); color:white; }
+        .success-icon.fail { background: linear-gradient(135deg,#dc2626,#b91c1c); color:white; }
+
+        .brand-title {
+            font-family: 'Chakra Petch', sans-serif;
+            color: var(--barca-blue);
+            letter-spacing: 1px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.92rem;
+        }
+
+        .detail-row:last-child { border-bottom: none; }
+        .detail-label { color: #64748b; }
+        .detail-value { font-weight: 600; color: #1e293b; }
+
+        .toyyibpay-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: #f0f9ff; border: 1px solid #bae6fd;
+            border-radius: 8px; padding: 6px 14px;
+            font-size: 0.82rem; color: #0369a1;
+            margin-top: 18px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="result-card">
+
+        <!-- SUCCESS -->
+        <div th:if="${paymentSuccess}">
+            <div class="success-icon ok">
+                <i class="fas fa-check"></i>
+            </div>
+            <h3 class="brand-title mb-1">Payment Successful!</h3>
+            <p class="text-muted mb-4">Your booking has been confirmed. A receipt has been sent to your email.</p>
+
+            <!-- Booking Details -->
+            <div th:if="${booking != null}" class="text-start mb-4 p-3 rounded-3" style="background:#f8faff; border:1px solid #e0e7ff;">
+                <div class="detail-row">
+                    <span class="detail-label"><i class="fas fa-hashtag me-1"></i>Booking ID</span>
+                    <span class="detail-value" th:text="'#' + ${booking.bookingId}">#123</span>
+                </div>
+                <div class="detail-row" th:if="${booking.field != null}">
+                    <span class="detail-label"><i class="fas fa-futbol me-1"></i>Field</span>
+                    <span class="detail-value" th:text="${booking.field.name}">Field A</span>
+                </div>
+                <div class="detail-row" th:if="${booking.date != null}">
+                    <span class="detail-label"><i class="far fa-calendar-alt me-1"></i>Date</span>
+                    <span class="detail-value" th:text="${booking.date}">2026-05-10</span>
+                </div>
+                <div class="detail-row" th:if="${booking.startTime != null}">
+                    <span class="detail-label"><i class="far fa-clock me-1"></i>Time</span>
+                    <span class="detail-value" th:text="${booking.startTime + ' - ' + booking.endTime}">08:00 - 10:00</span>
+                </div>
+                <div class="detail-row" th:if="${booking.paymentStatus != null}">
+                    <span class="detail-label"><i class="fas fa-credit-card me-1"></i>Payment</span>
+                    <span class="detail-value text-success" th:text="${booking.paymentStatus}">Full Payment</span>
+                </div>
+                <div class="detail-row" th:if="${booking.price != null}">
+                    <span class="detail-label"><i class="fas fa-tag me-1"></i>Amount Paid</span>
+                    <span class="detail-value text-success fw-bold" th:text="'RM ' + ${#numbers.formatDecimal(booking.price,1,2)}">RM 100.00</span>
+                </div>
+            </div>
+
+            <div class="toyyibpay-badge">
+                <i class="fas fa-lock"></i>
+                Payment processed securely via <strong>ToyyibPay</strong>
+            </div>
+
+            <div class="d-grid gap-2 mt-4">
+                <a href="/my-bookings" class="btn btn-primary rounded-pill py-2 fw-bold">
+                    <i class="fas fa-calendar-check me-2"></i>View My Bookings
+                </a>
+                <a th:if="${booking != null}" th:href="'/receipt/' + ${booking.bookingId}" class="btn btn-outline-secondary rounded-pill py-2">
+                    <i class="fas fa-file-pdf me-2"></i>Download Receipt PDF
+                </a>
+                <a href="/home" class="btn btn-link text-muted">Return to Home</a>
+            </div>
+        </div>
+
+        <!-- FAILED / CANCELLED -->
+        <div th:if="${!paymentSuccess}">
+            <div class="success-icon fail">
+                <i class="fas fa-times"></i>
+            </div>
+            <h3 class="brand-title mb-1" style="color:#dc2626;">Payment Not Completed</h3>
+            <p class="text-muted mb-3" th:text="${errorMsg != null ? errorMsg : 'Your payment was cancelled or did not go through.'}">
+                Your payment was cancelled or did not go through.
+            </p>
+            <p class="text-muted small mb-4">Your booking has <strong>not</strong> been confirmed. You can try again or cancel the booking.</p>
+
+            <div class="d-grid gap-2 mt-3">
+                <a th:if="${bookingId != null}" th:href="'/payment/' + ${bookingId}"
+                   class="btn btn-primary rounded-pill py-2 fw-bold">
+                    <i class="fas fa-redo me-2"></i>Try Again
+                </a>
+                <a href="/my-bookings" class="btn btn-outline-secondary rounded-pill py-2">
+                    <i class="fas fa-calendar-alt me-2"></i>My Bookings
+                </a>
+                <a href="/home" class="btn btn-link text-muted">Return to Home</a>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

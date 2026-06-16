@@ -1,0 +1,13 @@
+package com.footballsystem.repository;
+
+import com.footballsystem.model.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
+
+@Repository
+public interface UserRepository extends JpaRepository<User, Long> {
+    // This finds a user by their email automatically!
+    Optional<User> findByEmail(String email);
+}

@@ -1,0 +1,212 @@
+\chapter{System Design}
+\thispagestyle{empty}
+\label{ch:5}
+
+\section{Introduction}
+
+The system design phase represents a critical transition from conceptual requirements to concrete technical implementation. This chapter presents the architectural blueprint of FootballHub, a comprehensive web-based football field management system designed to address the challenges of manual booking processes, inefficient multi-branch management, and inadequate staff coordination. The design emphasizes scalability, maintainability, and user experience while adhering to established software engineering principles and industry best practices.
+
+The design philosophy underlying FootballHub centers on three core principles. First, the system employs a layered architecture that promotes separation of concerns, ensuring that presentation logic, business logic, and data access operations remain distinct and independently maintainable. Second, the design prioritizes scalability to accommodate growth in both user base and operational scope, allowing seamless addition of new branches, fields, and features without requiring fundamental restructuring. Third, the system emphasizes usability through intuitive interfaces tailored to each user role, recognizing that effective software must serve both technical and non-technical stakeholders.
+
+This chapter is organized to provide a comprehensive view of the system's technical design. The system architecture section examines the overall structural organization and the relationships between major components. The package diagram section illustrates the modular organization of code components and their dependencies. The database design section details the relational schema that underpins data persistence and integrity. The interface design section showcases the user-facing elements that facilitate interaction with the system. Finally, the discussion and summary sections reflect on design decisions and their implications for system quality.
+
+\section{System Architecture}
+
+The FootballHub system is built upon a three-tier architecture that cleanly separates presentation, business logic, and data management concerns. This architectural pattern, widely recognized in enterprise application development, provides numerous advantages including improved maintainability, testability, and the ability to modify individual tiers without cascading changes throughout the system.
+
+\subsection{Architecture Overview}
+
+The presentation tier comprises the user interface components implemented using Thymeleaf template engine integrated with HTML5, CSS3, and JavaScript. This tier is responsible for rendering dynamic web pages, capturing user input, and displaying information retrieved from the business tier. Thymeleaf's server-side rendering approach ensures that pages are generated with complete data before being sent to the client browser, improving initial page load performance and search engine optimization compared to purely client-side rendering frameworks.
+
+The business tier, implemented using the Spring Boot framework version 3.2.3, contains the core application logic and orchestrates all business operations. This tier follows the Model-View-Controller (MVC) design pattern, which further delineates responsibilities within the application layer. Controllers handle HTTP requests and coordinate between the view layer and the service layer. The service layer encapsulates business logic and transaction management, ensuring that complex operations maintain data consistency and adhere to business rules. Model classes represent domain entities and their relationships, providing an object-oriented abstraction over the underlying relational database.
+
+The data tier utilizes MySQL as the relational database management system, providing robust, ACID-compliant data persistence. The Java Persistence API (JPA) with Hibernate as the implementation provider serves as the object-relational mapping (ORM) framework, abstracting database interactions through entity classes and repository interfaces. This approach eliminates the need for manual SQL query construction for standard CRUD operations while still allowing custom queries when needed through the Spring Data JPA query derivation mechanism and JPQL.
+
+\subsection{Component Interaction Flow}
+
+A typical request flow through the system begins when a user interacts with the presentation tier, such as submitting a booking form. The HTTP request is routed to the appropriate controller based on URL mapping defined through Spring's request mapping annotations. The controller performs initial request validation and delegates business logic execution to the service layer. The service layer applies business rules, such as checking field availability and calculating pricing, and interacts with repository interfaces to retrieve or persist data. Repositories, in turn, leverage JPA to translate method calls into database operations. Once processing completes, the service layer returns results to the controller, which selects an appropriate view template and populates it with data. Thymeleaf renders the final HTML page, which is returned to the user's browser.
+
+This request-response cycle maintains loose coupling between components. Controllers depend on service interfaces rather than concrete implementations, facilitating testing through mock objects and allowing service implementations to evolve without requiring controller modifications. Similarly, services depend on repository interfaces, abstracting the specifics of data access and allowing potential database changes with minimal impact on business logic.
+
+\subsection{Key Architectural Components}
+
+Several specialized components extend the core MVC architecture to address specific functional requirements. The authentication system utilizes Spring's session management capabilities to maintain user login states across requests, with password hashing implemented using BCrypt to ensure secure credential storage. Role-based access control is enforced through custom middleware that verifies user permissions before allowing access to protected resources, with distinct permission sets for customers, staff members, and managers.
+
+The email notification system, implemented through Spring Mail with SMTP protocol integration, operates asynchronously to avoid blocking the main request-response flow. When events such as booking confirmations or password resets occur, email tasks are queued and processed by background threads, ensuring that email delivery latency does not impact user-perceived response times.
+
+The PDF generation component leverages the OpenPDF library to create professionally formatted receipts and invoices. This component receives booking data from the service layer, applies a predefined template layout, and generates binary PDF content that can be downloaded by users or attached to email notifications.
+
+The AI chatbot integration represents a sophisticated component that interfaces with Google's Generative AI SDK. This component processes natural language queries from users, analyzes system data to extract relevant information such as booking statistics or field availability, and formulates contextually appropriate responses. The chatbot operates through RESTful API endpoints, allowing both embedded webpage integration and potential future mobile application support.
+
+\subsection{Scalability Considerations}
+
+The architectural design incorporates several features that facilitate horizontal and vertical scaling as system usage grows. The stateless nature of the business tier, where each request contains all information necessary for processing, allows deployment of multiple application instances behind a load balancer without requiring session affinity configurations. Database connection pooling, managed by HikariCP (the default in Spring Boot), reuses database connections efficiently and can scale to hundreds of concurrent connections with minimal overhead.
+
+For future expansion, the architecture is compatible with caching strategies using Redis or similar in-memory data stores. Frequently accessed data such as branch lists or pricing matrices could be cached to reduce database load and improve response times. Additionally, the service layer abstraction allows introduction of message queue systems like RabbitMQ or Apache Kafka for handling long-running or batch operations asynchronously.
+
+\section{Package Diagram}
+
+The FootballHub application is organized into a package structure that reflects its layered architecture and promotes code organization by functional responsibility. This section describes the purpose and contents of each package and their interdependencies.
+
+\subsection{Package Structure}
+
+The root package \texttt{com.footballsystem} serves as the namespace for all application code. Within this root, several specialized packages organize functionality:
+
+The \texttt{model} package contains entity classes that represent core business domain objects. These classes are annotated with JPA annotations to define their mapping to database tables and relationships to other entities. The primary model classes include:
+\begin{itemize}
+    \item \texttt{User}: Represents system users including customers, staff, and managers with attributes such as username, email, role, and various profile information
+    \item \texttt{Branch}: Represents physical branch locations with attributes including name, location, contact information, and geographic coordinates
+    \item \texttt{Field}: Represents individual football fields within branches with attributes such as field name, type, size, status, pricing information, and discount settings
+    \item \texttt{Booking}: Represents customer reservations with comprehensive booking details including date, time, field assignment, payment status, and optional services
+    \item \texttt{Task}: Represents work assignments for staff members with description, status, due date, and completion tracking
+    \item \texttt{ProblemReport}: Represents maintenance issues or facility problems reported by staff with supporting images and resolution notes
+    \item \texttt{PriceMatrix}: Represents dynamic pricing configurations that vary by day of week and time slot
+\end{itemize}
+
+The \texttt{repository} package contains interfaces that extend Spring Data JPA's repository interfaces to provide data access capabilities. Each repository interface corresponds to a model entity and inherits standard CRUD operations automatically. Custom query methods are defined through method naming conventions or JPQL annotations. The repository interfaces include \texttt{UserRepository}, \texttt{BranchRepository}, \texttt{FieldRepository}, \texttt{BookingRepository}, \texttt{TaskRepository}, \texttt{ProblemReportRepository}, and \texttt{PriceMatrixRepository}.
+
+The \texttt{controller} package contains Spring MVC controller classes that handle HTTP requests and orchestrate application workflows. Controllers are organized by primary user role or functional area:
+\begin{itemize}
+    \item \texttt{AuthController}: Manages authentication operations including login, registration, password reset, and logout
+    \item \texttt{CustomerController}: Handles customer-facing operations such as booking creation, profile management, and booking history
+    \item \texttt{ManagerController}: Provides comprehensive administration capabilities including branch management, field management, staff management, task assignment, booking oversight, payment tracking, and analytics
+    \item \texttt{StaffController}: Supports staff operations including task viewing, task completion, maintenance reporting, and assigned field oversight
+    \item \texttt{PaymentController}: Processes payment-related operations and receipt generation
+    \item \texttt{PricingController}: Manages dynamic pricing matrix configuration
+    \item \texttt{ChatController}: Interfaces with the AI chatbot system to process user queries
+\end{itemize}
+
+The \texttt{service} package contains business logic components that operate between controllers and repositories. Service classes encapsulate complex operations, transaction management, and cross-cutting concerns:
+\begin{itemize}
+    \item \texttt{EmailService}: Handles email composition and delivery for notifications, confirmations, and password resets
+    \item \texttt{PdfService}: Generates PDF receipts and invoices with proper formatting and branding
+    \item \texttt{BookingCleanupService}: Performs scheduled background tasks such as removing expired pending bookings and updating booking statuses
+\end{itemize}
+
+The \texttt{config} package contains Spring configuration classes that define application-wide settings, bean definitions, and framework configurations. This package ensures proper initialization of framework components and third-party integrations.
+
+The \texttt{dto} package contains Data Transfer Objects used for transferring data between layers, particularly for complex operations that don't map directly to single entity structures.
+
+\subsection{Package Dependencies}
+
+The package structure enforces a clear dependency hierarchy that prevents circular dependencies and promotes maintainability. Controllers depend on both service interfaces and model classes but never directly interact with repositories. Services depend on repositories and model classes, encapsulating all data access logic. Repositories depend only on model classes. Model classes have minimal dependencies, primarily JPA annotations and occasionally other model classes through associations. This unidirectional dependency flow ensures changes propagate predictably through the system and facilitates unit testing through dependency injection and mocking.
+
+\section{Database Design}
+
+The database schema for FootballHub consists of seven core tables: users, branches, fields, bookings, tasks, problem reports, and price matrices. Each table uses auto-incrementing integer primary keys for simplicity and performance, with foreign keys establishing relationships between tables to maintain data integrity and prevent orphaned records. The design follows Third Normal Form (3NF) normalization principles to minimize data redundancy - for instance, user information is stored once in the users table and referenced by bookings rather than being duplicated in each booking record.
+
+To ensure optimal query performance, strategic indexes were placed on frequently queried columns. The email field in the users table has a unique index to accelerate login queries and prevent duplicate accounts. The date and field\_id columns in bookings are indexed for fast availability checks, while user\_id and status in tasks enable quick retrieval of staff assignments. A single users table with a role column handles all user types (customers, staff, managers) instead of separate tables, simplifying queries and avoiding complex UNION operations despite introducing some nullable columns for role-specific attributes.
+
+Key design decisions prioritized both performance and business requirements. Foreign key cascade behaviors were configured to delete branch-related records when branches are removed, but preserve booking history by setting user\_id to NULL when user accounts are deleted. Fields store simple pricing (hourly and weekend rates) directly for quick access, while a separate price matrix table handles complex time-based pricing variations. Status fields use string enumerations rather than lookup tables to reduce join complexity while maintaining data consistency through application-level validation.
+
+\subsection{Entity-Relationship Model}
+
+The database comprises seven primary tables representing core business entities, interconnected through carefully defined foreign key relationships.
+
+The \texttt{users} table serves as the central repository for all system users regardless of role. It contains fields including \texttt{user\_id} (primary key), \texttt{username}, \texttt{email} (with unique constraint), \texttt{password} (storing BCrypt hashed values), \texttt{role} (distinguishing between CUSTOMER, STAFF, and MANAGER), and various profile attributes such as \texttt{phone\_number}, \texttt{age}, and \texttt{image\_url}. Staff-specific fields include \texttt{staff\_id}, \texttt{position}, and \texttt{branch\_id} (foreign key to branches). Additional fields support advanced features including \texttt{visit\_count} for tracking customer engagement, \texttt{is\_vip} and associated VIP membership dates, \texttt{is\_blocked} for access control, and \texttt{reset\_token} with expiry for password recovery.
+
+The \texttt{branches} table represents physical branch locations with fields including \texttt{branch\_id} (primary key), \texttt{name}, \texttt{location}, \texttt{contact\_number}, \texttt{image\_url}, geographic coordinates (\texttt{latitude} and \texttt{longitude}), and \texttt{manager\_id} (foreign key to users). This structure supports the multi-branch operational model central to FootballHub's design.
+
+The \texttt{fields} table represents individual football fields with fields including \texttt{field\_id} (primary key), \texttt{name}, \texttt{type}, \texttt{size}, \texttt{status} (available, maintenance, or closed), \texttt{image\_url}, pricing information (\texttt{price\_per\_hour} and \texttt{weekend\_price}), discount configuration (\texttt{discount\_percentage} and \texttt{discount\_active}), \texttt{branch\_id} (foreign key to branches), and \texttt{supervisor\_id} (foreign key to users) for assigning staff oversight.
+
+The \texttt{bookings} table captures customer reservations with comprehensive details including \texttt{booking\_id} (primary key), \texttt{user\_id} (foreign key to users), \texttt{field\_id} (foreign key to fields), temporal information (\texttt{date}, \texttt{start\_time}, \texttt{end\_time}), \texttt{status} (confirmed, pending, or cancelled), \texttt{payment\_status} (distinguishing between deposit-only and full payment), \texttt{price}, \texttt{created\_at} timestamp, optional services (\texttt{hire\_photographer} and \texttt{rent\_jersey}), and \texttt{result} for storing match outcomes.
+
+The \texttt{tasks} table manages staff work assignments with fields including \texttt{task\_id} (primary key), \texttt{description}, \texttt{status} (PENDING or COMPLETED), temporal tracking (\texttt{due\_date}, \texttt{creation\_date}, \texttt{completed\_at}), \texttt{user\_id} (foreign key to users) identifying the assigned staff member, reference materials (\texttt{task\_image\_url}), completion evidence (\texttt{proof\_image\_url} and \texttt{completion\_note}), and \texttt{report\_id} (foreign key to problem\_reports) for linking tasks to maintenance issues.
+
+The \texttt{problem\_reports} table records facility maintenance issues with fields including \texttt{report\_id} (primary key), \texttt{description}, \texttt{image\_url}, \texttt{status}, \texttt{timestamp}, \texttt{notes}, \texttt{user\_id} (foreign key to users) identifying the reporting staff member, \texttt{branch\_id} (foreign key to branches), and \texttt{field\_id} (foreign key to fields) for precise issue location.
+
+The \texttt{price\_matrix} table enables dynamic pricing based on temporal factors with fields including \texttt{id} (primary key), \texttt{field\_id} (foreign key to fields), \texttt{day\_of\_week}, \texttt{start\_time}, and \texttt{price}. This design allows different pricing for peak and off-peak periods.
+
+\subsection{Relationship Types and Constraints}
+
+The database schema implements several relationship patterns to accurately model business logic. One-to-many relationships exist between branches and fields (one branch contains many fields), users and tasks (one staff member is assigned many tasks), users and bookings (one customer creates many bookings), and fields and bookings (one field hosts many bookings). One-to-one relationships exist between branches and managers (one branch has one designated manager) and between tasks and problem reports (one task may address one specific report). Many-to-one relationships are the inverse perspectives of the one-to-many relationships.
+
+Foreign key constraints enforce referential integrity with carefully chosen cascade behaviors. For example, deleting a branch cascades to delete all associated fields, which in turn cascades to delete associated bookings, ensuring no orphaned records. However, deleting a user does not cascade to delete bookings; instead, user deletion sets the user\_id in bookings to NULL, preserving historical records while acknowledging user removal. These design choices balance data integrity with business requirements for audit trails.
+
+Indexing strategies optimize query performance for common access patterns. Primary keys are automatically indexed. Additional indexes are applied to frequently queried fields such as email in the users table (supporting login operations), branch\_id and status in fields (supporting branch-specific field listings), date and field\_id in bookings (supporting availability checks), and user\_id and status in tasks (supporting staff task lists).
+
+\subsection{Data Integrity and Validation}
+
+Beyond foreign key constraints, the database schema employs additional integrity mechanisms. Unique constraints on the email field in the users table prevent duplicate accounts. Check constraints or application-level validation ensure that enumerated fields such as role, status, and payment\_status contain only valid values. Temporal constraints validated at the application level ensure that booking end times occur after start times and that past dates cannot be selected for new bookings.
+
+The schema supports soft deletion patterns where appropriate. Rather than physically removing records, the \texttt{is\_blocked} flag in users allows account deactivation without data loss. Similarly, booking and task status fields allow marking records as cancelled or inactive while preserving historical information for reporting and auditing purposes.
+
+\section{Interface Design}
+
+The interface design of FootballHub emphasizes usability, accessibility, and role-appropriate functionality. The system provides distinct interface experiences tailored to the needs and responsibilities of customers, staff members, and managers while maintaining visual consistency and intuitive navigation patterns throughout.
+
+\subsection{Design Principles and Visual Language}
+
+The interface adopts a modern, clean aesthetic leveraging the SB Admin 2 Bootstrap-based administrative template as its foundation. This choice provides a professional appearance, responsive grid layout that adapts to various screen sizes, and a comprehensive library of pre-styled components including cards, tables, forms, buttons, and modals. Custom CSS enhancements extend the base template to incorporate brand-specific colors, typography, and visual elements that distinguish FootballHub's identity.
+
+The color palette employs green as the primary accent color, reflecting the association with football fields and outdoor sports, with complementary shades for hover states, success messages, and call-to-action elements. Secondary colors including blue for informational elements, red for warnings and destructive actions, and gray for neutral content ensure clear visual communication of element purpose and state.
+
+Typography follows a hierarchical scale with clear distinction between headings, subheadings, body text, and labels. The Nunito Sans font family, loaded from Google Fonts, provides excellent readability in both large heading sizes and small body text while conveying a friendly, approachable character appropriate for a service-oriented application.
+
+Consistent layout patterns establish user expectations and reduce cognitive load. Page headers clearly identify the current section with large, bold typography. Breadcrumb navigation provides context within the site hierarchy. Primary actions are prominently displayed through colored buttons, while secondary and tertiary actions use ghost buttons or text links to maintain visual hierarchy without clutter.
+
+\subsection{Customer-Facing Interfaces}
+
+The customer journey begins with the landing page, which introduces FootballHub's value proposition through hero imagery of football fields, concise benefit statements, and prominent call-to-action buttons for registration and browsing branches. The navigation menu provides clear access to key sections including branches, booking, membership information, and contact support.
+
+The branch browsing interface presents available locations through a card-based grid layout. Each branch card displays an attractive image, branch name, location, contact information, and a prominent "View Fields" button. Clicking this button navigates to a branch-specific page listing all associated fields with their attributes, availability indicators, and current pricing. Geographic coordinates enable potential future integration with mapping services to help customers locate branches.
+
+The booking interface represents a critical customer touchpoint and receives particular attention in its design. The interface guides users through a multi-step process: selecting a branch and field, choosing a date and time slot, adding optional services (photographer hire and jersey rental), reviewing the booking summary including calculated pricing, and confirming the reservation. Visual feedback clearly indicates which time slots are available (green), booked (gray), or in the past (disabled). Real-time price calculation updates as users select options, ensuring transparency before confirmation.
+
+Upon successful booking creation, customers receive an immediate confirmation page summarizing their reservation details and payment requirements. The system sends a confirmation email containing the same information and a downloadable PDF receipt for record-keeping. This multi-channel confirmation approach reduces anxiety and provides customers with accessible references to their bookings.
+
+The "My Bookings" interface allows customers to view their booking history with filtering options for upcoming, in-progress, and completed matches. Each booking displays comprehensive details including date, time, field, branch, payment status, and match result if applicable. Color-coded status indicators provide at-a-glance understanding of booking states. Customers can update payment status for bookings requiring full payment and download receipts for completed transactions.
+
+The profile management interface allows customers to update personal information including username, phone number, age, and profile picture. VIP membership status is clearly displayed for members with active subscriptions, showing membership expiration dates and associated benefits such as booking discounts.
+
+\subsection{Staff Interfaces}
+
+Staff members access a dedicated portal optimized for operational efficiency. The staff dashboard provides an overview of assigned tasks with clear categorization by status (pending, in-progress, completed) and visual indicators using colored badges. Each task card displays the task description, due date, and reference image if provided by the manager. Staff can update task status, upload proof of completion images, and add completion notes documenting work performed and any relevant observations.
+
+The staff booking interface mirrors much of the manager's booking oversight capabilities but filtered to show only bookings relevant to the staff member's assigned branch. This allows staff to review upcoming field usage, identify scheduling conflicts, and prepare facilities accordingly. Similarly, the payment interface for staff allows viewing payment statuses to coordinate with customers regarding outstanding balances.
+
+The maintenance reporting interface enables staff to document facility issues directly through the system rather than relying on informal communication channels. The form captures the affected branch and field, a detailed problem description, and optional supporting photographs. Submitted reports become visible to managers who can create associated tasks for resolution, completing the maintenance workflow loop.
+
+\subsection{Manager Interfaces}
+
+The manager dashboard serves as a comprehensive command center providing high-level metrics and actionable insights. Key performance indicators displayed prominently include total revenue across all branches, number of active bookings, customer count, and staff count. Data visualizations using Chart.js library present revenue trends over time through line graphs, booking distribution across branches through bar charts, and payment status breakdown through pie charts. These visual analytics support informed decision-making and identify trends requiring management attention.
+
+The branch management interface provides CRUD operations for branch entities. Managers can create new branches by specifying name, location, contact information, and uploading representative images. Existing branches can be edited to update details or assigned managers. Branch deletion is supported with appropriate safeguards given the cascading impact on fields and bookings. The interface displays branches in a tabular format with sorting and searching capabilities for easy access in datasets containing many locations.
+
+Field management follows similar patterns with creation, editing, and deletion capabilities. The interface additionally supports configuring field-specific pricing including base price per hour, weekend pricing, and discount settings. The ability to activate or deactivate discounts on a per-field basis provides flexible promotional capabilities. Field status management (available, maintenance, closed) allows managers to temporarily remove fields from booking availability.
+
+Staff management provides comprehensive employee oversight including staff account creation with initial credentials delivered via email, staff profile editing, branch assignment to ensure staff work at designated locations, task assignment with detailed descriptions and optional reference images, and performance tracking through task completion metrics. The interface displays staff members in cards showing profile pictures, names, positions, assigned branches, and current task counts with color-coded status indicators.
+
+The booking oversight interface provides managers with system-wide visibility into all customer bookings across branches. Advanced filtering allows narrowing results by branch, field, date range, payment status, and booking status. Managers can modify booking details, update payment statuses to reflect offline payments, and delete erroneous bookings if necessary. Bulk operations such as exporting booking data to CSV format support external reporting and analysis.
+
+The payment tracking interface consolidates all financial transactions with clear indication of payment stages (deposit only, full payment, overdue). Search and filter capabilities help managers identify customers with outstanding balances requiring follow-up. The interface integrates with the PDF generation service to produce formal receipts and invoices for accounting purposes.
+
+The user management interface provides oversight of all customer accounts including blocking/unblocking accounts for users who violate terms of service or have persistent payment issues, viewing customer booking history and visit counts, and managing VIP membership status including activation dates and expiration dates.
+
+Analytics and reporting interfaces provide detailed insights beyond the dashboard summary. Revenue analysis breaks down earnings by branch, field, time period, and payment method. Booking pattern analysis identifies peak usage times, popular fields, and seasonal trends. Staff performance reports show task completion rates and average completion times. These analytical tools transform operational data into strategic intelligence.
+
+\subsection{Responsive Design and Accessibility}
+
+All interfaces are designed with responsive web design principles to ensure usability across device categories. The Bootstrap grid system adapts layouts from multi-column desktop presentations to single-column mobile views without loss of functionality. Touch-friendly button sizes and spacing accommodate mobile users, while hover states and tooltips enhance desktop experiences.
+
+Accessibility considerations include semantic HTML elements that provide meaningful structure for screen readers, sufficient color contrast ratios meeting WCAG guidelines for text readability, keyboard navigation support allowing operation without a mouse, and descriptive alt text for images to convey information to visually impaired users. While not claiming full accessibility compliance, these measures improve usability for users with diverse abilities and assistive technology users.
+
+\subsection{AI Chatbot Interface}
+
+The AI-powered chatbot interface is accessible through a floating icon positioned in the bottom-right corner of customer-facing pages. Clicking the icon expands a chat window where users can type natural language queries. The chatbot can answer questions about system features, field availability, pricing, booking procedures, and general football-related topics. Responses are generated in real-time by processing user input through Google's Generative AI API and querying system data when appropriate. The conversational interface reduces support burden on human staff while providing instant assistance to customers outside business hours.
+
+\section{Discussion}
+
+The system architecture adopting the MVC pattern with layered architecture provides clear separation of concerns between presentation, business logic, and data access layers. This architectural choice facilitates independent development and testing of components while maintaining loose coupling between system modules. The use of Spring Boot framework leverages proven enterprise patterns and reduces development complexity through convention-over-configuration principles.
+
+The package organization reflects the architectural layers with distinct packages for models, repositories, controllers, and services. This structure enforces proper dependency flow where controllers depend on services, services depend on repositories, and all components interact with model entities. The clear separation promotes code maintainability and enables collaborative development with minimal conflicts. The database design balances normalization with performance through strategic indexing and relationship configurations. The single users table with role differentiation simplifies queries while the hybrid pricing model accommodates both simple and complex pricing scenarios. Foreign key cascade behaviors ensure referential integrity while preserving important historical data.
+
+The interface design delivers role-specific experiences optimized for each user type's workflow. The Customer Portal emphasizes ease of booking with visual calendars and real-time price updates. The Staff Portal focuses on task management and problem reporting for operational efficiency. The Manager Dashboard provides comprehensive oversight with analytics, bulk operations, and configuration capabilities. Consistent feedback mechanisms across all interfaces ensure users understand system responses and maintain confidence in their actions.
+
+\section{Summary}
+
+This chapter presented the comprehensive system design for FFMS spanning four key areas: system architecture, package organization, database design, and interface design. The MVC architectural pattern with layered separation establishes a maintainable foundation where presentation, business logic, and data access remain distinct. The package structure organizes the codebase into model, repository, controller, and service packages that enforce clear dependency hierarchies and promote collaborative development.
+
+The database schema for seven core tables (users, branches, fields, bookings, tasks, problem reports, price matrices) follows normalization principles while incorporating strategic performance optimizations through indexing and relationship configurations. The ERD illustrates how foreign key relationships maintain data integrity across entities. The interface design provides three tailored user experiences: the Customer Portal for browsing and booking fields with visual calendars, the Staff Portal for task management and maintenance reporting, and the Manager Dashboard for comprehensive system oversight with analytics and configuration tools.
+
+The design decisions throughout this chapter balance functional completeness with practical implementation considerations. The selected technologies (Spring Boot, MySQL, Thymeleaf) provide stability and development efficiency while the modular architecture ensures extensibility for future enhancements. This foundation effectively addresses the identified challenges of manual booking processes, multi-branch management complexity, and inadequate coordination, positioning the system for successful implementation in the following chapter.

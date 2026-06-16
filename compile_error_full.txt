@@ -1,0 +1,56 @@
+﻿mvn : 
+'\\msi\Users\luqma\Saved 
+Games\FYP2'
+At line:1 char:1
++ mvn compile 2>&1 | 
+Out-File -FilePath 
+compile_error_full.txt 
+-Encodin ...
++ ~~~~~~~~~~~~~~~~
+    + CategoryInfo          
+    : NotSpecified: ('\\ms  
+  i\Users\luqma\Saved Gam   
+ es\FYP2':String) [], Re    
+moteException
+    + FullyQualifiedErrorId 
+    : NativeCommandError
+ 
+CMD.EXE was started with 
+the above path as the 
+current directory.
+UNC paths are not 
+supported.  Defaulting to 
+Windows directory.
+WARNING: A terminally 
+deprecated method in 
+sun.misc.Unsafe has been 
+called
+WARNING: sun.misc.Unsafe::st
+aticFieldBase has been 
+called by com.google.inject.
+internal.aop.HiddenClassDefi
+ner (file:/C:/Program%20File
+s/apache-maven-3.9.11/lib/gu
+ice-5.1.0-classes.jar)
+WARNING: Please consider 
+reporting this to the 
+maintainers of class com.goo
+gle.inject.internal.aop.Hidd
+enClassDefiner
+WARNING: sun.misc.Unsafe::st
+aticFieldBase will be 
+removed in a future release
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  0.050 s
+[INFO] Finished at: 2025-12-31T16:44:14+08:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] The goal you specified requires a project to execute but there is no POM in this directory (C:\Windows). Please verify you invoked Maven from the correct directory. -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MissingProjectException

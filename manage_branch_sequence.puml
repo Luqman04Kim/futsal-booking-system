@@ -1,0 +1,110 @@
+@startuml Manage Branch Sequence Diagram
+
+!theme plain
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+skinparam backgroundColor #FFFFFF
+skinparam maxMessageSize 200
+skinparam ParticipantPadding 80
+skinparam BoxPadding 30
+skinparam SequenceBoxBorderColor transparent
+hide footbox
+
+title Manage Branch Sequence Diagram
+
+actor Manager
+participant "Branch" as Branch <<Model>>
+participant "User" as User <<Model>>
+participant "Field" as Field <<Model>>
+
+== Create Branch ==
+Manager -> Branch: create Branch
+activate Branch
+Branch --> Manager: Branch created
+deactivate Branch
+
+alt Assign Manager to Branch
+    Manager -> User: get User
+    activate User
+    User --> Manager: User
+    deactivate User
+    Manager -> Branch: setManager(user)
+end
+
+Manager -> Branch: save Branch
+activate Branch
+Branch --> Manager: saved successfully
+deactivate Branch
+
+== View Branch Information ==
+Manager -> Branch: get branch details
+activate Branch
+Branch --> Manager: details
+deactivate Branch
+
+Manager -> Branch: getManager()
+activate Branch
+Branch -> User: get Manager
+activate User
+User --> Branch: User
+deactivate User
+Branch --> Manager: Manager details
+deactivate Branch
+
+Manager -> Branch: getFields()
+activate Branch
+Branch -> Field: get Fields
+activate Field
+Field --> Branch: Fields
+deactivate Field
+Branch --> Manager: Field list
+deactivate Branch
+
+== Update Branch Info ==
+Manager -> Branch: get Branch
+activate Branch
+Branch --> Manager: Branch found
+deactivate Branch
+
+Manager -> Branch: update details
+activate Branch
+Branch --> Manager: updated
+deactivate Branch
+
+alt Update Branch Manager
+    Manager -> User: get User
+    activate User
+    User --> Manager: User
+    deactivate User
+    Manager -> Branch: setManager(newManager)
+end
+
+Manager -> Branch: save Branch
+activate Branch
+Branch --> Manager: updated successfully
+deactivate Branch
+
+== Delete Branch ==
+alt Branch has Fields
+    Manager -> Branch: getFields()
+    activate Branch
+    Branch -> Field: get Fields
+    activate Field
+    Field --> Branch: Fields
+    deactivate Field
+    Branch --> Manager: Fields exist
+    deactivate Branch
+    
+    note right: CASCADE will delete Fields
+end
+
+Manager -> Branch: delete Branch
+activate Branch
+Branch -> Field: delete fields
+activate Field
+Field --> Branch: deleted
+deactivate Field
+Branch --> Manager: deleted
+deactivate Branch
+
+@enduml

@@ -1,0 +1,47 @@
+@startuml Manage Task Activity Diagram
+
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam ActivityFontSize 14
+skinparam PartitionBorderColor #333333
+skinparam PartitionBackgroundColor #F5F5F5
+
+title Manage Task Activity Diagram
+
+|Manager|
+start
+:Login to System;
+:Access Task Management;
+
+if (Action?) then (Assign Task)
+  :Create Task;
+  :Enter Description;
+  :Select Staff;
+  :Set Due Date;
+  :Save Task;
+  :Task Assigned;
+elseif (View Tasks) then
+  :View All Tasks;
+  :Monitor Progress;
+elseif (Delete Task) then
+  :Select Task;
+  :Confirm Deletion;
+  :Task Deleted;
+endif
+
+|Staff|
+:Login to System;
+:View Assigned Tasks;
+
+if (Action?) then (Complete Task)
+  :Select Task;
+  :Upload Proof;
+  :Add Notes;
+  :Mark as Completed;
+elseif (View Details) then
+  :View Task Details;
+endif
+
+stop
+
+@enduml

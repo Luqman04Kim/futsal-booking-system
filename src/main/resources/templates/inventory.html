@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Management - FOOTBALLHUB</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="/css/mobile-responsive.css">
+    <style>
+        :root {
+            --primary-color: #0f172a;
+            --secondary-color: #334155;
+            --accent-color: #3b82f6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+        }
+        body { background-color: var(--bg-color); font-family: 'Inter', sans-serif; color: var(--text-primary); overflow-x: hidden; }
+
+        /* Sidebar */
+        .sidebar { height: 100vh; background-color: var(--primary-color); color: white; position: fixed; width: 240px; z-index: 1000; transition: all 0.3s ease; box-shadow: 4px 0 10px rgba(0,0,0,0.1); overflow-y: scroll; }
+        .sidebar-header { padding: 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-header h3 { font-weight: 700; font-size: 1.5rem; margin: 0; letter-spacing: -0.5px; }
+        .sidebar-submenu a { padding-left: 45px; font-size: 0.88rem; }
+        .sidebar-parent { cursor: pointer; text-decoration: none; display: flex; justify-content: space-between; align-items: center; }
+        .sidebar-parent.active { color: #0d6efd; background: rgba(13,110,253,0.1); }
+        .sidebar-chevron { transition: transform 0.3s; font-size: 0.75rem; opacity: 0.6; }
+        .sidebar-parent[aria-expanded="false"] .sidebar-chevron { transform: rotate(-90deg); }
+        .sidebar a { color: #cbd5e1; text-decoration: none; display: flex; align-items: center; padding: 12px 25px; font-size: 0.9rem; font-weight: 500; transition: all 0.2s; border-left: 3px solid transparent; }
+        .sidebar a:hover, .sidebar a.active { background-color: rgba(255,255,255,0.05); color: white; }
+        .sidebar a.active { border-left-color: var(--accent-color); background: linear-gradient(90deg, rgba(59,130,246,0.1) 0%, transparent 100%); }
+        .sidebar a i { width: 20px; margin-right: 10px; text-align: center; }
+
+        /* Content */
+        .content { margin-left: 240px; padding: 25px; }
+
+        /* KPI Cards */
+        .kpi-card { background: var(--card-bg); border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border-left: 5px solid var(--accent-color); transition: transform 0.2s; }
+        .kpi-card:hover { transform: translateY(-2px); }
+        .kpi-title { color: var(--text-secondary); font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+        .kpi-value { font-size: 1.875rem; font-weight: 700; color: var(--text-primary); }
+
+        /* Main card */
+        .main-card { background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); overflow: hidden; border: none; }
+
+        /* Table */
+        .inv-table th { background-color: #f8fafc; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; font-size: 0.72rem; letter-spacing: 0.05em; padding: 12px 16px; border: none; }
+        .inv-table td { padding: 14px 16px; vertical-align: middle; font-size: 0.9rem; }
+        .inv-table tbody tr:hover { background: #fafbff; }
+
+        /* Price display */
+        .price-free { color: #10b981; font-weight: 700; }
+        .price-original { text-decoration: line-through; color: #94a3b8; font-size: .85rem; }
+        .price-discounted { color: #10b981; font-weight: 700; }
+        .discount-badge { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; font-size: 0.68rem; font-weight: 700; padding: 2px 7px; border-radius: 20px; margin-left: 5px; }
+
+        /* Status badges */
+        .badge-active   { background: #d1fae5; color: #065f46; font-weight: 700; padding: 4px 12px; border-radius: 20px; font-size: .78rem; }
+        .badge-inactive { background: #f1f5f9; color: #64748b; font-weight: 700; padding: 4px 12px; border-radius: 20px; font-size: .78rem; }
+
+        /* Icon preview */
+        .icon-preview { width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, #3b82f6, #1d4ed8); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.1rem; flex-shrink: 0; }
+
+        /* Add button */
+        .btn-add { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; border: none; border-radius: 10px; padding: 10px 22px; font-weight: 600; transition: all 0.2s; }
+        .btn-add:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(59,130,246,.35); color: white; }
+
+        /* Modal */
+        .modal-header-custom { background: linear-gradient(135deg, #0f172a, #1e293b); color: white; }
+        .form-label { font-size: .82rem; font-weight: 700; color: #374151; text-transform: uppercase; letter-spacing: .04em; }
+
+        /* Icon picker grid */
+        .icon-picker { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; max-height: 180px; overflow-y: auto; }
+        .icon-option { width: 40px; height: 40px; border-radius: 8px; border: 2px solid #e2e8f0; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all .15s; font-size: 1rem; color: #64748b; }
+        .icon-option:hover { border-color: #3b82f6; color: #3b82f6; background: #eff6ff; }
+        .icon-option.selected { border-color: #3b82f6; background: #3b82f6; color: white; }
+
+        /* Empty state */
+        .empty-state { text-align: center; padding: 60px 20px; }
+        .empty-icon { width: 80px; height: 80px; border-radius: 50%; background: #f0f4f8; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 2rem; color: #94a3b8; }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3><img src="/favicon.png" style="height:28px;width:28px;object-fit:contain;margin-right:8px;border-radius:4px;">FOOTBALLHUB</h3>
+        </div>
+        <div class="mt-3">
+            <a href="/manager/dashboard"><i class="fas fa-th-large"></i> Dashboard</a>
+            <a href="/manager/bookings"><i class="fas fa-calendar-check"></i> Bookings</a>
+            <a href="/manager/payment-field"><i class="fas fa-credit-card"></i> Payments</a>
+            <a href="/manager/transactions"><i class="fas fa-exchange-alt"></i> Transactions</a>
+            <a href="/manager/performance"><i class="fas fa-chart-line"></i> Performance</a>
+            <a href="#branchMenu" data-bs-toggle="collapse" role="button" aria-expanded="true"
+                class="sidebar-parent d-flex justify-content-between align-items-center active">
+                <span><i class="fas fa-building"></i> Branches</span>
+                <i class="fas fa-chevron-down sidebar-chevron"></i>
+            </a>
+            <div class="collapse show" id="branchMenu">
+                <div class="sidebar-submenu">
+                    <a href="/manager/branches"><i class="fas fa-code-branch"></i> Branch List</a>
+                    <a href="/manager/fields"><i class="fas fa-map-marker-alt"></i> Fields</a>
+                    <a href="/manager/inventory" class="active"><i class="fas fa-boxes"></i> Inventory</a>
+                </div>
+            </div>
+            <a href="#usersMenu" data-bs-toggle="collapse" role="button" aria-expanded="false"
+                class="sidebar-parent d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-users"></i> Users</span>
+                <i class="fas fa-chevron-down sidebar-chevron"></i>
+            </a>
+            <div class="collapse" id="usersMenu">
+                <div class="sidebar-submenu">
+                    <a href="/manager/users"><i class="fas fa-user-circle"></i> User List</a>
+                    <a href="/manager/staff"><i class="fas fa-user-tie"></i> Staff</a>
+                    <a href="/manager/memberships"><i class="fas fa-crown" style="color:#FFD700;"></i> Memberships</a>
+                </div>
+            </div>
+            <a href="#maintMenu" data-bs-toggle="collapse" role="button" aria-expanded="false"
+                class="sidebar-parent d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-tools"></i> Maintenance</span>
+                <i class="fas fa-chevron-down sidebar-chevron"></i>
+            </a>
+            <div class="collapse" id="maintMenu">
+                <div class="sidebar-submenu">
+                    <a href="/manager/maintenance"><i class="fas fa-wrench"></i> Maintenance Log</a>
+                    <a href="/manager/reports"><i class="fas fa-chart-bar"></i> Reports</a>
+                </div>
+            </div>
+        </div>
+        <div style="margin-top:auto;padding-bottom:20px;">
+            <a href="/logout" class="text-danger"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold text-primary mb-1">Inventory &amp; Services</h2>
+                <p class="text-muted mb-0">Manage add-on services shown on the customer booking page.</p>
+            </div>
+            <button class="btn-add" data-bs-toggle="modal" data-bs-target="#addItemModal">
+                <i class="fas fa-plus me-2"></i>Add New Item
+            </button>
+        </div>
+
+        <!-- Flash messages -->
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i><span th:text="${success}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i><span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-3">
+                <div class="kpi-card" style="border-left-color:#3b82f6;">
+                    <div class="kpi-title">Total Items</div>
+                    <div class="kpi-value" th:text="${totalItems}">0</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="kpi-card" style="border-left-color:#10b981;">
+                    <div class="kpi-title">Active</div>
+                    <div class="kpi-value text-success" th:text="${activeItems}">0</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="kpi-card" style="border-left-color:#f59e0b;">
+                    <div class="kpi-title">Discounted</div>
+                    <div class="kpi-value" style="color:#f59e0b;" th:text="${discountedItems}">0</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="kpi-card" style="border-left-color:#06b6d4;">
+                    <div class="kpi-title">Free Items</div>
+                    <div class="kpi-value" style="color:#06b6d4;" th:text="${freeItems}">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Items Table -->
+        <div class="main-card">
+            <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center px-4">
+                <h5 class="mb-0 fw-bold"><i class="fas fa-boxes me-2 text-primary"></i>All Services &amp; Items</h5>
+                <small class="text-muted" th:text="${totalItems} + ' items total'"></small>
+            </div>
+
+            <!-- Empty state -->
+            <div th:if="${#lists.isEmpty(items)}" class="empty-state">
+                <div class="empty-icon"><i class="fas fa-box-open"></i></div>
+                <h6 class="fw-bold">No items yet</h6>
+                <p class="text-muted">Click "Add New Item" to create your first service.</p>
+            </div>
+
+            <!-- Table -->
+            <div class="table-responsive" th:if="${!#lists.isEmpty(items)}">
+                <table class="table inv-table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Service / Item</th>
+                            <th>Description</th>
+                            <th>Base Price</th>
+                            <th>Effective Price</th>
+                            <th>Status</th>
+                            <th>Visibility</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="item : ${items}">
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="icon-preview">
+                                        <i th:class="${item.iconClass}"></i>
+                                    </div>
+                                    <span class="fw-bold" th:text="${item.name}">Item Name</span>
+                                </div>
+                            </td>
+                            <td class="text-muted" style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"
+                                th:text="${item.description != null ? item.description : 'â€”'}">â€”</td>
+                            <td>
+                                <span th:text="'RM ' + ${#numbers.formatDecimal(item.basePrice, 1, 'COMMA', 2, 'POINT')}">RM 0.00</span>
+                            </td>
+                            <td>
+                                <!-- Free -->
+                                <span th:if="${item.free}" class="price-free"><i class="fas fa-gift me-1"></i>FREE</span>
+                                <!-- Discounted -->
+                                <span th:if="${!item.free && item.hasDiscount()}">
+                                    <span class="price-original" th:text="'RM ' + ${#numbers.formatDecimal(item.basePrice, 1, 'COMMA', 2, 'POINT')}">RM 0.00</span>
+                                    <span class="price-discounted ms-1" th:text="'RM ' + ${#numbers.formatDecimal(item.discountedPrice, 1, 'COMMA', 2, 'POINT')}">RM 0.00</span>
+                                    <span class="discount-badge" th:text="${item.discountPercentage} + '% OFF'">0% OFF</span>
+                                </span>
+                                <!-- Normal -->
+                                <span th:if="${!item.free && !item.hasDiscount()}" class="fw-bold"
+                                      th:text="'RM ' + ${#numbers.formatDecimal(item.basePrice, 1, 'COMMA', 2, 'POINT')}">RM 0.00</span>
+                            </td>
+                            <td>
+                                <span th:if="${item.free}" class="badge bg-info text-dark fw-semibold">Free</span>
+                                <span th:if="${!item.free && item.hasDiscount()}" class="badge bg-warning text-dark fw-semibold">Discounted</span>
+                                <span th:if="${!item.free && !item.hasDiscount()}" class="badge bg-light text-dark fw-semibold border">Normal</span>
+                            </td>
+                            <td>
+                                <span th:if="${item.active}" class="badge-active"><i class="fas fa-eye me-1"></i>Visible</span>
+                                <span th:if="${!item.active}" class="badge-inactive"><i class="fas fa-eye-slash me-1"></i>Hidden</span>
+                            </td>
+                            <td class="text-center">
+                                <div class="d-flex gap-2 justify-content-center">
+                                    <!-- Edit -->
+                                    <button class="btn btn-sm btn-outline-primary rounded"
+                                            th:attr="
+                                                data-id=${item.id},
+                                                data-name=${item.name},
+                                                data-description=${item.description},
+                                                data-baseprice=${item.basePrice},
+                                                data-discountedprice=${item.discountedPrice},
+                                                data-free=${item.free},
+                                                data-iconclass=${item.iconClass}"
+                                            onclick="openEditModal(this)"
+                                            title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <!-- Toggle visibility -->
+                                    <form th:action="@{/manager/inventory/toggle/{id}(id=${item.id})}" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-sm rounded"
+                                                th:class="${item.active ? 'btn btn-sm btn-outline-secondary rounded' : 'btn btn-sm btn-outline-success rounded'}"
+                                                th:title="${item.active ? 'Hide from customers' : 'Show to customers'}">
+                                            <i th:class="${item.active ? 'fas fa-eye-slash' : 'fas fa-eye'}"></i>
+                                        </button>
+                                    </form>
+                                    <!-- Delete -->
+                                    <form th:action="@{/manager/inventory/delete/{id}(id=${item.id})}" method="post" class="d-inline">
+                                        <button type="button" class="btn btn-sm btn-outline-danger rounded" title="Delete" onclick="confirmAction(this, 'this inventory item')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• ADD MODAL â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <div class="modal fade" id="addItemModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header modal-header-custom">
+                    <h5 class="modal-title"><i class="fas fa-plus-circle me-2"></i>Add New Service / Item</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form action="/manager/inventory/add" method="post">
+                    <div class="modal-body p-4">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Service Name *</label>
+                                <input type="text" name="name" class="form-control" placeholder="e.g. Hire Photographer" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Base Price (RM) *</label>
+                                <input type="number" name="basePrice" class="form-control" placeholder="0.00" min="0" step="0.01" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Description <span class="text-muted fw-normal">(optional)</span></label>
+                                <input type="text" name="description" class="form-control" placeholder="Brief description shown to customers">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Discounted Price (RM) <span class="text-muted fw-normal">(optional)</span></label>
+                                <input type="number" name="discountedPrice" class="form-control" placeholder="Leave blank for no discount" min="0" step="0.01" id="addDiscountPrice">
+                                <small class="text-muted">Must be less than Base Price to apply.</small>
+                            </div>
+                            <div class="col-md-6 d-flex align-items-center">
+                                <div class="form-check form-switch mt-3">
+                                    <input class="form-check-input" type="checkbox" name="free" id="addFreeCheck" onchange="toggleFreeAdd(this)">
+                                    <label class="form-check-label fw-bold text-success" for="addFreeCheck">Mark as FREE (RM 0.00)</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Icon</label>
+                                <input type="hidden" name="iconClass" id="addIconInput" value="fas fa-box">
+                                <div class="icon-picker" id="addIconPicker">
+                                    <!-- icons injected by JS -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn-add"><i class="fas fa-save me-2"></i>Save Item</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• EDIT MODAL â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <div class="modal fade" id="editItemModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header" style="background:linear-gradient(135deg,#1e40af,#1d4ed8);color:white;">
+                    <h5 class="modal-title"><i class="fas fa-edit me-2"></i>Edit Service / Item</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="editForm" method="post">
+                    <div class="modal-body p-4">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Service Name *</label>
+                                <input type="text" name="name" id="editName" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Base Price (RM) *</label>
+                                <input type="number" name="basePrice" id="editBasePrice" class="form-control" min="0" step="0.01" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Description</label>
+                                <input type="text" name="description" id="editDescription" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Discounted Price (RM)</label>
+                                <input type="number" name="discountedPrice" id="editDiscountPrice" class="form-control" min="0" step="0.01">
+                                <small class="text-muted">Must be less than Base Price. Leave blank to remove discount.</small>
+                            </div>
+                            <div class="col-md-6 d-flex align-items-center">
+                                <div class="form-check form-switch mt-3">
+                                    <input class="form-check-input" type="checkbox" name="free" id="editFreeCheck" onchange="toggleFreeEdit(this)">
+                                    <label class="form-check-label fw-bold text-success" for="editFreeCheck">Mark as FREE</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Icon</label>
+                                <input type="hidden" name="iconClass" id="editIconInput" value="fas fa-box">
+                                <div class="icon-picker" id="editIconPicker">
+                                    <!-- icons injected by JS -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary px-4"><i class="fas fa-save me-2"></i>Update Item</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const ICONS = [
+            { cls: 'fas fa-camera',        label: 'Camera'       },
+            { cls: 'fas fa-tshirt',         label: 'Jersey'       },
+            { cls: 'fas fa-user-shield',    label: 'Referee'      },
+            { cls: 'fas fa-futbol',         label: 'Ball'         },
+            { cls: 'fas fa-first-aid',      label: 'First Aid'    },
+            { cls: 'fas fa-lightbulb',      label: 'Lighting'     },
+            { cls: 'fas fa-video',          label: 'Video'        },
+            { cls: 'fas fa-music',          label: 'Music'        },
+            { cls: 'fas fa-utensils',       label: 'Food'         },
+            { cls: 'fas fa-car',            label: 'Parking'      },
+            { cls: 'fas fa-shower',         label: 'Shower'       },
+            { cls: 'fas fa-trophy',         label: 'Trophy'       },
+            { cls: 'fas fa-medal',          label: 'Medal'        },
+            { cls: 'fas fa-flag',           label: 'Flag'         },
+            { cls: 'fas fa-box',            label: 'Box'          },
+            { cls: 'fas fa-star',           label: 'Star'         },
+            { cls: 'fas fa-dumbbell',       label: 'Gym'          },
+            { cls: 'fas fa-headset',        label: 'Support'      },
+        ];
+
+        function buildIconPicker(containerId, inputId, currentIcon) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            ICONS.forEach(icon => {
+                const div = document.createElement('div');
+                div.className = 'icon-option' + (icon.cls === currentIcon ? ' selected' : '');
+                div.title = icon.label;
+                div.innerHTML = `<i class="${icon.cls}"></i>`;
+                div.onclick = () => {
+                    container.querySelectorAll('.icon-option').forEach(el => el.classList.remove('selected'));
+                    div.classList.add('selected');
+                    document.getElementById(inputId).value = icon.cls;
+                };
+                container.appendChild(div);
+            });
+        }
+
+        // Build add modal picker on page load
+        buildIconPicker('addIconPicker', 'addIconInput', 'fas fa-box');
+
+        // Open edit modal and populate fields
+        function openEditModal(btn) {
+            const id    = btn.dataset.id;
+            const name  = btn.dataset.name;
+            const desc  = btn.dataset.description || '';
+            const base  = btn.dataset.baseprice;
+            const disc  = btn.dataset.discountedprice;
+            const free  = btn.dataset.free === 'true';
+            const icon  = btn.dataset.iconclass || 'fas fa-box';
+
+            document.getElementById('editForm').action = `/manager/inventory/edit/${id}`;
+            document.getElementById('editName').value = name;
+            document.getElementById('editDescription').value = desc === 'null' ? '' : desc;
+            document.getElementById('editBasePrice').value = base;
+            document.getElementById('editDiscountPrice').value = (disc && disc !== 'null') ? disc : '';
+            document.getElementById('editFreeCheck').checked = free;
+            document.getElementById('editIconInput').value = icon;
+
+            buildIconPicker('editIconPicker', 'editIconInput', icon);
+
+            if (free) {
+                document.getElementById('editDiscountPrice').disabled = true;
+            } else {
+                document.getElementById('editDiscountPrice').disabled = false;
+            }
+
+            new bootstrap.Modal(document.getElementById('editItemModal')).show();
+        }
+
+        // Disable discount field when "free" is checked
+        function toggleFreeAdd(cb) {
+            document.getElementById('addDiscountPrice').disabled = cb.checked;
+            if (cb.checked) document.getElementById('addDiscountPrice').value = '';
+        }
+        function toggleFreeEdit(cb) {
+            document.getElementById('editDiscountPrice').disabled = cb.checked;
+            if (cb.checked) document.getElementById('editDiscountPrice').value = '';
+        }
+
+        // Custom delete confirmation logic
+        let formToSubmit = null;
+        function confirmAction(element, itemName) {
+            const confirmBtn = document.getElementById('confirmDeleteBtn');
+            const form = element.closest('form');
+            if (form) {
+                formToSubmit = form;
+                confirmBtn.removeAttribute('href');
+                confirmBtn.onclick = function(e) {
+                    e.preventDefault();
+                    if (formToSubmit) formToSubmit.submit();
+                };
+            } else {
+                formToSubmit = null;
+                confirmBtn.href = element.getAttribute('href') || element.getAttribute('data-url');
+                confirmBtn.onclick = null;
+            }
+            document.getElementById('deleteItemName').textContent = itemName || 'this action';
+            var modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+            modal.show();
+        }
+    </script>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title"><i class="fas fa-exclamation-triangle me-2"></i>Confirm Action</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <i class="fas fa-trash-alt fa-3x text-danger mb-3"></i>
+                    <p class="mb-0 fs-5">Are you sure you want to proceed with deleting <span id="deleteItemName">this action</span>?</p>
+                    <p class="text-muted small mt-2">This action cannot be undone.</p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <a href="#" id="confirmDeleteBtn" class="btn btn-danger">Confirm</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

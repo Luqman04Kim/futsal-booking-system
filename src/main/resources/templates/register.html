@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - FOOTBALLHUB Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700;800&family=Inter:wght@400;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/mobile-responsive.css">
+
+
+    <style>
+        :root {
+            --barca-blue: #004d98;
+            --barca-pink: #a50044;
+            /* Garnet/Pink */
+            --barca-gold: #fdc52c;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            /* BOLD GRADIENT: Pink (Garnet) to Blue */
+            background: linear-gradient(135deg, var(--barca-pink) 0%, var(--barca-blue) 100%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            color: white;
+            position: relative;
+        }
+
+        /* Diagonal Stripe Pattern Overlay */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: repeating-linear-gradient(45deg,
+                    rgba(0, 0, 0, 0.05) 0px,
+                    rgba(0, 0, 0, 0.05) 2px,
+                    transparent 2px,
+                    transparent 10px);
+            z-index: -1;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 500px;
+            /* Wider for registration inputs */
+            padding: 40px;
+            text-align: center;
+            /* Dark Semi-Transparent Card */
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 16px;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .brand-header {
+            margin-bottom: 30px;
+        }
+
+        .brand-title {
+            font-family: 'Chakra Petch', sans-serif;
+            font-weight: 800;
+            font-size: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .brand-subtitle {
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.9);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 3px solid var(--barca-gold);
+            display: inline-block;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .login-label {
+            font-family: 'Chakra Petch', sans-serif;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.8);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+
+        .form-control {
+            background-color: #f0f2f5;
+            border: none;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 15px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-control:focus {
+            background-color: #fff;
+            box-shadow: 0 0 0 3px rgba(253, 197, 44, 0.6);
+            /* Gold Glow */
+        }
+
+        /* Password field with eye toggle */
+        .password-group {
+            position: relative;
+            margin-bottom: 0;
+        }
+
+        .password-group .form-control {
+            padding-right: 48px;
+            margin-bottom: 0;
+        }
+
+        .password-group .eye-btn {
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 100%;
+            width: 44px;
+            background: transparent;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s;
+            z-index: 5;
+        }
+
+        .password-group .eye-btn:hover { color: #333; }
+
+        /* Password match indicator */
+        .match-msg {
+            font-size: 0.78rem;
+            margin-top: 4px;
+            margin-bottom: 4px;
+            text-align: left;
+            padding-left: 4px;
+            min-height: 18px;
+        }
+
+        .match-ok   { color: #6ee7b7; }
+        .match-fail { color: #fca5a5; }
+
+        .btn-access {
+            background-color: var(--barca-gold);
+            color: #000;
+            border: none;
+            padding: 15px;
+            font-weight: 800;
+            width: 100%;
+            border-radius: 4px;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: 'Chakra Petch', sans-serif;
+            transition: transform 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-access:hover {
+            background-color: #e0a800;
+            transform: translateY(-2px);
+        }
+
+        .links-area {
+            margin-top: 20px;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .links-area a {
+            color: var(--barca-gold);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .links-area a:hover {
+            text-decoration: underline;
+        }
+
+        .footer-section {
+            margin-top: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            padding-top: 20px;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="login-container">
+
+        <div class="brand-header">
+            <div class="brand-title"><img src="/favicon.png" style="height:32px;width:32px;object-fit:contain;margin-right:8px;border-radius:4px;vertical-align:middle;"> FOOTBALL HUB</div>
+            <div class="brand-subtitle">Registration</div>
+        </div>
+
+        <div th:if="${error}" class="alert alert-danger py-2 small fw-bold text-center shadow-sm"
+            style="border-radius: 4px;">
+            <i class="fas fa-exclamation-circle me-1"></i> <span th:text="${error}"></span>
+        </div>
+
+        <div class="login-label">CREATE ACCOUNT</div>
+
+        <form action="/register" method="POST">
+
+            <div class="input-group mb-3">
+                <span class="input-group-text border-0 rounded-start-1" style="background: #e9ecef;"><i
+                        class="fas fa-id-card text-secondary"></i></span>
+                <input type="text" class="form-control m-0" name="username" placeholder="Team / Organization Name"
+                    required>
+            </div>
+
+            <div class="input-group mb-3">
+                <span class="input-group-text border-0 rounded-start-1" style="background: #e9ecef;"><i
+                        class="fas fa-envelope text-secondary"></i></span>
+                <input type="email" class="form-control m-0" name="email" placeholder="Contact Email" required>
+            </div>
+
+            <div class="input-group mb-3">
+                <span class="input-group-text border-0 rounded-start-1" style="background: #e9ecef;"><i
+                        class="fas fa-phone text-secondary"></i></span>
+                <input type="tel" class="form-control m-0" name="phoneNumber" placeholder="Phone Number"
+                    pattern="[0-9]+" inputmode="numeric" title="Please enter only digits" required>
+            </div>
+
+            <!-- Create Password -->
+            <div class="input-group mb-2">
+                <span class="input-group-text border-0 rounded-start-1" style="background: #e9ecef;"><i
+                        class="fas fa-lock text-secondary"></i></span>
+                <div class="password-group flex-grow-1">
+                    <input type="password" class="form-control m-0" id="passwordInput" name="password"
+                        placeholder="Create Password" required oninput="checkMatch()">
+                    <button type="button" class="eye-btn" onclick="toggleEye('passwordInput', 'eyeIcon1')"
+                        tabindex="-1" aria-label="Toggle password visibility">
+                        <i class="fas fa-eye" id="eyeIcon1"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Confirm Password -->
+            <div class="input-group mb-1">
+                <span class="input-group-text border-0 rounded-start-1" style="background: #e9ecef;"><i
+                        class="fas fa-lock-open text-secondary"></i></span>
+                <div class="password-group flex-grow-1">
+                    <input type="password" class="form-control m-0" id="confirmInput" name="confirmPassword"
+                        placeholder="Confirm Password" required oninput="checkMatch()">
+                    <button type="button" class="eye-btn" onclick="toggleEye('confirmInput', 'eyeIcon2')"
+                        tabindex="-1" aria-label="Toggle confirm password visibility">
+                        <i class="fas fa-eye" id="eyeIcon2"></i>
+                    </button>
+                </div>
+            </div>
+            <!-- Match status message -->
+            <div class="match-msg" id="matchMsg"></div>
+
+            <input type="hidden" name="role" value="CUSTOMER">
+
+            <button type="submit" class="btn btn-access">REGISTER TEAM</button>
+
+            <div class="links-area">
+                Already have an account? <a href="/login">Login here</a>
+            </div>
+        </form>
+
+        <div class="footer-section">
+            &copy; 2025 FOOTBALLHUB Portal. All Rights Reserved.<br>
+            <span class="text-white-50">Official Partner of Football Hub</span>
+        </div>
+
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function toggleEye(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon  = document.getElementById(iconId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
+
+        function checkMatch() {
+            const pw      = document.getElementById('passwordInput').value;
+            const confirm = document.getElementById('confirmInput').value;
+            const msg     = document.getElementById('matchMsg');
+            const btn     = document.querySelector('.btn-access');
+            if (confirm.length === 0) { msg.textContent = ''; btn.disabled = false; return; }
+            if (pw === confirm) {
+                msg.className = 'match-msg match-ok';
+                msg.innerHTML = '<i class="fas fa-check-circle me-1"></i>Passwords match';
+                btn.disabled = false;
+            } else {
+                msg.className = 'match-msg match-fail';
+                msg.innerHTML = '<i class="fas fa-times-circle me-1"></i>Passwords do not match';
+                btn.disabled = true;
+            }
+        }
+
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const pw      = document.getElementById('passwordInput').value;
+            const confirm = document.getElementById('confirmInput').value;
+            if (pw !== confirm) { e.preventDefault(); checkMatch(); document.getElementById('confirmInput').focus(); }
+        });
+    </script>
+</body>
+
+</html>

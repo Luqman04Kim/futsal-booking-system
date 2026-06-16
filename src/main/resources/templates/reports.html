@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <meta charset="UTF-8">
+    <title>Manager Reports - FOOTBALLHUB</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #0f172a;
+            --secondary-color: #334155;
+            --accent-color: #3b82f6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Inter', sans-serif;
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            height: 100vh;
+            background-color: var(--primary-color);
+            color: white;
+            position: fixed;
+            width: 240px;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+            overflow-y: scroll;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-header h3 {
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        .sidebar-submenu a {
+            padding-left: 45px;
+            font-size: 0.88rem;
+        }
+        .sidebar-parent {
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .sidebar-parent.active {
+            color: #0d6efd;
+            background: rgba(13, 110, 253, 0.1);
+        }
+        .sidebar-chevron {
+            transition: transform 0.3s;
+            font-size: 0.75rem;
+            opacity: 0.6;
+        }
+        .sidebar-parent[aria-expanded="false"] .sidebar-chevron {
+            transform: rotate(-90deg);
+        }
+
+        .sidebar a {
+            color: #cbd5e1;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 12px 25px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+
+        .sidebar a.active {
+            border-left-color: var(--accent-color);
+            background: linear-gradient(90deg, rgba(59, 130, 246, 0.1) 0%, transparent 100%);
+        }
+
+        .sidebar a i {
+            width: 20px;
+            margin-right: 10px;
+            text-align: center;
+        }
+
+        /* Content */
+        .content {
+            margin-left: 240px;
+            padding: 25px;
+        }
+
+        /* Search & Filter */
+        .search-filter-container {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .search-box {
+            flex-grow: 1;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 20px 12px 45px;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            border-color: var(--accent-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #aaa;
+        }
+
+        .filter-box select {
+            padding: 12px 20px;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            min-width: 200px;
+        }
+
+        /* Table Styles */
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table thead th {
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #eee;
+            color: var(--secondary-color);
+            font-weight: 600;
+            padding: 15px 20px;
+        }
+
+        .table tbody td {
+            padding: 15px 20px;
+            vertical-align: middle;
+            border-bottom: 1px solid #eee;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .status-reported {
+            background-color: #ffeaa7;
+            color: #d35400;
+        }
+
+        .status-maintenance {
+            background-color: #ffe0e0;
+            color: #c0392b;
+        }
+
+        .status-fixed {
+            background-color: #d5f5e3;
+            color: #27ae60;
+        }
+
+        .status-review {
+            background-color: #dbeafe;
+            color: #2563eb;
+        }
+
+        .report-img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .report-img:hover {
+            transform: scale(1.1);
+        }
+
+        .btn-action {
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-update {
+            background-color: #e8f6f3;
+            color: #1abc9c;
+            border: none;
+        }
+
+        .btn-update:hover {
+            background-color: #d1f2eb;
+            color: #16a085;
+        }
+
+        .btn-delete {
+            background-color: #fadbd8;
+            color: #c0392b;
+            border: none;
+        }
+
+        .btn-delete:hover {
+            background-color: #f5b7b1;
+            color: #a93226;
+        }
+        /* Staff Checkbox List */
+        .staff-checkbox-list {
+            max-height: 180px;
+            overflow-y: auto;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            padding: 8px 12px;
+            background: #fafafa;
+        }
+        .staff-checkbox-list:focus-within {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+        }
+        .staff-checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 7px 6px;
+            border-radius: 7px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .staff-checkbox-item:hover {
+            background: #e8f0fe;
+        }
+        .staff-checkbox-item input[type="checkbox"] {
+            width: 17px;
+            height: 17px;
+            accent-color: var(--accent-color);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .staff-checkbox-item label {
+            margin: 0;
+            cursor: pointer;
+            font-size: 0.93rem;
+            color: var(--text-primary);
+        }
+        .staff-checkbox-empty {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-align: center;
+            padding: 12px 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3><img src="/favicon.png" style="height:28px;width:28px;object-fit:contain;margin-right:8px;border-radius:4px;">FOOTBALLHUB</h3>
+        </div>
+        <div class="mt-3">
+            <a href="/manager/dashboard"><i class="fas fa-th-large"></i> Dashboard</a>
+            <a href="/manager/bookings"><i class="fas fa-calendar-check"></i> Bookings</a>
+            <a href="/manager/payment-field"><i class="fas fa-credit-card"></i> Payments</a>
+            <a href="/manager/transactions"><i class="fas fa-exchange-alt"></i> Transactions</a>
+            <a href="/manager/performance"><i class="fas fa-chart-line"></i> Performance</a>
+            <a href="#branchMenu" data-bs-toggle="collapse" role="button" aria-expanded="false" class="sidebar-parent d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-building"></i> Branches</span>
+                <i class="fas fa-chevron-down sidebar-chevron"></i>
+            </a>
+            <div class="collapse" id="branchMenu">
+                <div class="sidebar-submenu">
+                    <a href="/manager/branches"><i class="fas fa-code-branch"></i> Branch List</a>
+                    <a href="/manager/fields"><i class="fas fa-map-marker-alt"></i> Fields</a>
+                    <a href="/manager/inventory"><i class="fas fa-boxes"></i> Inventory</a>
+                </div>
+            </div>
+            <a href="#usersMenu" data-bs-toggle="collapse" role="button" aria-expanded="false" class="sidebar-parent d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-users"></i> Users</span>
+                <i class="fas fa-chevron-down sidebar-chevron"></i>
+            </a>
+            <div class="collapse" id="usersMenu">
+                <div class="sidebar-submenu">
+                    <a href="/manager/users"><i class="fas fa-user-circle"></i> User List</a>
+                    <a href="/manager/staff"><i class="fas fa-user-tie"></i> Staff</a>
+                    <a href="/manager/memberships"><i class="fas fa-crown" style="color: #FFD700;"></i> Memberships</a>
+                </div>
+            </div>
+            <a href="#maintMenu" data-bs-toggle="collapse" role="button" aria-expanded="true" class="sidebar-parent active d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-tools"></i> Maintenance</span>
+                <i class="fas fa-chevron-down sidebar-chevron"></i>
+            </a>
+            <div class="collapse show" id="maintMenu">
+                <div class="sidebar-submenu">
+                    <a href="/manager/maintenance"><i class="fas fa-wrench"></i> Maintenance Log</a>
+                    <a href="/manager/reports" class="active"><i class="fas fa-chart-bar"></i> Reports</a>
+                </div>
+            </div>
+        </div>
+        <div style="margin-top: auto; padding-bottom: 20px;">
+            <a href="/logout" class="text-danger"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold text-primary">PROBLEM REPORTS</h2>
+        </div>
+
+
+        <!-- SEARCH BAR & FILTER -->
+        <form action="/manager/reports" method="GET" class="search-filter-container">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" name="searchId" placeholder="Search by Report ID..."
+                    th:value="${searchId}">
+            </div>
+            <div class="filter-box">
+                <select name="branchFilter" onchange="this.form.submit()">
+                    <option value="">All Branches</option>
+                    <option th:each="b : ${branches}" th:value="${b.branchId}" th:text="${b.name}"
+                        th:selected="${branchFilter != null and branchFilter == b.branchId}">
+                    </option>
+                </select>
+            </div>
+            <div th:if="${searchId} or ${branchFilter}">
+                <a href="/manager/reports" class="btn btn-outline-secondary"><i class="fas fa-times"></i> Clear</a>
+            </div>
+        </form>
+
+        <!-- Success Messages -->
+        <div th:if="${param.deleted != null}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            Report deleted successfully!
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div th:if="${param.updated != null}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            Report status updated successfully!
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div th:if="${param.added != null}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            New report added successfully!
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Reports Table -->
+        <div class="table-container">
+            <table class="table table-hover" id="reportsTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Date & Time</th>
+                        <th>Location</th>
+                        <th>Reporter</th>
+                        <th>Issue</th>
+                        <th>Photo</th>
+                        <th>Priority</th>
+                        <th>Assigned To</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${reports.isEmpty()}">
+                        <td colspan="10" class="text-center py-5 text-muted">
+                            <i class="fas fa-clipboard-list fa-3x mb-3"></i>
+                            <p>No reports available yet.</p>
+                        </td>
+                    </tr>
+                    <tr th:each="report : ${reports}">
+                        <td th:text="${report.formattedReportId}">R1</td>
+                        <td
+                            th:text="${report.timestamp != null ? #temporals.format(report.timestamp, 'dd MMM yyyy, hh:mm a') : 'N/A'}">
+                            12 Jan 2026, 02:30 PM</td>
+                        <td>
+                            <div th:if="${report.branch != null}">
+                                <strong th:text="${report.branch.name}">Branch A</strong>
+                                <div th:if="${report.field != null}" class="text-muted small">
+                                    <i class="fas fa-map-marker-alt me-1"></i>
+                                    <span th:text="${report.field.name}">Field 1</span>
+                                </div>
+                            </div>
+                            <span th:if="${report.branch == null}" class="text-muted">N/A</span>
+                        </td>
+                        <td>
+                            <span th:if="${report.reporter != null}" th:text="${report.reporter.username}">John
+                                Doe</span>
+                            <span th:if="${report.reporter == null}" class="text-muted">Anonymous</span>
+                        </td>
+                        <td>
+                            <span
+                                th:text="${report.description != null ? report.description : 'No description'}">Equipment
+                                damaged</span>
+                            <div th:if="${report.notes != null && !report.notes.isEmpty()}"
+                                class="text-muted small mt-1">
+                                <i class="fas fa-sticky-note me-1"></i>
+                                <span th:text="${report.notes}">Manager Notes here</span>
+                            </div>
+                        </td>
+                        <td>
+                            <img th:if="${report.imageUrl != null && !report.imageUrl.isEmpty()}"
+                                th:src="${report.imageUrl}" class="report-img" data-bs-toggle="modal"
+                                th:attr="data-bs-target='#imageCarouselModal' + ${report.reportId}" alt="Report Image">
+                            
+                            <!-- Unique Image Carousel Modal per Report -->
+                            <div th:if="${report.imageUrl != null && !report.imageUrl.isEmpty()}" class="modal fade" th:id="'imageCarouselModal' + ${report.reportId}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered modal-lg">
+                                    <div class="modal-content text-bg-dark border-0">
+                                        <div class="modal-header border-0 pb-0">
+                                            <h5 class="modal-title"><i class="fas fa-images me-2"></i>Report Photos (<span th:text="${report.formattedReportId}"></span>)</h5>
+                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body p-0">
+                                            <div th:id="'carouselReport' + ${report.reportId}" class="carousel slide" data-bs-ride="false">
+                                                <div class="carousel-inner">
+                                                    <div class="carousel-item active" th:if="${report.imageUrl != null}">
+                                                        <img th:src="${report.imageUrl}" class="d-block w-100" style="max-height: 80vh; object-fit: contain;" alt="Photo 1">
+                                                    </div>
+                                                    <div class="carousel-item" th:if="${report.imageUrl2 != null && !report.imageUrl2.isEmpty()}">
+                                                        <img th:src="${report.imageUrl2}" class="d-block w-100" style="max-height: 80vh; object-fit: contain;" alt="Photo 2">
+                                                    </div>
+                                                    <div class="carousel-item" th:if="${report.imageUrl3 != null && !report.imageUrl3.isEmpty()}">
+                                                        <img th:src="${report.imageUrl3}" class="d-block w-100" style="max-height: 80vh; object-fit: contain;" alt="Photo 3">
+                                                    </div>
+                                                    <div class="carousel-item" th:if="${report.imageUrl4 != null && !report.imageUrl4.isEmpty()}">
+                                                        <img th:src="${report.imageUrl4}" class="d-block w-100" style="max-height: 80vh; object-fit: contain;" alt="Photo 4">
+                                                    </div>
+                                                    <div class="carousel-item" th:if="${report.imageUrl5 != null && !report.imageUrl5.isEmpty()}">
+                                                        <img th:src="${report.imageUrl5}" class="d-block w-100" style="max-height: 80vh; object-fit: contain;" alt="Photo 5">
+                                                    </div>
+                                                </div>
+                                                <button class="carousel-control-prev" type="button" th:attr="data-bs-target='#carouselReport' + ${report.reportId}" data-bs-slide="prev">
+                                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                                    <span class="visually-hidden">Previous</span>
+                                                </button>
+                                                <button class="carousel-control-next" type="button" th:attr="data-bs-target='#carouselReport' + ${report.reportId}" data-bs-slide="next">
+                                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                                    <span class="visually-hidden">Next</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <span th:if="${report.imageUrl == null || report.imageUrl.isEmpty()}" class="text-muted">No
+                                photo</span>
+                        </td>
+                        <td>
+                            <span th:if="${report.priority != null}"
+                                th:class="'badge ' + (${report.priority == 'CRITICAL'} ? 'bg-danger' : (${report.priority == 'HIGH'} ? 'bg-warning text-dark' : (${report.priority == 'MEDIUM'} ? 'bg-info text-dark' : 'bg-secondary')))"
+                                th:text="${report.priority}">LOW</span>
+                            <span th:if="${report.priority == null}" class="text-muted">-</span>
+                        </td>
+                        <td>
+                            <th:block th:if="${tasksMap != null and tasksMap.containsKey(report.reportId)}">
+                                <span th:each="t, iter : ${tasksMap.get(report.reportId)}">
+                                    <span th:text="${t.assignedStaff != null ? t.assignedStaff.username : ''}"></span><span th:if="${!iter.last}">, </span>
+                                </span>
+                            </th:block>
+                            <span th:if="${tasksMap == null or !tasksMap.containsKey(report.reportId)}">
+                                <span th:if="${report.assignedStaff != null}" th:text="${report.assignedStaff.username}">Staff</span>
+                                <span th:if="${report.assignedStaff == null}" class="text-muted">Unassigned</span>
+                            </span>
+                        </td>
+                        <td>
+                            <span
+                                th:class="'status-badge status-' + ${report.status != null ? report.status.toLowerCase() : 'reported'}"
+                                th:text="${report.status == 'FIXED' ? 'Completed' : (report.status == 'REVIEW' ? 'Review' : (report.status != null ? report.status : 'REPORTED'))}">REPORTED</span>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-action me-1" style="background-color:#e8eaf6;color:#3949ab;border:none;" data-bs-toggle="modal"
+                                th:attr="data-bs-target='#detailsModal' + ${report.reportId}" title="View Details">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-action btn-update me-1" data-bs-toggle="modal"
+                                th:attr="data-bs-target='#updateModal' + ${report.reportId}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <a th:href="@{/manager/report/delete/{id}(id=${report.reportId})}"
+                                class="btn btn-sm btn-action btn-delete"
+                                onclick="confirmAction(this, 'this report'); return false;">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Update Status Modals (one per report) -->
+    <div th:each="report : ${reports}">
+        <div class="modal fade" th:id="'updateModal' + ${report.reportId}" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form th:action="@{/manager/update-report-status}" method="POST">
+                        <div class="modal-header bg-primary text-white">
+                            <h5 class="modal-title">Update Report Status</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <input type="hidden" name="reportId" th:value="${report.reportId}">
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Status</label>
+                                <select name="status" class="form-select" required>
+                                    <option value="REPORTED" th:selected="${report.status == 'REPORTED'}">Reported
+                                    </option>
+                                    <option value="MAINTENANCE" th:selected="${report.status == 'MAINTENANCE'}">Under
+                                        Maintenance</option>
+                                    <option value="REVIEW" th:selected="${report.status == 'REVIEW'}">Review</option>
+                                    <option value="FIXED" th:selected="${report.status == 'FIXED'}">Completed</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                    <label class="form-label fw-bold mb-0">
+                                        <i class="fas fa-hard-hat me-1 text-warning"></i> Assign Maintenance Staff
+                                    </label>
+                                    <!-- View Staff button - opens popup for selection -->
+                                    <button type="button"
+                                            class="btn btn-sm btn-info text-white py-1 px-3"
+                                            th:onclick="'openViewStaff(' + ${report.reportId} + ')'">
+                                        <i class="fas fa-users me-1"></i> View & Select Staff
+                                    </button>
+                                </div>
+
+                                <!-- Hidden checkbox inputs (actual form values, not visible) -->
+                                <div th:id="'hiddenStaffInputs_' + ${report.reportId}" style="display:none;">
+                                    <div th:each="staff : ${maintenanceStaff}">
+                                        <input type="checkbox"
+                                               name="assignedStaffIds"
+                                               th:value="${staff.userId}"
+                                               th:id="'hstaff_' + ${report.reportId} + '_' + ${staff.userId}"
+                                               th:attr="data-name=${staff.username}"
+                                               th:checked="${assignedStaffIdsMap != null
+                                                             and assignedStaffIdsMap.containsKey(report.reportId)
+                                                             and assignedStaffIdsMap.get(report.reportId).contains(staff.userId)}">
+                                    </div>
+                                </div>
+
+                                <!-- Selected staff badge display -->
+                                <div th:id="'selectedStaffDisplay_' + ${report.reportId}"
+                                     class="d-flex flex-wrap gap-1 mb-1">
+                                    <!-- Populated by JS on load and on confirm -->
+                                </div>
+                            </div>
+
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Priority</label>
+                                <select name="priority" class="form-select">
+                                    <option value="">-- Select Priority --</option>
+                                    <option value="LOW" th:selected="${report.priority == 'LOW'}">Low</option>
+                                    <option value="MEDIUM" th:selected="${report.priority == 'MEDIUM'}">Medium</option>
+                                    <option value="HIGH" th:selected="${report.priority == 'HIGH'}">High</option>
+                                    <option value="CRITICAL" th:selected="${report.priority == 'CRITICAL'}">Critical</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Due Date</label>
+                                <input type="date" name="dueDate" class="form-control"
+                                    th:value="${report.dueDate != null ? #temporals.format(report.dueDate, 'yyyy-MM-dd') : ''}">
+                                <small class="text-muted">When the repair should be completed</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Manager Notes</label>
+                                <textarea name="notes" class="form-control" rows="3" th:text="${report.notes}"
+                                    placeholder="Add notes about this report..."></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Update Status</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- View Staff Popup Modal with checkboxes (branch-filtered) -->
+        <div class="modal fade" th:id="'viewStaffModal' + ${report.reportId}" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg">
+                    <div class="modal-header" style="background:linear-gradient(135deg,#0f172a,#1e3a5f); color:white;">
+                        <h6 class="modal-title fw-bold mb-0">
+                            <i class="fas fa-hard-hat me-2 text-warning"></i>
+                            Select Staff &mdash;
+                            <span th:text="${report.branch != null ? report.branch.name : 'N/A'}">Branch</span>
+                        </h6>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body p-0">
+                        <th:block th:with="branchId=${report.branch != null ? report.branch.branchId : -1}">
+                            <!-- Staff list with checkboxes -->
+                            <th:block th:if="${branchMaintStaffMap != null and branchMaintStaffMap.containsKey(branchId) and !branchMaintStaffMap.get(branchId).isEmpty()}">
+                                <table class="table table-hover mb-0" style="font-size:0.92rem;">
+                                    <thead style="background:#f1f5f9;">
+                                        <tr>
+                                            <th class="ps-3" style="width:40px;">Assign</th>
+                                            <th>Staff ID</th>
+                                            <th>Name</th>
+                                            <th>Phone</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="s : ${branchMaintStaffMap.get(branchId)}"
+                                            style="cursor:pointer;"
+                                            th:onclick="'togglePopupRow(this, ' + ${report.reportId} + ', ' + ${s.userId} + ')'">
+                                            <td class="ps-3 text-center">
+                                                <input type="checkbox" class="form-check-input"
+                                                       th:id="'popupStaff_' + ${report.reportId} + '_' + ${s.userId}"
+                                                       th:attr="data-report-id=${report.reportId}, data-staff-id=${s.userId}, data-name=${s.username}"
+                                                       onclick="event.stopPropagation();">
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-secondary" th:text="${s.staffId != null ? s.staffId : 'N/A'}">ID</span>
+                                            </td>
+                                            <td>
+                                                <i class="fas fa-user-circle me-1 text-primary"></i>
+                                                <span th:text="${s.username}">Name</span>
+                                            </td>
+                                            <td class="text-muted">
+                                                <span th:text="${s.phoneNumber != null ? s.phoneNumber : '&mdash;'}">-</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </th:block>
+                            <!-- No staff message -->
+                            <th:block th:if="${branchMaintStaffMap == null or !branchMaintStaffMap.containsKey(branchId) or branchMaintStaffMap.get(branchId).isEmpty()}">
+                                <div class="text-center text-muted py-4">
+                                    <i class="fas fa-user-slash fa-2x mb-2 d-block"></i>
+                                    No maintenance staff assigned to
+                                    <strong th:text="${report.branch != null ? report.branch.name : 'this branch'}">this branch</strong>.
+                                </div>
+                            </th:block>
+                        </th:block>
+                    </div>
+                    <div class="modal-footer py-2 d-flex justify-content-between align-items-center">
+                        <small class="text-muted"><i class="fas fa-info-circle me-1"></i>Click a row or checkbox to select.</small>
+                        <div>
+                            <button type="button" class="btn btn-secondary btn-sm me-2" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-success btn-sm"
+                                    th:onclick="'confirmStaffSelection(' + ${report.reportId} + ')'">
+                                <i class="fas fa-check me-1"></i> Confirm Selection
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Report Modal -->
+
+    <!-- Report Details Modals (one per report) -->
+    <div th:each="report : ${reports}">
+        <div class="modal fade" th:id="'detailsModal' + ${report.reportId}" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-dark text-white">
+                        <h5 class="modal-title"><i class="fas fa-info-circle me-2"></i>Report Details â€” <span th:text="${report.formattedReportId}">R1</span></h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Report Info -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <p><strong>Location:</strong>
+                                    <span th:if="${report.branch != null}" th:text="${report.branch.name}">Branch</span>
+                                    <span th:if="${report.field != null}"> â€” <span th:text="${report.field.name}">Field</span></span>
+                                </p>
+                                <p><strong>Reporter:</strong>
+                                    <span th:if="${report.reporter != null}" th:text="${report.reporter.username}">Staff</span>
+                                    <span th:if="${report.reporter == null}" class="text-muted">N/A</span>
+                                </p>
+                                <p><strong>Status:</strong>
+                                    <span th:class="'status-badge status-' + ${report.status != null ? report.status.toLowerCase() : 'reported'}"
+                                        th:text="${report.status == 'FIXED' ? 'Completed' : (report.status != null ? report.status : 'REPORTED')}">REPORTED</span>
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Priority:</strong>
+                                    <span th:if="${report.priority != null}"
+                                        th:class="'badge ' + (${report.priority == 'CRITICAL'} ? 'bg-danger' : (${report.priority == 'HIGH'} ? 'bg-warning text-dark' : (${report.priority == 'MEDIUM'} ? 'bg-info text-dark' : 'bg-secondary')))"
+                                        th:text="${report.priority}">-</span>
+                                    <span th:if="${report.priority == null}" class="text-muted">Not set</span>
+                                </p>
+                                <p><strong>Assigned To:</strong>
+                                    <th:block th:if="${tasksMap != null and tasksMap.containsKey(report.reportId)}">
+                                        <span th:each="t, iter : ${tasksMap.get(report.reportId)}">
+                                            <span th:text="${t.assignedStaff != null ? t.assignedStaff.username : ''}"></span><span th:if="${!iter.last}">, </span>
+                                        </span>
+                                    </th:block>
+                                    <span th:if="${tasksMap == null or !tasksMap.containsKey(report.reportId)}">
+                                        <span th:if="${report.assignedStaff != null}" th:text="${report.assignedStaff.username}">Staff</span>
+                                        <span th:if="${report.assignedStaff == null}" class="text-muted">Unassigned</span>
+                                    </span>
+                                </p>
+                                <p><strong>Due Date:</strong>
+                                    <span th:if="${report.dueDate != null}" th:text="${#temporals.format(report.dueDate, 'dd MMM yyyy')}">-</span>
+                                    <span th:if="${report.dueDate == null}" class="text-muted">Not set</span>
+                                </p>
+                            </div>
+                        </div>
+                        <p><strong>Issue:</strong> <span th:text="${report.description}">Description</span></p>
+                        <p th:if="${report.notes != null && !report.notes.isEmpty()}"><strong>Notes:</strong> <span th:text="${report.notes}">Notes</span></p>
+
+                        <!-- Proof of Completion Images -->
+                        <div th:if="${tasksMap != null and tasksMap.containsKey(report.reportId) and !tasksMap.get(report.reportId).isEmpty()}" class="mb-3">
+                            <h6 class="fw-bold"><i class="fas fa-camera me-2"></i>Proof of Completion</h6>
+                            <th:block th:with="task=${tasksMap.get(report.reportId).get(0)}">
+                                <div th:if="${task.proofImageUrl != null}">
+                                    <div th:id="'proofCarousel' + ${report.reportId}" class="carousel slide" data-bs-ride="false">
+                                        <div class="carousel-inner">
+                                            <div class="carousel-item active" th:if="${task.proofImageUrl != null}">
+                                                <img th:src="${task.proofImageUrl}" class="d-block mx-auto rounded" style="max-height:250px;" alt="Proof 1">
+                                            </div>
+                                            <div class="carousel-item" th:if="${task.proofImageUrl2 != null}">
+                                                <img th:src="${task.proofImageUrl2}" class="d-block mx-auto rounded" style="max-height:250px;" alt="Proof 2">
+                                            </div>
+                                            <div class="carousel-item" th:if="${task.proofImageUrl3 != null}">
+                                                <img th:src="${task.proofImageUrl3}" class="d-block mx-auto rounded" style="max-height:250px;" alt="Proof 3">
+                                            </div>
+                                            <div class="carousel-item" th:if="${task.proofImageUrl4 != null}">
+                                                <img th:src="${task.proofImageUrl4}" class="d-block mx-auto rounded" style="max-height:250px;" alt="Proof 4">
+                                            </div>
+                                            <div class="carousel-item" th:if="${task.proofImageUrl5 != null}">
+                                                <img th:src="${task.proofImageUrl5}" class="d-block mx-auto rounded" style="max-height:250px;" alt="Proof 5">
+                                            </div>
+                                        </div>
+                                        <button class="carousel-control-prev" type="button" th:attr="data-bs-target='#proofCarousel' + ${report.reportId}" data-bs-slide="prev">
+                                            <span class="carousel-control-prev-icon" style="filter:invert(1)"></span>
+                                        </button>
+                                        <button class="carousel-control-next" type="button" th:attr="data-bs-target='#proofCarousel' + ${report.reportId}" data-bs-slide="next">
+                                            <span class="carousel-control-next-icon" style="filter:invert(1)"></span>
+                                        </button>
+                                    </div>
+                                    <p th:if="${task.completionNote != null && !task.completionNote.isEmpty()}" class="mt-2 text-muted fst-italic bg-light p-2 rounded">
+                                        <strong>Staff Note:</strong> <span th:text="${task.completionNote}">Note</span>
+                                    </p>
+                                </div>
+                                <p th:if="${task.proofImageUrl == null}" class="text-muted">No proof uploaded yet.</p>
+                            </th:block>
+                        </div>
+
+                        <hr>
+
+                        <!-- Activity Timeline -->
+                        <h6 class="fw-bold mb-3"><i class="fas fa-history me-2"></i>Activity Timeline</h6>
+                        <div th:if="${activitiesMap.containsKey(report.reportId) && !activitiesMap.get(report.reportId).isEmpty()}">
+                            <div class="timeline">
+                                <div th:each="activity : ${activitiesMap.get(report.reportId)}" class="timeline-item d-flex mb-3">
+                                    <div class="timeline-dot me-3 d-flex flex-column align-items-center">
+                                        <div style="width:12px;height:12px;border-radius:50%;background:#3b82f6;margin-top:5px;"></div>
+                                        <div style="width:2px;flex:1;background:#e2e8f0;"></div>
+                                    </div>
+                                    <div class="timeline-content pb-2">
+                                        <div class="text-muted small" th:text="${#temporals.format(activity.timestamp, 'dd MMM yyyy hh:mm a')}">24 Feb 2026 06:21 AM</div>
+                                        <div th:text="${activity.action}">Report submitted by Ronaldo</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div th:if="${!activitiesMap.containsKey(report.reportId) || activitiesMap.get(report.reportId).isEmpty()}" class="text-muted text-center py-3">
+                            <i class="fas fa-clock fa-2x mb-2"></i>
+                            <p>No activity recorded yet.</p>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="addReportModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form th:action="@{/manager/add-report}" method="POST" enctype="multipart/form-data">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title"><i class="fas fa-plus-circle me-2"></i>Add New Report</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Branch <span class="text-danger">*</span></label>
+                            <select name="branchId" class="form-select" required
+                                onchange="loadFieldsForBranch(this.value)">
+                                <option value="">Select Branch</option>
+                                <option th:each="branch : ${branches}" th:value="${branch.branchId}"
+                                    th:text="${branch.name}">Branch A</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Field (Optional)</label>
+                            <select name="fieldId" id="fieldSelect" class="form-select">
+                                <option value="">No Specific Field</option>
+                            </select>
+                            <small class="text-muted">Leave empty if the issue is not field-specific</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Issue Description <span
+                                    class="text-danger">*</span></label>
+                            <textarea name="description" class="form-control" rows="4" required
+                                placeholder="Describe the problem in detail..."></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Photo Evidence (Optional)</label>
+                            <input type="file" name="reportImage" class="form-control" accept="image/*">
+                            <small class="text-muted">Supported formats: JPG, PNG, GIF</small>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save me-2"></i>Submit
+                            Report</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function loadFieldsForBranch(branchId) {
+            const fieldSelect = document.getElementById('fieldSelect');
+            fieldSelect.innerHTML = '<option value="">No Specific Field</option>';
+
+            if (!branchId) return;
+
+            // Fetch fields for the selected branch
+            fetch(`/api/branches/${branchId}/fields`)
+                .then(response => response.json())
+                .then(fields => {
+                    fields.forEach(field => {
+                        const option = document.createElement('option');
+                        option.value = field.fieldId;
+                        option.textContent = field.name;
+                        fieldSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error loading fields:', error));
+        }
+
+        /* =============================================
+           STAFF SELECTION POPUP FUNCTIONS
+           ============================================= */
+
+        // Open the View Staff popup and pre-sync checkboxes from hidden form inputs
+        function openViewStaff(reportId) {
+            // Get all hidden form checkboxes for this report
+            const hiddenContainer = document.getElementById('hiddenStaffInputs_' + reportId);
+            if (!hiddenContainer) return;
+
+            const hiddenCheckboxes = hiddenContainer.querySelectorAll('input[type="checkbox"]');
+            hiddenCheckboxes.forEach(function(hidden) {
+                const staffId = hidden.value;
+                const popupCb = document.getElementById('popupStaff_' + reportId + '_' + staffId);
+                if (popupCb) {
+                    popupCb.checked = hidden.checked;
+                    // Highlight pre-checked rows
+                    const row = popupCb.closest('tr');
+                    if (row) row.classList.toggle('table-success', hidden.checked);
+                }
+            });
+
+            // Open the popup modal
+            const modalEl = document.getElementById('viewStaffModal' + reportId);
+            if (modalEl) {
+                const modal = new bootstrap.Modal(modalEl);
+                modal.show();
+            }
+        }
+
+        // Click anywhere on a row to toggle that row's checkbox
+        function togglePopupRow(row, reportId, staffId) {
+            const cb = document.getElementById('popupStaff_' + reportId + '_' + staffId);
+            if (!cb) return;
+            cb.checked = !cb.checked;
+            row.classList.toggle('table-success', cb.checked);
+        }
+
+        // Confirm Selection: copy popup checks â†’ hidden form inputs, update badges, close popup
+        function confirmStaffSelection(reportId) {
+            // Sync popup â†’ hidden inputs
+            const popupCheckboxes = document.querySelectorAll(
+                '#viewStaffModal' + reportId + ' input[type="checkbox"][data-report-id]'
+            );
+            popupCheckboxes.forEach(function(popupCb) {
+                const staffId = popupCb.getAttribute('data-staff-id');
+                const hidden = document.getElementById('hstaff_' + reportId + '_' + staffId);
+                if (hidden) hidden.checked = popupCb.checked;
+            });
+
+            // Update the badge display
+            updateSelectedBadges(reportId);
+
+            // Close the popup modal
+            const modalEl = document.getElementById('viewStaffModal' + reportId);
+            if (modalEl) {
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                if (modal) modal.hide();
+            }
+        }
+
+        // Render selected staff as green badge chips under the button
+        function updateSelectedBadges(reportId) {
+            const display = document.getElementById('selectedStaffDisplay_' + reportId);
+            if (!display) return;
+
+            const hiddenContainer = document.getElementById('hiddenStaffInputs_' + reportId);
+            if (!hiddenContainer) return;
+
+            const selected = [];
+            hiddenContainer.querySelectorAll('input[type="checkbox"]:checked').forEach(function(cb) {
+                const name = cb.getAttribute('data-name') || cb.value;
+                selected.push(name);
+            });
+
+            if (selected.length === 0) {
+                display.innerHTML = '';
+            } else {
+                display.innerHTML = selected.map(function(n) {
+                    return '<span class="badge bg-success me-1 mb-1" style="font-size:0.82rem;">'
+                         + '<i class="fas fa-user-check me-1"></i>' + n + '</span>';
+                }).join('');
+            }
+        }
+
+        // On page load: initialize badge displays for all reports
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('[id^="hiddenStaffInputs_"]').forEach(function(container) {
+                const reportId = container.id.replace('hiddenStaffInputs_', '');
+                updateSelectedBadges(reportId);
+            });
+        });
+        let formToSubmit = null;
+        function confirmAction(element, itemName) {
+            const confirmBtn = document.getElementById('confirmDeleteBtn');
+            const form = element.closest('form');
+            if (form) {
+                formToSubmit = form;
+                confirmBtn.removeAttribute('href');
+                confirmBtn.onclick = function(e) {
+                    e.preventDefault();
+                    if (formToSubmit) formToSubmit.submit();
+                };
+            } else {
+                formToSubmit = null;
+                confirmBtn.href = element.getAttribute('href') || element.getAttribute('data-url');
+                confirmBtn.onclick = null;
+            }
+            document.getElementById('deleteItemName').textContent = itemName || 'this action';
+            var modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+            modal.show();
+        }
+    </script>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title"><i class="fas fa-exclamation-triangle me-2"></i>Confirm Action</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <i class="fas fa-trash-alt fa-3x text-danger mb-3"></i>
+                    <p class="mb-0 fs-5">Are you sure you want to proceed with deleting <span id="deleteItemName">this action</span>?</p>
+                    <p class="text-muted small mt-2">This action cannot be undone.</p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <a href="#" id="confirmDeleteBtn" class="btn btn-danger">Confirm</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

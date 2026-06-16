@@ -1,0 +1,109 @@
+@startuml Manage Field Sequence Diagram
+
+!theme plain
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+skinparam backgroundColor #FFFFFF
+skinparam maxMessageSize 200
+skinparam ParticipantPadding 80
+skinparam BoxPadding 30
+skinparam SequenceBoxBorderColor transparent
+hide footbox
+
+title Manage Field Sequence Diagram
+
+actor Manager
+participant "Field" as Field <<Model>>
+participant "Branch" as Branch <<Model>>
+participant "User" as User <<Model>>
+
+== Create Field ==
+Manager -> Field: create Field
+activate Field
+Field --> Manager: Field created
+deactivate Field
+
+Manager -> Branch: get Branch
+activate Branch
+Branch --> Manager: Branch
+deactivate Branch
+Manager -> Field: setBranch(branch)
+
+alt Assign Supervisor to Field
+    Manager -> User: get User
+    activate User
+    User --> Manager: User
+    deactivate User
+    Manager -> Field: setSupervisor(user)
+end
+
+Manager -> Field: save Field
+activate Field
+Field --> Manager: saved successfully
+deactivate Field
+
+== View Field Information ==
+Manager -> Field: get field details
+activate Field
+Field --> Manager: details
+deactivate Field
+
+Manager -> Field: getBranch()
+activate Field
+Field -> Branch: get Branch
+activate Branch
+Branch --> Field: Branch
+deactivate Branch
+Field --> Manager: Branch details
+deactivate Field
+
+alt Field has Supervisor
+    Manager -> Field: getSupervisor()
+    activate Field
+    Field -> User: get Supervisor
+    activate User
+    User --> Field: User
+    deactivate User
+    Field --> Manager: Supervisor details
+    deactivate Field
+end
+
+== Update Field Info ==
+Manager -> Field: get Field
+activate Field
+Field --> Manager: Field found
+deactivate Field
+
+Manager -> Field: update details
+activate Field
+Field --> Manager: updated
+deactivate Field
+
+alt Update Branch Assignment
+    Manager -> Branch: get Branch
+    activate Branch
+    Branch --> Manager: Branch
+    deactivate Branch
+    Manager -> Field: setBranch(newBranch)
+end
+
+alt Update Supervisor Assignment
+    Manager -> User: get User
+    activate User
+    User --> Manager: User
+    deactivate User
+    Manager -> Field: setSupervisor(newSupervisor)
+end
+
+Manager -> Field: save Field
+activate Field
+Field --> Manager: updated successfully
+deactivate Field
+
+== Delete Field ==
+Manager -> Field: delete Field
+activate Field
+Field --> Manager: Field deleted
+deactivate Field
+
+@enduml

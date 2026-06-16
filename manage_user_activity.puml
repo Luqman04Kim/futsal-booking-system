@@ -1,0 +1,89 @@
+@startuml Manage User Activity Diagram
+
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam ActivityFontSize 14
+skinparam PartitionBorderColor #333333
+skinparam PartitionBackgroundColor #F5F5F5
+
+title Manage User Activity Diagram
+
+|Customer|
+start
+:Open Application;
+
+if (Has Account?) then (yes)
+  :Go to Login Page;
+  :Enter Email & Password;
+  :Submit Login;
+  if (Valid Credentials?) then (yes)
+    :Login Successful;
+    :Access Customer Dashboard;
+    if (Update Profile?) then (yes)
+      :Go to Profile Page;
+      :Edit Profile Details;
+      :Save Changes;
+      :Profile Updated;
+    endif
+  else (no)
+    :Show Error Message;
+    stop
+  endif
+else (no)
+  :Go to Register Page;
+  :Enter Registration Details;
+  :Submit Registration;
+  :Account Created;
+  :Redirect to Login;
+  stop
+endif
+
+stop
+
+|Manager|
+start
+:Login as Manager;
+:Access Manager Dashboard;
+
+if (Manage Users?) then (yes)
+  :View All Users;
+  
+  if (Action Type?) then (Add Staff)
+    :Click Add Staff;
+    :Enter Staff Details;
+    :Assign Branch;
+    :Save Staff;
+    :Staff Added;
+  else (Update User)
+    :Select User;
+    :Edit User Details;
+    :Update Information;
+    :User Updated;
+  else (Delete User)
+    :Select User;
+    :Confirm Deletion;
+    :User Deleted;
+  else (Block User)
+    :Select User;
+    :Set Block Status;
+    :User Blocked;
+  endif
+endif
+
+stop
+
+|Staff|
+start
+:Login as Staff;
+:Access Staff Dashboard;
+
+if (Update Profile?) then (yes)
+  :Go to Profile Page;
+  :Edit Staff Details;
+  :Update Information;
+  :Profile Updated;
+endif
+
+stop
+
+@enduml

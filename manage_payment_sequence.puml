@@ -1,0 +1,87 @@
+@startuml Manage Payment Sequence Diagram
+
+!theme plain
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+skinparam backgroundColor #FFFFFF
+skinparam maxMessageSize 200
+skinparam ParticipantPadding 80
+skinparam BoxPadding 30
+skinparam SequenceBoxBorderColor transparent
+hide footbox
+
+title Manage Payment Sequence Diagram
+
+actor Customer
+participant "Booking" as Booking <<Model>>
+participant "User" as User <<Model>>
+
+== Make Deposit Payment ==
+Customer -> Booking: get Booking
+activate Booking
+Booking --> Customer: Booking found
+deactivate Booking
+
+Customer -> Booking: setPaymentStatus("Pay Deposit")
+activate Booking
+Booking --> Customer: payment status set
+deactivate Booking
+
+Customer -> Booking: save Booking
+activate Booking
+Booking --> Customer: deposit recorded
+deactivate Booking
+
+== Make Full Payment ==
+Customer -> Booking: get Booking
+activate Booking
+Booking --> Customer: Booking found
+deactivate Booking
+
+Customer -> Booking: setPaymentStatus("Full Payment")
+activate Booking
+Booking --> Customer: payment status set
+deactivate Booking
+
+Customer -> Booking: save Booking
+activate Booking
+Booking --> Customer: fully paid
+deactivate Booking
+
+== View Payment Status ==
+Customer -> Booking: get Booking
+activate Booking
+Booking --> Customer: Booking found
+deactivate Booking
+
+Customer -> Booking: getPaymentStatus()
+activate Booking
+Booking --> Customer: payment status
+deactivate Booking
+
+Customer -> Booking: getUser()
+activate Booking
+Booking -> User: get User
+activate User
+User --> Booking: User
+deactivate User
+Booking --> Customer: User details
+deactivate Booking
+
+== Update Payment Status ==
+Customer -> Booking: get Booking
+activate Booking
+Booking --> Customer: Booking found
+deactivate Booking
+
+Customer -> Booking: setPaymentStatus(status)
+activate Booking
+Booking --> Customer: status updated
+deactivate Booking
+
+Customer -> Booking: save Booking
+activate Booking
+Booking --> Customer: updated successfully
+deactivate Booking
+
+@enduml

@@ -1,0 +1,42 @@
+@startuml Manage Payment Activity Diagram
+
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam ActivityFontSize 14
+skinparam PartitionBorderColor #333333
+skinparam PartitionBackgroundColor #F5F5F5
+
+title Manage Payment Activity Diagram
+
+|Customer|
+start
+:Login to System;
+:View Booking;
+
+if (Payment Status?) then (Pay Deposit)
+  :Select Deposit Option;
+  :Pay RM200;
+  :Payment Recorded;
+  :Status = Pay Deposit;
+elseif (Pay Full Amount) then
+  :Select Full Payment;
+  :Pay Total Amount;
+  :Payment Recorded;
+  :Status = Full Payment;
+elseif (Complete Remaining) then
+  :View Outstanding Balance;
+  :Pay Remaining Amount;
+  :Payment Completed;
+  :Status = Full Payment;
+endif
+
+:Receive Receipt;
+
+|Manager|
+:View All Payments;
+:Monitor Payment Status;
+:View Transaction History;
+
+stop
+
+@enduml

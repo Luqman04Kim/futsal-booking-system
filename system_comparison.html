@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FootballHub System Architecture</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            max-width: 95%;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+
+        .diagram-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>FootballHub System Architecture</h1>
+        <div class="diagram-container">
+            <div class="mermaid">
+                graph LR
+                %% Styles
+                classDef client fill:#e3f2fd,stroke:#1565c0,stroke-width:2px;
+                classDef app fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px;
+                classDef data fill:#fff3e0,stroke:#ef6c00,stroke-width:2px;
+                classDef external fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px;
+                subgraph "Client Tier (Frontend)"
+                Browser["Web Browser<br />(HTML/CSS/JS)<br /><i>Admin, Staff, Customer</i>"]:::client
+                end
+                subgraph "Application Tier (Backend - Spring Boot)"
+                Security["Security / Auth Layer"]:::app
+                Controller["Controller Layer<br />(Request Handling)"]:::app
+                Service["Service Layer<br />(Business Logic)"]:::app
+                Repo["Repository Layer<br />(Data Access)"]:::app
+                end
+                subgraph "Data Tier"
+                DB[("MySQL Database<br />(Relational Data)")]:::data
+                end
+                subgraph "External Services"
+                Maps(("Google Maps API<br />(Location)")):::external
+                Gemini(("Chatbot Gemini API<br />(AI Assistant)")):::external
+                end
+                %% Relationships
+                Browser <-->|"HTTPS Requests"| Controller
+                    Browser -.->|"Authentication"| Security
+                    Controller -->|"Process"| Service
+                    Service -->|"Persistence"| Repo
+                    Repo <-->|"SQL/Hibernate"| DB
+                        Service -->|"Geocoding"| Maps
+                        Service -->|"AI Query"| Gemini
+            </div>
+        </div>
+    </div>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            flowchart: {
+                curve: 'linear'
+            }
+        });
+    </script>
+</body>

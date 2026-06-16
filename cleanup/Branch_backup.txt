@@ -1,0 +1,37 @@
+package com.footballsystem.model;
+
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "branches")
+public class Branch {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long branchId;
+
+    private String name;       // e.g., "Downtown Arena"
+    private String location;   // e.g., "123 Main St, KL"
+    private String contactNumber;
+
+    public Branch() {}
+
+    public Branch(String name, String location, String contactNumber) {
+        this.name = name;
+        this.location = location;
+        this.contactNumber = contactNumber;
+    }
+
+    // Getters and Setters
+    public Long getBranchId() { return branchId; }
+    public void setBranchId(Long branchId) { this.branchId = branchId; }
+    
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    
+    public String getLocation() { return location; }
+    public void setLocation(String location) { this.location = location; }
+    
+    public String getContactNumber() { return contactNumber; }
+    public void setContactNumber(String contactNumber) { this.contactNumber = contactNumber; }
+}

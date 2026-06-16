@@ -1,0 +1,43 @@
+@startuml Manage Staff Activity Diagram
+
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam ActivityFontSize 14
+skinparam PartitionBorderColor #333333
+skinparam PartitionBackgroundColor #F5F5F5
+
+title Manage Staff Activity Diagram
+
+|Manager|
+start
+:Login to System;
+:Access Staff Management;
+
+if (Action?) then (Add Staff)
+  :Enter Staff Details;
+  :Assign Branch;
+  :Set Position;
+  :Save Staff;
+  :Staff Created;
+elseif (View Staff) then
+  :View All Staff;
+  :View Staff Tasks;
+elseif (Update Staff) then
+  :Select Staff;
+  :Edit Details;
+  :Update Branch;
+  :Save Changes;
+elseif (Delete Staff) then
+  :Select Staff;
+  :Confirm Deletion;
+  :Staff Deleted;
+endif
+
+|Staff|
+:Login to System;
+:View Personal Info;
+:View Assigned Tasks;
+
+stop
+
+@enduml

@@ -1,0 +1,46 @@
+@startuml Manage Maintenance Activity Diagram
+
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam ActivityFontSize 14
+skinparam PartitionBorderColor #333333
+skinparam PartitionBackgroundColor #F5F5F5
+
+title Manage Maintenance Activity Diagram
+
+|Staff|
+start
+:Login to System;
+
+if (Action?) then (Report Problem)
+  :Create Problem Report;
+  :Enter Description;
+  :Upload Photo;
+  :Select Branch/Field;
+  :Submit Report;
+  :Report Created;
+elseif (View Reports) then
+  :View All Reports;
+  :View Report Status;
+endif
+
+|Manager|
+:Access Maintenance Management;
+
+if (Action?) then (View Reports)
+  :View All Reports;
+  :View Details;
+elseif (Assign Maintenance) then
+  :Select Report;
+  :Create Maintenance Task;
+  :Assign to Staff;
+  :Task Created;
+elseif (Update Status) then
+  :Select Report;
+  :Update Status;
+  :Mark as Fixed;
+endif
+
+stop
+
+@enduml

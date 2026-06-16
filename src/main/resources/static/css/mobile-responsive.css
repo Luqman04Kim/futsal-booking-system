@@ -1,0 +1,513 @@
+/**
+ * FOOTBALLHUB - Mobile Responsive Styles
+ * These styles only activate at smaller screen sizes
+ * Desktop design remains completely intact
+ */
+
+/* ==========================================
+   TABLET BREAKPOINT (max-width: 991px)
+   ========================================== */
+@media (max-width: 991px) {
+
+    /* Sidebar - Hide on tablet and smaller */
+    .sidebar {
+        position: fixed;
+        left: -260px;
+        top: 0;
+        height: 100vh;
+        width: 240px;
+        transition: left 0.3s ease;
+        z-index: 1100 !important;
+        pointer-events: auto;
+    }
+
+    .sidebar.show {
+        left: 0;
+    }
+
+    /* Ensure sidebar links are clickable */
+    .sidebar a {
+        pointer-events: auto !important;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Sidebar Overlay */
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1090;
+    }
+
+    .sidebar-overlay.show {
+        display: block;
+    }
+
+    /* Content - Full width on tablet */
+    .content {
+        margin-left: 0 !important;
+        padding: 15px !important;
+    }
+
+    /* Dashboard Header */
+    .dashboard-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start !important;
+    }
+
+    .dashboard-header>div:last-child {
+        width: 100%;
+        justify-content: flex-start !important;
+        flex-wrap: wrap;
+    }
+
+    /* Date badges - smaller on tablet */
+    .date-badge {
+        font-size: 0.8rem !important;
+        padding: 6px 12px !important;
+    }
+
+    /* Welcome Card */
+    .welcome-card h1 {
+        font-size: 1.5rem !important;
+    }
+
+    /* Chart Cards */
+    .chart-card {
+        margin-bottom: 20px;
+    }
+}
+
+/* ==========================================
+   MOBILE BREAKPOINT (max-width: 768px)
+   ========================================== */
+@media (max-width: 768px) {
+
+    /* Typography - Scale down headings */
+    h1,
+    .hero-title {
+        font-size: 2rem !important;
+    }
+
+    h2,
+    .section-title {
+        font-size: 1.5rem !important;
+    }
+
+    h3 {
+        font-size: 1.25rem !important;
+    }
+
+    /* Navbar */
+    .navbar {
+        padding: 10px 0 !important;
+    }
+
+    .navbar-brand {
+        font-size: 1.1rem !important;
+    }
+
+    /* Profile Dropdown */
+    .profile-dropdown .dropdown-toggle {
+        padding: 5px 10px !important;
+        font-size: 0.85rem !important;
+    }
+
+    .profile-avatar {
+        width: 28px !important;
+        height: 28px !important;
+    }
+
+    /* VIP Badge/Button */
+    .btn.btn-warning.fw-bold,
+    .badge.bg-warning {
+        font-size: 0.75rem !important;
+        padding: 6px 10px !important;
+    }
+
+    /* Hero Section */
+    .hero-title {
+        font-size: 2.5rem !important;
+        line-height: 1.1 !important;
+    }
+
+    .hero-subtitle,
+    .hero-sub {
+        font-size: 1rem !important;
+        margin-bottom: 25px !important;
+    }
+
+    /* Branch Buttons */
+    .branch-btn-group {
+        gap: 10px !important;
+    }
+
+    .btn-branch {
+        padding: 12px 25px !important;
+        font-size: 0.85rem !important;
+    }
+
+    /* Ticket Cards (Home Page) */
+    .ticket-card {
+        border-radius: 12px !important;
+    }
+
+    .card-img-wrapper {
+        height: 180px !important;
+    }
+
+    .card-body {
+        padding: 15px !important;
+    }
+
+    .card-title {
+        font-size: 1.2rem !important;
+    }
+
+    /* Ticket Card Notches - Adjust position */
+    .ticket-card::before,
+    .ticket-card::after {
+        top: 165px !important;
+        height: 25px !important;
+        width: 25px !important;
+    }
+
+    /* Booking Page - Stack ticket visual and details */
+    .ticket-card.w-100 {
+        flex-direction: column !important;
+    }
+
+    .ticket-visual {
+        width: 100% !important;
+        min-height: 250px !important;
+        border-right: none !important;
+        border-bottom: 3px dashed #ccc !important;
+    }
+
+    .ticket-details {
+        width: 100% !important;
+        padding: 25px 20px !important;
+    }
+
+    /* Hide ticket notches on horizontal layout when stacked */
+    .ticket-card.w-100::before,
+    .ticket-card.w-100::after {
+        display: none !important;
+    }
+
+    .ticket-container {
+        margin-top: 60px !important;
+    }
+
+    /* Slot Grid - 2 columns on mobile */
+    .slot-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
+    }
+
+    .btn-slot {
+        padding: 10px !important;
+    }
+
+    .slot-time {
+        font-size: 0.85rem !important;
+    }
+
+    /* Add-on Cards */
+    .addon-card {
+        padding: 12px !important;
+    }
+
+    .addon-card h6 {
+        font-size: 0.9rem !important;
+    }
+
+    .addon-icon {
+        font-size: 1.2rem !important;
+    }
+
+    /* Total Bar */
+    .total-bar {
+        flex-direction: column !important;
+        gap: 10px !important;
+        text-align: center !important;
+    }
+
+    .total-price {
+        font-size: 1.3rem !important;
+    }
+
+    /* Stat Cards */
+    .stat-card {
+        padding: 15px !important;
+    }
+
+    .stat-value {
+        font-size: 1.4rem !important;
+    }
+
+    .stat-label {
+        font-size: 0.75rem !important;
+    }
+
+    /* Tables */
+    .table thead th,
+    .table tbody td {
+        padding: 10px 8px !important;
+        font-size: 0.8rem !important;
+    }
+
+    .table-responsive {
+        font-size: 0.85rem;
+    }
+
+    /* Glass Panel (My Bookings) */
+    .glass-panel {
+        padding: 20px 15px !important;
+        margin-top: 15px !important;
+    }
+
+    /* Chat Widget */
+    .chat-btn {
+        width: 50px !important;
+        height: 50px !important;
+        font-size: 20px !important;
+        bottom: 20px !important;
+        right: 20px !important;
+    }
+
+    .chat-window {
+        width: calc(100% - 30px) !important;
+        right: 15px !important;
+        left: 15px !important;
+        bottom: 80px !important;
+        height: 400px !important;
+    }
+
+    /* VIP Banner */
+    .vip-gold-banner {
+        padding: 18px !important;
+        margin-bottom: 25px !important;
+    }
+
+    .vip-gold-banner h2 {
+        font-size: 1.1rem !important;
+    }
+
+    /* Welcome Banner */
+    .welcome-banner {
+        padding: 15px !important;
+    }
+
+    .welcome-banner p {
+        font-size: 0.95rem !important;
+    }
+
+    /* Weather Widget */
+    .chart-card #weatherTemp {
+        font-size: 2.5rem !important;
+    }
+
+    /* Modal Dialogs */
+    .modal-dialog {
+        margin: 10px !important;
+    }
+
+    .modal-body {
+        padding: 15px !important;
+    }
+
+    /* Forms */
+    .form-control {
+        padding: 10px 12px !important;
+        font-size: 0.9rem !important;
+    }
+
+    /* Buttons */
+    .btn {
+        padding: 10px 15px !important;
+    }
+
+    .btn-sm {
+        padding: 6px 10px !important;
+        font-size: 0.75rem !important;
+    }
+
+    /* Login/Register Forms */
+    .login-card,
+    .register-card {
+        padding: 25px 20px !important;
+        margin: 15px !important;
+    }
+}
+
+/* ==========================================
+   SMALL PHONE BREAKPOINT (max-width: 576px)
+   ========================================== */
+@media (max-width: 576px) {
+
+    /* Extreme small screens */
+    .hero-title {
+        font-size: 2rem !important;
+    }
+
+    /* Branch buttons - stack vertically */
+    .branch-btn-group {
+        flex-direction: column !important;
+        align-items: center !important;
+    }
+
+    .btn-branch {
+        width: 80% !important;
+        text-align: center !important;
+    }
+
+    /* Slot Grid - Keep 2 columns */
+    .slot-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+
+    /* Navbar items */
+    .navbar .d-flex.align-items-center.gap-3 {
+        gap: 8px !important;
+    }
+
+    /* Profile dropdown - Hide username on very small screens */
+    .profile-dropdown .dropdown-toggle span:not(.profile-avatar) {
+        display: none !important;
+    }
+
+    /* Date badges - Stack vertically */
+    .dashboard-header .d-flex.align-items-center.gap-3 {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 8px !important;
+    }
+
+    /* Stat cards - Single column */
+    .row-cols-md-2>.col,
+    .row-cols-xl-5>.col {
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+    }
+
+    /* Task cards */
+    .task-card {
+        padding: 12px !important;
+    }
+
+    .task-card h5 {
+        font-size: 0.95rem !important;
+    }
+
+    .task-card .d-flex.gap-2 {
+        flex-wrap: wrap !important;
+        gap: 5px !important;
+    }
+
+    /* Bento Grid (Landing Page) */
+    .bento-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .bento-card,
+    .span-2 {
+        grid-column: span 1 !important;
+        height: 300px !important;
+    }
+
+    /* Timeline Cards */
+    .timeline-card {
+        min-width: 280px !important;
+    }
+
+    /* Owner Card */
+    .owner-card {
+        flex-direction: column !important;
+        text-align: center !important;
+    }
+
+    .owner-img {
+        width: 150px !important;
+        height: 150px !important;
+    }
+
+    /* Footer */
+    footer {
+        padding: 30px 0 !important;
+    }
+}
+
+/* ==========================================
+   MOBILE HAMBURGER MENU BUTTON
+   ========================================== */
+.mobile-menu-btn {
+    display: none;
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    background: #0f172a;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    padding: 10px 14px;
+    cursor: pointer;
+    z-index: 1060;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.mobile-menu-btn:hover {
+    background: #1e293b;
+}
+
+@media (max-width: 991px) {
+    .mobile-menu-btn {
+        display: block !important;
+    }
+
+    /* Add padding-top to content so hamburger doesn't overlap */
+    .content {
+        padding-top: 70px !important;
+    }
+}
+
+/* ==========================================
+   UTILITY CLASSES FOR MOBILE
+   ========================================== */
+@media (max-width: 768px) {
+    .hide-on-mobile {
+        display: none !important;
+    }
+
+    .show-on-mobile {
+        display: block !important;
+    }
+
+    .text-center-mobile {
+        text-align: center !important;
+    }
+
+    .full-width-mobile {
+        width: 100% !important;
+    }
+
+    .p-mobile {
+        padding: 15px !important;
+    }
+
+    .mb-mobile {
+        margin-bottom: 15px !important;
+    }
+}
+
+/* Default hide mobile-only elements */
+.show-on-mobile {
+    display: none;
+}

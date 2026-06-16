@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <meta charset="UTF-8">
+    <title>Secure Payment - FOOTBALLHUB</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700;800&family=Inter:wght@400;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --barca-blue: #004D98;
+            --barca-red: #A50044;
+            --barca-yellow: #edbb00;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #004d98;
+            background-image: url('https://images.unsplash.com/photo-1560259595-d25dc6470058?q=80&w=2070');
+            background-size: cover;
+            background-position: center;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding-bottom: 50px;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: -1;
+        }
+
+        .navbar {
+            width: 100%;
+            background: rgba(0, 77, 152, 0.95);
+            border-bottom: 4px solid var(--barca-red);
+            backdrop-filter: blur(10px);
+            margin-bottom: 40px;
+        }
+
+        .navbar-brand {
+            color: var(--barca-yellow) !important;
+            font-family: 'Chakra Petch';
+            letter-spacing: 2px;
+            font-weight: 800;
+        }
+
+        .payment-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: slideUp 0.6s ease-out;
+            border: 2px solid white;
+            position: relative;
+            z-index: 10;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .amount-box {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid #e9ecef;
+        }
+
+        .payment-option {
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .payment-option:hover {
+            border-color: var(--barca-blue);
+            background: #f0f7ff;
+        }
+
+        .btn-pay {
+            background: linear-gradient(135deg, var(--barca-blue) 0%, #003580 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 1.1rem;
+            width: 100%;
+            border: none;
+            margin-top: 20px;
+            transition: 0.3s;
+        }
+
+        .btn-pay:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 77, 152, 0.3);
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#"><img src="/favicon.png" style="height:28px;width:28px;object-fit:contain;margin-right:8px;border-radius:4px;"> FOOTBALLHUB</a>
+        </div>
+    </nav>
+
+    <div class="payment-card">
+        <h3 class="text-center mb-4 fw-bold" style="font-family: 'Chakra Petch'; color: #003580;">
+            <i class="fas fa-crown me-2 text-warning"></i><span th:text="${plan.name}">VIP</span> Subscription
+        </h3>
+
+        <!-- Order Summary -->
+        <div class="amount-box">
+            <h5 class="text-center mb-3 fw-bold" style="color: #003580;">Order Summary</h5>
+
+            <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted">Plan</span>
+                <span class="fw-bold" th:text="${plan.name}">VIP Membership</span>
+            </div>
+
+            <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted">Field Discount</span>
+                <span class="text-success fw-bold"><span th:text="${plan.discountPercentage}">10</span>% Off Field Bookings</span>
+            </div>
+
+            <div class="d-flex justify-content-between mb-2" th:if="${plan.freeAddonsIncluded}">
+                <span class="text-muted">Extra Perks</span>
+                <span class="text-success fw-bold">Free Extra Services</span>
+            </div>
+            
+            <div class="d-flex justify-content-between mb-2" th:if="${plan.priorityBooking}">
+                <span class="text-muted">Priority</span>
+                <span class="text-success fw-bold">Priority Status</span>
+            </div>
+
+            <hr>
+
+            <div class="d-flex justify-content-between align-items-center">
+                <span class="fw-bold fs-5">Total</span>
+                <span class="fw-bold fs-4 text-warning">RM <span th:text="${plan.price != null ? #numbers.formatDecimal(plan.price, 1, 2) : '0.00'}">1000.00</span></span>
+            </div>
+
+            <p class="text-center text-muted small mt-2">Valid for 365 days from today.</p>
+        </div>
+
+        <!-- Payment Form -->
+        <form action="/payment/membership/process" method="POST">
+            <input type="hidden" name="planId" th:value="${plan.id}">
+
+            <!-- Payment Options -->
+            <div class="mb-4">
+                <label class="form-label fw-bold mb-2">Select Payment Option</label>
+
+                <div class="payment-option">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="paymentType" id="payFull" value="FULL"
+                            checked>
+                        <label class="form-check-label w-100" for="payFull">
+                            <div class="d-flex justify-content-between">
+                                <span class="fw-bold">Full Payment</span>
+                                <span class="fw-bold text-success">RM <span th:text="${plan.price != null ? #numbers.formatDecimal(plan.price, 1, 2) : '0.00'}">1000.00</span></span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-pay">
+                PROCEED TO TOYYIBPAY GATEWAY <i class="fas fa-arrow-right ms-2"></i>
+            </button>
+
+            <div class="text-center mt-3">
+                <a href="/membership" class="text-danger small text-decoration-none">Cancel Transaction</a>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

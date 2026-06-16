@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Matches - FOOTBALLHUB</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700\u0026family=Inter:wght@400;600\u0026display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/mobile-responsive.css">
+
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-image: url('https://images.unsplash.com/photo-1560259595-d25dc6470058?q=80&w=2070');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: -1;
+        }
+
+        :root {
+            --barca-blue: #004D98;
+            --barca-red: #A50044;
+            --barca-yellow: #edbb00;
+        }
+
+        .navbar {
+            background: rgba(0, 77, 152, 0.95) !important;
+            border-bottom: 4px solid var(--barca-red) !important;
+            backdrop-filter: blur(10px) !important;
+            padding: 15px 0 !important;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            margin-top: 30px;
+        }
+
+        h2 {
+            font-family: 'Chakra Petch', sans-serif;
+            color: #003580;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-badge {
+            padding: 8px 15px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background-color: #ffc107;
+            color: #000;
+        }
+
+        .status-approved {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .status-rejected {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        /* Profile Dropdown Styles */
+        .profile-dropdown .dropdown-toggle {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 5px 15px;
+            border-radius: 30px;
+            transition: 0.3s;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .profile-dropdown .dropdown-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .profile-dropdown .dropdown-menu {
+            background: #004D98;
+            border: 2px solid #A50044;
+            border-radius: 15px;
+            padding: 10px;
+            margin-top: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            min-width: 220px;
+        }
+
+        .profile-dropdown .dropdown-item {
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            transition: 0.2s;
+            font-weight: 600;
+        }
+
+        .profile-dropdown .dropdown-item:hover {
+            background: #A50044;
+            color: #edbb00;
+            transform: translateX(5px);
+        }
+
+        .profile-dropdown .dropdown-divider {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .profile-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #edbb00;
+        }
+
+        /* VIP Dropdown Styling */
+        .vip-dropdown-toggle {
+            background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%) !important;
+            border: 2px solid #004d98 !important;
+            color: #004d98 !important;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+            font-weight: bold;
+            padding: 5px 15px;
+            border-radius: 30px;
+        }
+
+        .vip-dropdown-toggle::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.5), transparent);
+            transform: skewX(-25deg);
+            animation: vipShine 3s infinite;
+        }
+
+        @keyframes vipShine {
+            0% {
+                left: -100%;
+            }
+
+            20% {
+                left: 200%;
+            }
+
+            100% {
+                left: 200%;
+            }
+        }
+
+        /* VIP Navbar */
+        .vip-navbar {
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%) !important;
+            border-bottom: 2px solid #004d98 !important;
+            position: relative;
+        }
+
+        .vip-navbar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.4), transparent);
+            animation: navbarShine 8s linear infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .vip-navbar::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                radial-gradient(#004d98 1.5px, transparent 1.5px),
+                radial-gradient(#004d98 1px, transparent 1px),
+                radial-gradient(#004d98 2px, transparent 2px),
+                radial-gradient(white 1px, transparent 1px);
+            background-size: 60px 60px, 45px 45px, 90px 90px, 30px 30px;
+            background-position: 0 0, 15px 25px, 40px 10px, 10px 10px;
+            opacity: 0;
+            animation: sparkles 4s linear infinite;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .vip-navbar>* {
+            position: relative;
+            z-index: 3;
+        }
+
+        @keyframes navbarShine {
+            0% {
+                left: -100%;
+            }
+
+            100% {
+                left: 100%;
+            }
+        }
+
+        @keyframes sparkles {
+            0% {
+                opacity: 0;
+                transform: translateY(0);
+            }
+
+            50% {
+                opacity: 1.0;
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateY(-15px);
+            }
+        }
+
+        .dropdown-menu {
+            background: rgba(0, 53, 128, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .dropdown-item {
+            color: white;
+        }
+
+        .dropdown-item:hover {
+            background: #a50044;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark mb-4"
+        th:classappend="${session.loggedUser != null && session.loggedUser.vip ? 'vip-navbar' : ''}">
+        <div class="container">
+            <a class="navbar-brand" href="/home">
+                <img src="/favicon.png" style="height:28px;width:28px;object-fit:contain;margin-right:8px;border-radius:4px;"> FOOTBALLHUB
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
+                aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <div class="ms-auto d-flex flex-column flex-lg-row align-items-lg-center gap-3 mt-3 mt-lg-0">
+                    <a href="/home" class="btn btn-outline-light btn-sm rounded-pill px-3 w-fit-content">
+                        <i class="fas fa-home me-1"></i> Home
+                    </a>
+
+                    <!-- VIP STATUS -->
+                    <div th:if="${session.loggedUser != null && session.loggedUser.vip}">
+                        <span class="badge fw-bold px-3 py-2"
+                            th:style="${session.loggedUser.membershipPlan != null && session.loggedUser.membershipPlan.cardColor != null ? 'background-color:' + session.loggedUser.membershipPlan.cardColor + ';color:#fff;' : 'background-color:#fbbf24;color:#1a1a1a;'}">
+                            <i class="fas fa-crown me-2"></i><span th:text="${session.loggedUser.membershipPlan != null ? #strings.toUpperCase(session.loggedUser.membershipPlan.name) + ' MEMBER' : 'VIP MEMBER'}">VIP MEMBER</span>
+                        </span>
+                    </div>
+
+                    <!-- Profile Dropdown -->
+                    <div class="dropdown profile-dropdown" th:if="${session.loggedUser != null}">
+                        <a href="#" class="dropdown-toggle text-decoration-none"
+                            th:classappend="${session.loggedUser.vip ? 'vip-dropdown-toggle' : ''}"
+                            data-bs-toggle="dropdown">
+                            <img th:src="${session.loggedUser.imageUrl != null ? session.loggedUser.imageUrl : 'https://ui-avatars.com/api/?name=' + session.loggedUser.username}"
+                                class="profile-avatar">
+                            <span th:text="${session.loggedUser.username}">User</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="/home"><i class="fas fa-home me-2"></i> Home</a></li>
+                            <li><a class="dropdown-item" href="/profile"><i class="fas fa-user-cog me-2"></i> Manage Profile</a></li>
+                            <li><a class="dropdown-item" href="/my-team"><i class="fas fa-users-cog me-2"></i> My Team Info</a></li>
+                            <li><a class="dropdown-item" href="/my-bookings"><i class="fas fa-calendar-alt me-2"></i> My Bookings</a></li>
+                            <li><a class="dropdown-item" href="/membership"><i class="fas fa-crown me-2"></i> Membership</a></li>
+                            <li><a class="dropdown-item" href="/contact"><i class="fas fa-envelope me-2"></i> Contact Us</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="glass-panel">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-history me-2"></i> Match History</h2>
+                <a href="/home" class="btn btn-primary fw-bold text-uppercase"
+                    style="background-color: #a50044; border:none;">
+                    <i class="fas fa-plus me-2"></i> New Booking
+                </a>
+            </div>
+
+            <!-- Flash Messages -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle me-2"></i> <span th:text="${success}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i> <span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <div th:if="${param.paid}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle me-2"></i> <strong>Payment Successful!</strong> Your booking is now
+                confirmed.
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>#ID</th>
+                            <th>Field</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Payment</th>
+                            <th>Status</th>
+                            <th>QR</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="booking : ${bookings}">
+                            <td class="fw-bold" th:text="'#' + ${booking.bookingId}">#101</td>
+                            <td class="fw-bold" style="color: #003580;"
+                                th:text="${booking.field != null ? booking.field.name : 'N/A'}">Field A</td>
+                            <td th:text="${booking.date}">2025-11-28</td>
+                            <td>
+                                <span th:text="${booking.startTime}">10:00</span> -
+                                <span th:text="${booking.endTime}">11:00</span>
+                            </td>
+                            <td>
+                                <small th:text="${booking.paymentStatus}" class="text-muted">-</small>
+                            </td>
+                            <td>
+                                <span th:if="${booking.status == 'PENDING'}"
+                                    class="status-badge status-pending">Unpaid</span>
+                                <span th:if="${booking.status == 'APPROVED'}"
+                                    class="status-badge status-approved">Confirmed</span>
+                                <span th:if="${booking.status == 'REJECTED'}"
+                                    class="status-badge status-rejected">Rejected</span>
+                            </td>
+                            <!-- QR Code cell -->
+                            <td>
+                                <div th:if="${booking.status == 'APPROVED'}">
+                                    <!-- Thumbnail: click to show full size modal -->
+                                    <img th:src="@{/qr/{id}(id=${booking.bookingId})}"
+                                        th:data-booking-id="${booking.bookingId}" class="qr-thumb"
+                                        onclick="showQrModal(this)" title="Click to show full QR"
+                                        style="width:48px;height:48px;cursor:pointer;border-radius:6px;border:2px solid #3b82f6;transition:transform 0.2s;"
+                                        onmouseover="this.style.transform='scale(1.15)'"
+                                        onmouseout="this.style.transform='scale(1)'">
+                                    <div th:if="${booking.checkedIn}" class="mt-1">
+                                        <span class="badge bg-success" style="font-size:0.65rem;"><i
+                                                class="fas fa-check-circle me-1"></i>Checked In</span>
+                                    </div>
+                                </div>
+                                <span th:if="${booking.status != 'APPROVED'}" class="text-muted small">—</span>
+                            </td>
+
+                            <td class="d-flex flex-wrap gap-1">
+                                <!-- PAY BUTTON: Only show if Pending -->
+                                <a th:if="${booking.status == 'PENDING'}"
+                                    th:href="@{/payment/{id}(id=${booking.bookingId})}"
+                                    class="btn btn-sm btn-success fw-bold">
+                                    <i class="fas fa-credit-card me-1"></i> Pay Now
+                                </a>
+
+                                <!-- DOWNLOAD RECEIPT BUTTON: Only show if Approved -->
+                                <a th:if="${booking.status == 'APPROVED'}"
+                                    th:href="@{/receipt/{id}(id=${booking.bookingId})}"
+                                    class="btn btn-sm btn-primary fw-bold" target="_blank">
+                                    <i class="fas fa-download me-1"></i> Receipt
+                                </a>
+
+                                <!-- RATE BUTTON: Only for Full Payment bookings not yet reviewed -->
+                                <a th:if="${booking.paymentStatus == 'Full Payment' and !reviewedBookingIds.contains(booking.bookingId)}"
+                                    th:href="@{/review/{id}(id=${booking.bookingId})}" class="btn btn-sm fw-bold"
+                                    style="background: linear-gradient(135deg,#f59e0b,#d97706); color:white; border:none;">
+                                    <i class="fas fa-star me-1"></i> Rate
+                                </a>
+                                <!-- RATED indicator -->
+                                <span
+                                    th:if="${booking.paymentStatus == 'Full Payment' and reviewedBookingIds.contains(booking.bookingId)}"
+                                    class="btn btn-sm fw-bold"
+                                    style="background:#e2f7ea; color:#198754; border:1px solid #198754; cursor:default;">
+                                    <i class="fas fa-star me-1"></i> Rated ✓
+                                </span>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(bookings)}">
+                            <td colspan="8" class="text-center py-5 text-muted">No bookings found.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR Full-Size Modal -->
+    <div class="modal fade" id="qrModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content text-center">
+                <div class="modal-header" style="background:#003580;color:white;">
+                    <h5 class="modal-title"><i class="fas fa-qrcode me-2"></i>Your Booking QR Code</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <p class="text-muted mb-3">Show this QR code to staff to verify your attendance.</p>
+                    <img id="qrModalImg" src="" alt="QR Code"
+                        style="width:240px;height:240px;border:3px solid #003580;border-radius:12px;">
+                    <p class="mt-3 fw-bold" id="qrModalInfo"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIP MODAL -->
+    <div class="modal fade" id="vipModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content"
+                style="background: linear-gradient(135deg, #004D98 0%, #A50044 100%); color: white;">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title fw-bold"><i class="fas fa-crown text-warning me-2"></i>VIP Membership</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center p-4">
+                    <div class="mb-3">
+                        <i class="fas fa-gem fa-4x text-warning animate__animated animate__pulse animate__infinite"></i>
+                    </div>
+                    <h3 class="fw-bold">Become a Legend!</h3>
+                    <p class="fs-5">Get <strong>10% OFF</strong> on all field bookings for 1 Year.</p>
+                    <h2 class="text-warning fw-bold my-4 display-4">RM 1000<span
+                            class="fs-6 text-white opacity-75">/yr</span></h2>
+
+                    <form action="/subscribe-vip" method="post">
+                        <button type="submit"
+                            class="btn btn-warning w-100 fw-bold py-3 fs-5 rounded-pill shadow-lg hover-scale">
+                            SUBSCRIBE NOW
+                        </button>
+                    </form>
+                    <p class="mt-3 small opacity-75">Instant activation. Cancel anytime.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function showQrModal(img) {
+            const bookingId = img.getAttribute('data-booking-id');
+            document.getElementById('qrModalImg').src = '/qr/' + bookingId;
+            document.getElementById('qrModalInfo').textContent = 'Booking #' + bookingId;
+            new bootstrap.Modal(document.getElementById('qrModal')).show();
+        }
+    </script>
+</body>
+
+</html>

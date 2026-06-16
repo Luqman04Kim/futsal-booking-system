@@ -1,0 +1,123 @@
+\chapter{System Implementation}
+\thispagestyle{empty}
+\label{ch:6}
+
+\section{Introduction}
+
+The implementation phase transforms the system design specifications into a functional, deployable application. This chapter documents the technical realization of FootballHub, detailing the development environment, tools, coding practices, and key implementation decisions that brought the system design to life. The implementation process followed an iterative development approach, where core functionalities were built incrementally, tested continuously, and refined based on feedback and emerging requirements.
+
+The implementation prioritized code quality, maintainability, and adherence to established design patterns. Throughout development, particular attention was paid to ensuring consistency across the codebase, implementing proper error handling, maintaining security best practices, and creating intuitive user interfaces. The modular architecture established during the design phase facilitated parallel development of different system components, allowing efficient progress across the presentation, business logic, and data access layers.
+
+This chapter begins with an overview of the system's hierarchical menu structure, which provides context for understanding how users navigate and interact with different system functions. The system development section then explores the technical implementation of key modules, examining representative code patterns, explaining architectural choices, and highlighting solutions to implementation challenges. The discussion section reflects on the development experience, technical obstacles encountered, and lessons learned. Finally, the summary synthesizes the key aspects of the implementation and its alignment with design specifications.
+
+\section{System Hierarchical Menu}
+
+The menu structure in FootballHub is designed to provide intuitive navigation tailored to each user role while maintaining consistency in presentation and interaction patterns. The hierarchical organization reflects the functional groupings established in the requirements analysis and ensures users can efficiently access the features relevant to their responsibilities.
+
+\subsection{Customer Menu Structure}
+
+The customer-facing navigation provides access to core booking functionality and account management through a clean, simplified menu structure. The primary navigation elements are organized as follows:
+
+The \textbf{Home} page serves as the entry point, presenting the system's value proposition, featured branches, and quick access to the booking functionality. The navigation bar provides persistent access from any page within the customer portal. The \textbf{Branches} menu item directs users to a comprehensive listing of all branch locations, each displaying detailed information including address, contact number, operating hours, and available fields. Clicking on a specific branch navigates to a branch detail page showing all fields at that location with their current availability status and pricing.
+
+The \textbf{Book Now} menu item represents the primary transaction flow, guiding customers through the multi-step booking process. This option is prominently highlighted in the navigation to encourage bookings. Upon selection, customers are presented with an interactive booking interface where they select their desired branch, field, date, time slot, and optional services. The interface provides real-time feedback on slot availability and dynamically calculates pricing based on selections.
+
+The \textbf{My Bookings} section allows customers to manage their reservations through a personalized dashboard. This page displays all bookings associated with the logged-in customer, organized by status (upcoming, in-progress, completed). Each booking entry provides comprehensive details and action buttons for payment status updates and receipt downloads. Status indicators use color coding to provide at-a-glance understanding of booking states.
+
+The \textbf{Membership} menu item provides information about the VIP membership program, including benefits, pricing, and current membership status for logged-in users. VIP members see their expiration dates and exclusive perks, while non-VIP customers see promotional content encouraging membership sign-up.
+
+Account management functions are accessible through a user profile dropdown menu positioned in the top-right corner of the navigation bar. This dropdown includes options for \textbf{My Profile} (allowing profile information updates), \textbf{Settings} (for preference configuration), and \textbf{Logout} (for session termination). The profile dropdown provides persistent access to these secondary functions without cluttering the primary navigation.
+
+A \textbf{Contact Us} page is accessible from the footer navigation, providing multiple channels for customer support including an integrated AI chatbot accessible via a floating icon, email contact form, phone numbers, and customer service hours.
+
+\subsection{Staff Menu Structure}
+
+Staff members access a dedicated portal optimized for operational efficiency and task management. The staff navigation structure includes:
+
+The \textbf{Dashboard} serves as the staff landing page, providing an at-a-glance overview of assigned tasks, task completion statistics, and quick links to common actions. Visual indicators highlight pending tasks that require immediate attention, approaching deadlines, and recently completed work.
+
+The \textbf{My Tasks} section presents a comprehensive list of all tasks assigned to the logged-in staff member. Tasks are organized by status (pending, in-progress, completed) with filtering and sorting capabilities. Each task card displays the description, due date, priority level, and reference images if provided by management. Staff can update task status, upload proof of completion images, and add completion notes directly from this interface.
+
+The \textbf{Booking Schedule} page displays all bookings relevant to the staff member's assigned branch, organized chronologically. This view helps staff prepare for upcoming field usage, identify potential scheduling conflicts, and coordinate facility preparation. The schedule can be filtered by field, date range, or booking status.
+
+The \textbf{Maintenance Reports} section enables staff to document facility issues systematically. The reporting form captures affected branch, specific field, problem description, severity level, and supporting photographs. Submitted reports are immediately visible to managers and logged permanently in the system.
+
+The \textbf{Payment Status} interface allows staff to view payment statuses for bookings at their assigned branch. This information supports coordination with customers regarding outstanding balances and helps staff understand revenue collection status without access to sensitive financial controls reserved for management.
+
+Profile management and logout functions are accessible through a profile dropdown menu similar to the customer interface, maintaining consistency in navigation patterns across user roles.
+
+\subsection{Manager Menu Structure}
+
+The manager interface provides comprehensive system administration capabilities organized into logical functional groups. The manager navigation structure is considerably more extensive than customer or staff menus, reflecting the breadth of managerial responsibilities:
+
+The \textbf{Dashboard} serves as the command center, presenting key performance indicators including total revenue, booking counts, customer statistics, and staff performance metrics. Interactive charts visualize revenue trends, booking patterns across branches, payment status distribution, and field utilization rates. The dashboard provides actionable insights and quick links to detailed management interfaces.
+
+The \textbf{Branch Management} section provides complete CRUD (Create, Read, Update, Delete) operations for branch entities. Managers can view all branches in a searchable table, add new locations with detailed information including contact details and geographic coordinates, edit existing branch information, and remove branches (with appropriate cascading effects on associated fields and bookings). Branch assignment of managers ensures proper oversight of each location.
+
+The \textbf{Field Management} interface allows managers to configure and maintain field inventories across all branches. The interface supports adding new fields with specifications including name, type, size, status, and pricing information. Field-specific discounts can be activated or deactivated for promotional purposes. Supervisor assignment allows delegation of field oversight to specific staff members. Field status management (available, maintenance, closed) controls booking availability.
+
+The \textbf{Staff Management} section provides comprehensive employee oversight. Managers can create new staff accounts with auto-generated staff IDs, assign staff to specific branches, designate positions and roles, monitor task completion metrics, and manage staff profiles. The interface displays staff performance indicators including total assigned tasks, completed tasks, and completion percentages. Advanced filtering allows managers to segment staff by role, position, branch assignment, or performance criteria.
+
+The \textbf{Booking Management} interface provides system-wide visibility into all customer bookings. Advanced filtering capabilities allow managers to narrow results by branch, field, date range, payment status, or booking status. Managers can modify booking details, update payment statuses to reflect offline transactions, and delete erroneous entries. The interface supports bulk operations including CSV export for external analysis.
+
+The \textbf{User Management} section provides oversight of all customer accounts. Managers can view customer profiles, booking histories, visit counts, and VIP membership statuses. Account blocking/unblocking functionality allows managers to restrict access for users who violate terms of service or maintain persistent payment issues. The interface supports searching and filtering by various customer attributes.
+
+The \textbf{Payment Tracking} interface consolidates all financial transactions with clear categorization by payment stage (deposit only, full payment, overdue). Search and filter capabilities help identify customers requiring follow-up for outstanding balances. Integration with the PDF generation service produces formal receipts and invoices for accounting purposes.
+
+The \textbf{Reports \& Analytics} section provides detailed insights through specialized reporting interfaces. Revenue analysis breaks down earnings by branch, field, time period, and payment method. Booking pattern analysis identifies peak usage times, popular fields, and seasonal trends. Staff performance reports track task completion metrics across the organization.
+
+The \textbf{Maintenance Log} displays all maintenance reports submitted by staff members across all branches. Managers can review pending issues, create associated tasks for resolution, update status as problems are addressed, and maintain a historical record of facility maintenance.
+
+The \textbf{Pricing Matrix} interface enables dynamic pricing configuration based on temporal factors. Managers can define different pricing for specific days of the week and time slots, supporting peak/off-peak pricing strategies and promotional pricing periods.
+
+Administrative functions including profile management and system logout are accessible through a profile dropdown menu positioned consistently with other user roles.
+
+\section{System Development}
+
+The system was developed using Spring Boot framework implementing the three-tier architecture design. This section outlines the main implementation modules.
+
+\subsection{Development Tools}
+
+Visual Studio Code served as the development environment, MySQL Workbench for database management, and Maven for dependency management. Key dependencies include Spring Boot (web, JPA, Thymeleaf, mail), MySQL Connector, Google GenAI SDK, and OpenPDF library.
+
+\subsection{Core Implementation Layers}
+
+\textbf{Database Layer:} JPA entity classes use annotations (\texttt{@Entity}, \texttt{@Table}, \texttt{@OneToMany}, \texttt{@ManyToOne}) to map domain objects to MySQL tables. Repository interfaces extend \texttt{JpaRepository} for CRUD operations and custom queries.
+
+\textbf{Controller Layer:} Spring MVC controllers (\texttt{ManagerController}, \texttt{CustomerController}, \texttt{StaffController}) handle HTTP requests using \texttt{@GetMapping} and \texttt{@PostMapping}. Session-based authentication with role validation controls access.
+
+\textbf{Service Layer:} \texttt{EmailService} handles notifications and PDF attachments, \texttt{PdfService} generates receipts, and \texttt{BookingCleanupService} runs scheduled background tasks.
+
+\textbf{View Layer:} Thymeleaf templates provide server-side rendering with dynamic content binding. JavaScript libraries (jQuery, Bootstrap, Chart.js) enhance client-side interactivity.
+
+\subsection{Key Features}
+
+\textbf{Authentication:} Session-based login with role-based authorization. Password reset uses time-limited email tokens.
+
+\textbf{AI Chatbot:} Google GenAI SDK integration provides automated customer support with database queries for real-time information.
+
+\textbf{Dynamic Pricing:} Combination of base rates and \texttt{PriceMatrix} entity for time-based pricing with discounts and service charges.
+
+\textbf{File Management:} Image uploads via \texttt{MultipartFile} and PDF generation using OpenPDF library.
+
+\textbf{Automated Tasks:} \texttt{@Scheduled} annotations enable automatic booking cleanup and status updates.
+
+\textbf{Validation:} Client-side and server-side validation with user-friendly error messages.
+
+Performance optimization includes database indexing, connection pooling, and result set filtering.
+
+\section{Discussion}
+
+The implementation of FootballHub successfully applied the three-tier architecture through Spring Boot framework. The database layer using JPA effectively mapped domain objects to MySQL tables, while the repository pattern simplified data access operations. The controller layer handled user requests efficiently with session-based authentication providing adequate security for role-based access control across the three user types.
+
+The service layer encapsulated business logic well, with the email service, PDF generation, and scheduled cleanup tasks functioning as intended. Thymeleaf templates for the view layer enabled rapid UI development, and JavaScript libraries enhanced the user experience with interactive elements. Key features including the AI chatbot integration, dynamic pricing system, and automated tasks were implemented successfully and met the functional requirements.
+
+Overall, the selected technology stack proved suitable for the project scope. The modular architecture facilitated organized development and the implementation successfully addresses the problems identified in earlier chapters including manual booking processes, multi-branch management challenges, and business analytics requirements.
+
+\section{Summary}
+
+This chapter documented the implementation of FootballHub, transforming the architectural design into a functional web application. The hierarchical menu structure provides role-appropriate navigation for customers, staff, and managers. The system development section outlined the main implementation modules including the database layer using JPA, controller layer for request handling, service layer for business logic, and view layer using Thymeleaf templates. Key features such as authentication, AI chatbot integration, dynamic pricing, file management, and automated tasks were successfully implemented using Spring Boot framework.
+
+The implementation realizes the design specifications from Chapter Five, delivering a complete system that addresses manual booking processes, multi-branch management challenges, and business analytics requirements. The discussion reflected on how the three-tier architecture, technology choices, and modular design facilitated organized development and met functional requirements.
+
+The implemented system is ready for deployment and validation testing, establishing a foundation for robust football field booking management with potential for future enhancements.

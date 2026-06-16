@@ -1,0 +1,85 @@
+﻿Created At: 2026-05-25T05:31:03Z
+Completed At: 2026-05-25T05:31:03Z
+File Path: `file:///d:/luqma/TEST/FYP3/src/main/resources/templates/membership.html`
+Total Lines: 392
+Total Bytes: 14271
+Showing lines 1 to 392
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+1: <!DOCTYPE html>
+2: <html lang="en" xmlns:th="http://www.thymeleaf.org">
+3: 
+4: <head>
+5:     <link rel="icon" type="image/png" href="/favicon.png">
+6:     <meta charset="UTF-8">
+7:     <title>Membership Plans - FOOTBALLHUB</title>
+8:     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+9:     <link
+10:         href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700;800&family=Inter:wght@400;600&display=swap"
+11:         rel="stylesheet">
+12:     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+13: 
+14:     <style>
+15:         :root {
+16:             --barca-blue: #004D98;
+17:             --barca-red: #A50044;
+18:             --barca-yellow: #edbb00;
+19:         }
+20: 
+21:         body {
+22:             font-family: 'Inter', sans-serif;
+23:             background: linear-gradient(135deg, #000428 0%, #004e92 100%);
+24:             min-height: 100vh;
+25:             color: white;
+26:             padding-bottom: 50px;
+27:             overflow-x: hidden;
+28:         }
+29: 
+30:         .navbar {
+31:             background: rgba(0, 77, 152, 0.95);
+32:             border-bottom: 4px solid var(--barca-red);
+33:             backdrop-filter: blur(10px);
+34:         }
+35: 
+36:         .navbar-brand {
+37:             color: var(--barca-yellow) !important;
+38:             font-family: 'Chakra Petch';
+39:             letter-spacing: 2px;
+40:             font-weight: 800;
+41:         }
+42: 
+43:         .page-title {
+<truncated 12564 bytes>
+ck text-warning"></i> Priority booking status</div>
+362:                         <div th:if="${plan.freeAddonsIncluded}" class="feature-item"><i class="fas fa-check text-warning"></i> Free Extra Services Included!</div>
+363:                         <div class="feature-item"><i class="fas fa-check text-warning"></i> Exclusive Profile Badge</div>
+364:                     </div>
+365:                     <div class="plan-footer">
+366:                         <!-- Action: Show 'Upgrade' if user does NOT have this specific plan -->
+367:                         <a th:if="${session.loggedUser.membershipPlan == null || session.loggedUser.membershipPlan.id != plan.id}" 
+368:                            th:href="@{/payment/membership(planId=${plan.id})}" class="btn-upgrade">
+369:                             SUBSCRIBE NOW <i class="fas fa-arrow-right ms-2"></i>
+370:                         </a>
+371: 
+372:                         <!-- Show 'Active' button if user has exactly this plan -->
+373:                         <div th:if="${session.loggedUser.membershipPlan != null && session.loggedUser.membershipPlan.id == plan.id}">
+374:                             <button class="btn-current text-success fw-bold bg-white border border-success mb-2">
+375:                                 <i class="fas fa-check me-2"></i> CURRENT PLAN
+376:                             </button>
+377:                             <p class="small text-muted mb-0">
+378:                                 Expires: <span th:text="${#temporals.format(session.loggedUser.vipExpiryDate, 'dd-MM-yyyy')}"></span>
+379:                             </p>
+380:                         </div>
+381:                     </div>
+382:                 </div>
+383:             </div>
+384: 
+385:         </div>
+386:     </div>
+387: 
+388:     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+389: </body>
+390: 
+391: </html>
+392: 
+The above content shows the entire, complete file contents of the requested file.
+

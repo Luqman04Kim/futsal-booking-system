@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Manage Prices - FOOTBALLHUB</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #0f172a;
+            --accent-color: #3b82f6;
+            --accent-light: #eff6ff;
+            --accent-border: #bfdbfe;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+        }
+        body { background-color: var(--bg-color); font-family: 'Inter', sans-serif; color: var(--text-primary); }
+        .container-fluid { max-width: 1400px; padding: 30px; }
+
+        /* Header */
+        .header-card {
+            background: var(--card-bg); border-radius: 16px; padding: 25px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,.05); margin-bottom: 25px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-left: 5px solid var(--accent-color);
+        }
+        .field-info h2 { font-weight: 700; margin-bottom: 5px; }
+        .field-meta { display: flex; gap: 15px; align-items: center; color: var(--text-secondary); font-size: .95rem; }
+        .badge-custom { padding: 6px 12px; border-radius: 8px; font-weight: 600; font-size: .85rem; }
+        .badge-type  { background-color: #e0f2fe; color: #0284c7; }
+        .badge-size  { background-color: #f0fdf4; color: #16a34a; }
+
+        /* Cards */
+        .section-card {
+            background: var(--card-bg); border-radius: 16px; padding: 25px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,.05); margin-bottom: 25px;
+        }
+        .section-title { font-weight: 700; font-size: 1rem; color: var(--text-primary); margin-bottom: 0; }
+        .section-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: .9rem; }
+
+        /* Setup form */
+        .setup-label { font-size: .74rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; display: block; }
+        .setup-input { border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; font-weight: 600; width: 100%; transition: .2s; background: white; }
+        .setup-input:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(59,130,246,.12); }
+
+        /* Session grid */
+        .session-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .session-item { background: #f8fafc; border-radius: 10px; padding: 12px; border: 1.5px solid #e2e8f0; }
+        .session-badge { background: #1e40af; color: white; font-size: .7rem; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
+        .session-time { font-size: .72rem; color: var(--text-secondary); }
+        .preview-row { display: flex; gap: 6px; margin-top: 6px; }
+        .preview-chip { font-size: .68rem; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
+        .preview-weekday { background: #dbeafe; color: #1e40af; }
+        .preview-weekend { background: #fce7f3; color: #9d174d; }
+
+        /* Generate button */
+        .btn-generate {
+            background: linear-gradient(135deg, #1e40af, #3b82f6); color: white; border: none;
+            padding: 12px 28px; border-radius: 10px; font-weight: 700; font-size: .95rem;
+            transition: .2s; box-shadow: 0 4px 12px rgba(59,130,246,.35);
+        }
+        .btn-generate:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(59,130,246,.45); color: white; }
+
+        /* Table */
+        .table-custom { margin-bottom: 0; border-collapse: separate; border-spacing: 0; border: 1px solid var(--accent-border); border-radius: 12px; overflow: hidden; }
+        .table-custom thead th { background-color: #1e40af; color: white; font-weight: 600; text-transform: uppercase; font-size: .8rem; letter-spacing: .5px; padding: 15px 10px; vertical-align: middle; border-bottom: none; border-right: 1px solid rgba(255,255,255,.1); }
+        .table-custom thead th:last-child { border-right: none; }
+        .table-custom tbody td { padding: 10px 8px; vertical-align: middle; border-bottom: 1px solid var(--accent-border); border-right: 1px solid var(--accent-border); background-color: #fff; }
+        .table-custom tbody td:last-child { border-right: none; }
+        .table-custom tbody tr:last-child td { border-bottom: none; }
+        .table-custom tbody tr:nth-child(even) td { background-color: #f8fafc; }
+        .table-custom tbody tr:hover td:not(.time-cell) { background-color: #eff6ff; }
+        .table-custom thead th.weekend-col { background-color: #9d174d !important; }
+        .time-cell { font-weight: 700; color: #1e3a8a; background-color: #dbeafe !important; width: 140px; border-right: 2px solid var(--accent-border) !important; font-size: .82rem; }
+        .price-input-group { position: relative; max-width: 100px; margin: 0 auto; }
+        .price-currency { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); font-size: .8rem; font-weight: 500; }
+        .price-input { width: 100%; padding: 7px 5px 7px 28px; border: 1px solid #cbd5e1; border-radius: 8px; font-weight: 600; color: var(--text-primary); transition: .2s; text-align: right; background: white; font-size: .88rem; }
+        .price-input:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(59,130,246,.1); }
+        .price-input.is-default { border-color: #a5b4fc; background: #eef2ff; }
+
+        /* Action buttons */
+        .btn-save { background-color: var(--accent-color); color: white; padding: 12px 35px; border-radius: 10px; font-weight: 600; border: none; transition: .2s; box-shadow: 0 4px 6px -1px rgba(59,130,246,.3); }
+        .btn-save:hover { background-color: #2563eb; transform: translateY(-2px); color: white; }
+        .btn-restore { background: #f1f5f9; color: #64748b; border: 1.5px solid #e2e8f0; padding: 12px 20px; border-radius: 10px; font-weight: 600; transition: .2s; cursor: pointer; }
+        .btn-restore:hover { background: #fee2e2; color: #dc2626; border-color: #fca5a5; }
+        .btn-back { color: var(--text-secondary); font-weight: 500; text-decoration: none; display: flex; align-items: center; gap: 8px; transition: color .2s; }
+        .btn-back:hover { color: var(--primary-color); }
+
+        /* Discount */
+        .discount-card { background: var(--card-bg); border-radius: 16px; padding: 20px 25px; box-shadow: 0 4px 6px -1px rgba(0,0,0,.05); margin-bottom: 25px; border-left: 5px solid #10b981; }
+        .discount-card.has-discount { border-left-color: #f59e0b; background: linear-gradient(135deg, #fffbeb, #fef3c7); }
+        .discount-badge { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: 8px 16px; border-radius: 20px; font-weight: 700; font-size: 1.1rem; display: inline-flex; align-items: center; gap: 8px; animation: pulse-discount 2s infinite; }
+        @keyframes pulse-discount { 0%,100%{transform:scale(1);}50%{transform:scale(1.05);} }
+        .btn-apply-discount { background-color: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; transition: .2s; }
+        .btn-apply-discount:hover { background-color: #059669; transform: translateY(-1px); }
+        .btn-remove-discount { background-color: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; transition: .2s; }
+        .btn-remove-discount:hover { background-color: #dc2626; }
+        .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 4px; }
+    </style>
+</head>
+
+<body>
+<div class="container-fluid">
+
+    <!-- Flash messages -->
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i><span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i><span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <!-- Header -->
+    <div class="header-card">
+        <div class="field-info">
+            <div class="mb-2">
+                <a href="/manager/fields" class="btn-back"><i class="fas fa-arrow-left"></i> Back to Fields</a>
+            </div>
+            <h2 th:text="${field.name}">Field Name</h2>
+            <div class="field-meta">
+                <span th:if="${field.branch != null}">
+                    <i class="fas fa-building me-1"></i>
+                    <span th:text="${field.branch.name}">Branch</span>
+                </span>
+                <span class="badge-custom badge-type" th:text="${field.type}">Type</span>
+                <span class="badge-custom badge-size" th:text="${field.size}">Size</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Discount Control -->
+    <div class="discount-card" th:classappend="${field.discountActive != null and field.discountActive ? 'has-discount' : ''}">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <div>
+                <h5 class="mb-1 fw-bold"><i class="fas fa-tags me-2" style="color:#10b981;"></i>Field Discount</h5>
+                <p class="text-muted mb-0 small">Apply a percentage discount to all time slots for this field</p>
+            </div>
+            <div th:if="${field.discountActive != null and field.discountActive}" class="d-flex align-items-center gap-3">
+                <span class="discount-badge">
+                    <i class="fas fa-percent"></i>
+                    <span th:text="${field.discountPercentage} + '% OFF'">10% OFF</span>
+                </span>
+                <form action="/pricing/discount/clear" method="POST" class="d-inline">
+                    <input type="hidden" name="fieldId" th:value="${field.fieldId}">
+                    <button type="submit" class="btn-remove-discount">
+                        <i class="fas fa-times me-1"></i>Remove Discount
+                    </button>
+                </form>
+            </div>
+            <form th:unless="${field.discountActive != null and field.discountActive}"
+                  action="/pricing/discount/save" method="POST" class="d-flex align-items-center gap-2">
+                <input type="hidden" name="fieldId" th:value="${field.fieldId}">
+                <div class="input-group" style="width:180px;">
+                    <input type="number" name="discountPercentage" class="form-control" min="1" max="99" placeholder="Enter %" required style="border-radius:8px 0 0 8px;">
+                    <span class="input-group-text" style="border-radius:0 8px 8px 0;background:#f1f5f9;">%</span>
+                </div>
+                <button type="submit" class="btn-apply-discount">
+                    <i class="fas fa-check me-1"></i>Apply Discount
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!--          PRICE AUTO-SETUP TOOL                     -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <div class="section-card">
+        <div class="d-flex align-items-center gap-3 mb-4">
+            <div class="section-icon" style="background:#eff6ff;">
+                <i class="fas fa-magic" style="color:#3b82f6;"></i>
+            </div>
+            <div>
+                <div class="section-title">Price Auto-Setup Tool</div>
+                <div class="text-muted" style="font-size:.82rem;">
+                    Set max prices &amp; deduction per session — system calculates and pre-fills the table.
+                </div>
+            </div>
+        </div>
+
+        <!-- Max price inputs -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <label class="setup-label"><i class="fas fa-calendar-week me-1"></i>Max Weekday Price (RM)</label>
+                <input type="number" id="maxWeekday" class="setup-input" min="0" step="0.01" placeholder="e.g. 200" value="0">
+            </div>
+            <div class="col-md-3">
+                <label class="setup-label"><i class="fas fa-calendar-day me-1"></i>Max Weekend Price (RM)</label>
+                <input type="number" id="maxWeekend" class="setup-input" min="0" step="0.01" placeholder="e.g. 250" value="0">
+            </div>
+            <div class="col-12">
+                <div class="alert alert-info py-2 px-3 mb-0" style="font-size:.82rem;border-radius:8px;">
+                    <i class="fas fa-info-circle me-1"></i>
+                    <strong>Formula:</strong> Final Price = Max Price − Session Deduction.
+                    Weekday sessions apply Mon–Fri; Weekend applies Sat–Sun.
+                </div>
+            </div>
+        </div>
+
+        <!-- Session deductions -->
+        <label class="setup-label mb-2">Session Deductions (RM deducted from max price)</label>
+        <div class="session-grid mb-4" id="sessionGrid">
+            <!-- Injected by JS -->
+        </div>
+
+        <div class="d-flex align-items-center gap-3">
+            <button type="button" class="btn-generate" onclick="applyAutoSetup()">
+                <i class="fas fa-bolt me-2"></i>Generate Prices
+            </button>
+            <span class="text-muted small" id="setupStatus" style="font-size:.82rem;"></span>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!--          PRICE MATRIX TABLE                        -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <div class="section-card">
+        <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="section-icon" style="background:#f0fdf4;">
+                    <i class="fas fa-table" style="color:#16a34a;"></i>
+                </div>
+                <div>
+                    <div class="section-title">Price Matrix</div>
+                    <div class="text-muted" style="font-size:.82rem;">9 sessions × 7 days — edit any cell and click Save Changes</div>
+                </div>
+            </div>
+            <!-- Legend -->
+            <div class="d-flex align-items-center gap-3" style="font-size:.78rem;color:#64748b;">
+                <span><span class="legend-dot" style="background:#bfdbfe;"></span>Weekday</span>
+                <span><span class="legend-dot" style="background:#fbcfe8;"></span>Weekend</span>
+                <span><span class="legend-dot" style="background:#a5b4fc;"></span>Auto-filled</span>
+            </div>
+        </div>
+
+        <form action="/pricing/matrix/save" method="POST" id="matrixForm">
+            <input type="hidden" name="fieldId" th:value="${field.fieldId}">
+
+            <div class="table-responsive">
+                <table class="table table-custom text-center">
+                    <thead>
+                        <tr>
+                            <th>Session / Time</th>
+                            <th th:each="day : ${days}"
+                                th:text="${day}"
+                                th:classappend="${day.name() == 'SATURDAY' || day.name() == 'SUNDAY' ? ' weekend-col' : ''}">
+                                MON
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="hourStat, iterStat : ${startHours}" th:with="hour=${hourStat}">
+                            <td class="time-cell">
+                                <span class="session-badge" th:text="'S' + ${iterStat.count}">S1</span>
+                                <div class="mt-1" style="font-size:.76rem;"
+                                     th:text="${hour == 0 ? '00:00 – 02:00' :
+                                               hour == 22 ? '22:00 – 00:00' :
+                                               (hour < 10 ? '0' + hour : hour) + ':00 – ' + (hour + 2) + ':00'}">
+                                    08:00 – 10:00
+                                </div>
+                            </td>
+                            <td th:each="day : ${days}"
+                                th:with="dayPrices=${priceMap.get(day.name())}, priceValue=${dayPrices != null ? dayPrices.get(hour) : null}"
+                                th:classappend="${day.name() == 'SATURDAY' || day.name() == 'SUNDAY' ? ' weekend-col' : ''}">
+                                <div class="price-input-group">
+                                    <span class="price-currency">RM</span>
+                                    <input type="number" step="0.01"
+                                           th:name="'price_' + ${day} + '_' + ${hour}"
+                                           th:value="${priceValue}"
+                                           class="price-input"
+                                           placeholder="0"
+                                           th:attr="data-session=${iterStat.index}, data-day=${day.name()}">
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="d-flex justify-content-end gap-3 mt-4">
+                <button type="button" class="btn-restore" onclick="restoreDefaults()">
+                    <i class="fas fa-undo me-2"></i>Restore Default
+                </button>
+                <button type="submit" class="btn-save">
+                    <i class="fas fa-save me-2"></i>Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script th:inline="javascript">
+/*<![CDATA[*/
+const FIELD_ID   = /*[[${field.fieldId}]]*/ 0;
+const STORAGE_KEY = 'pm_defaults_' + FIELD_ID;
+
+const SESSION_TIMES = [
+    '08:00 – 10:00', '10:00 – 12:00', '12:00 – 14:00',
+    '14:00 – 16:00', '16:00 – 18:00', '18:00 – 20:00',
+    '20:00 – 22:00', '22:00 – 00:00', '00:00 – 02:00'
+];
+const WEEKENDS = ['SATURDAY', 'SUNDAY'];
+
+// ── Build the session deduction cards ────────────────────────────
+function buildSessionGrid() {
+    const grid = document.getElementById('sessionGrid');
+    let html = '';
+    for (let i = 0; i < 9; i++) {
+        html += `
+        <div class="session-item">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="session-badge">Session ${i + 1}</span>
+                <span class="session-time">${SESSION_TIMES[i]}</span>
+            </div>
+            <label class="setup-label">Deduction (RM)</label>
+            <input type="number" id="ded_${i}" class="setup-input" min="0" step="0.01"
+                   value="0" placeholder="0" oninput="updatePreview(${i})">
+            <div class="preview-row" id="prev_${i}">
+                <span class="preview-chip preview-weekday" id="prev_wd_${i}">WD: —</span>
+                <span class="preview-chip preview-weekend" id="prev_we_${i}">WE: —</span>
+            </div>
+        </div>`;
+    }
+    grid.innerHTML = html;
+}
+
+// ── Live preview for a single session ────────────────────────────
+function updatePreview(idx) {
+    const maxWd = parseFloat(document.getElementById('maxWeekday').value) || 0;
+    const maxWe = parseFloat(document.getElementById('maxWeekend').value) || 0;
+    const ded   = parseFloat(document.getElementById('ded_' + idx).value) || 0;
+    document.getElementById('prev_wd_' + idx).textContent = 'WD: RM ' + Math.max(0, maxWd - ded).toFixed(2);
+    document.getElementById('prev_we_' + idx).textContent = 'WE: RM ' + Math.max(0, maxWe - ded).toFixed(2);
+}
+
+function refreshAllPreviews() {
+    for (let i = 0; i < 9; i++) updatePreview(i);
+}
+
+// ── Apply auto setup — fill the table ────────────────────────────
+function applyAutoSetup() {
+    const maxWd = parseFloat(document.getElementById('maxWeekday').value) || 0;
+    const maxWe = parseFloat(document.getElementById('maxWeekend').value) || 0;
+    const deductions = [];
+    for (let i = 0; i < 9; i++) {
+        deductions.push(parseFloat(document.getElementById('ded_' + i).value) || 0);
+    }
+
+    const defaults = {};
+    document.querySelectorAll('.price-input').forEach(inp => {
+        const session = parseInt(inp.getAttribute('data-session'), 10);
+        const day     = inp.getAttribute('data-day');
+        const ded     = deductions[session] || 0;
+        const max     = WEEKENDS.includes(day) ? maxWe : maxWd;
+        const price   = Math.max(0, max - ded);
+
+        inp.value = price.toFixed(2);
+        inp.classList.add('is-default');
+
+        if (!defaults[session]) defaults[session] = {};
+        defaults[session][day] = price;
+    });
+
+    // Save to localStorage so Restore Default can retrieve it later
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ maxWd, maxWe, deductions, defaults }));
+
+    document.getElementById('setupStatus').innerHTML =
+        '<span style="color:#16a34a;"><i class="fas fa-check-circle me-1"></i>Prices generated — review and click <strong>Save Changes</strong> to apply.</span>';
+}
+
+// ── Restore default (last generated) prices ──────────────────────
+function restoreDefaults() {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) {
+        alert('No auto-generated prices found.\nPlease fill in the setup form and click "Generate Prices" first.');
+        return;
+    }
+    const parsed = JSON.parse(raw);
+    const defaults = parsed.defaults || {};
+
+    document.querySelectorAll('.price-input').forEach(inp => {
+        const session = parseInt(inp.getAttribute('data-session'), 10);
+        const day     = inp.getAttribute('data-day');
+        if (defaults[session] && defaults[session][day] !== undefined) {
+            inp.value = parseFloat(defaults[session][day]).toFixed(2);
+            inp.classList.add('is-default');
+        }
+    });
+
+    document.getElementById('setupStatus').innerHTML =
+        '<span style="color:#3b82f6;"><i class="fas fa-undo me-1"></i>Reverted to auto-generated prices — click <strong>Save Changes</strong> to apply.</span>';
+}
+
+// ── Restore setup form values from storage on page load ──────────
+function restoreSetupForm() {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    try {
+        const { maxWd, maxWe, deductions } = JSON.parse(raw);
+        document.getElementById('maxWeekday').value = maxWd || 0;
+        document.getElementById('maxWeekend').value = maxWe || 0;
+        if (Array.isArray(deductions)) {
+            for (let i = 0; i < 9; i++) {
+                const el = document.getElementById('ded_' + i);
+                if (el) el.value = deductions[i] || 0;
+            }
+        }
+        refreshAllPreviews();
+    } catch (e) { /* ignore stale storage */ }
+}
+
+// ── Remove auto-fill highlight when user manually edits ──────────
+document.addEventListener('input', function(e) {
+    if (e.target.classList && e.target.classList.contains('price-input')) {
+        e.target.classList.remove('is-default');
+    }
+});
+
+// ── Init ─────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function () {
+    buildSessionGrid();
+    restoreSetupForm();
+
+    document.getElementById('maxWeekday').addEventListener('input', refreshAllPreviews);
+    document.getElementById('maxWeekend').addEventListener('input', refreshAllPreviews);
+});
+/*]]>*/
+</script>
+</body>
+</html>

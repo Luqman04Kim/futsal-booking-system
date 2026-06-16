@@ -1,0 +1,82 @@
+@startuml Manage User Sequence Diagram
+
+!theme plain
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+skinparam backgroundColor #FFFFFF
+skinparam maxMessageSize 200
+skinparam ParticipantPadding 80
+skinparam BoxPadding 30
+skinparam SequenceBoxBorderColor transparent
+hide footbox
+
+title Manage User Sequence Diagram
+
+actor User
+participant "User" as UserModel <<Model>>
+participant "Branch" as Branch <<Model>>
+
+== Register ==
+User -> UserModel: create new User
+activate UserModel
+UserModel --> User: User created
+deactivate UserModel
+
+alt Assign Branch (for Staff)
+    User -> Branch: get Branch
+    activate Branch
+    Branch --> User: Branch
+    deactivate Branch
+    User -> UserModel: setBranch(branch)
+end
+
+User -> UserModel: save User
+activate UserModel
+UserModel --> User: registered successfully
+deactivate UserModel
+
+== Login ==
+User -> UserModel: findByEmail(email)
+activate UserModel
+UserModel --> User: User found
+deactivate UserModel
+
+User -> UserModel: getPassword()
+activate UserModel
+UserModel --> User: password
+deactivate UserModel
+
+User -> UserModel: validate credentials
+activate UserModel
+alt Valid credentials
+    UserModel --> User: login successful
+else Invalid credentials
+    UserModel --> User: login failed
+end
+deactivate UserModel
+
+== Update User Info ==
+User -> UserModel: get User
+activate UserModel
+UserModel --> User: User found
+deactivate UserModel
+
+User -> UserModel: update details
+activate UserModel
+UserModel --> User: updated
+deactivate UserModel
+
+alt Update Branch (for Staff)
+    User -> Branch: get Branch
+    activate Branch
+    Branch --> User: Branch
+    deactivate Branch
+    User -> UserModel: setBranch(newBranch)
+end
+
+User -> UserModel: save User
+activate UserModel
+UserModel --> User: updated successfully
+deactivate UserModel
+
+@enduml

@@ -1,0 +1,88 @@
+@startuml Manage Task Sequence Diagram
+
+!theme plain
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+skinparam backgroundColor #FFFFFF
+skinparam maxMessageSize 200
+skinparam ParticipantPadding 80
+skinparam BoxPadding 30
+skinparam SequenceBoxBorderColor transparent
+hide footbox
+
+title Manage Task Sequence Diagram
+
+actor Manager
+participant "Task" as Task <<Model>>
+participant "User" as User <<Model>>
+participant "ProblemReport" as Report <<Model>>
+
+== Assign Task ==
+Manager -> Task: create Task
+activate Task
+Task --> Manager: Task created
+deactivate Task
+
+Manager -> User: get Staff
+activate User
+User --> Manager: Staff
+deactivate User
+Manager -> Task: setAssignedStaff(staff)
+
+alt Task from Problem Report
+    Manager -> Report: get Report
+    activate Report
+    Report --> Manager: Report
+    deactivate Report
+    Manager -> Task: setProblemReport(report)
+end
+
+Manager -> Task: save Task
+activate Task
+Task --> Manager: saved successfully
+deactivate Task
+
+== View Task ==
+Manager -> Task: get task details
+activate Task
+Task --> Manager: details
+deactivate Task
+
+Manager -> Task: getAssignedStaff()
+activate Task
+Task -> User: get Staff
+activate User
+User --> Task: Staff
+deactivate User
+Task --> Manager: Staff details
+deactivate Task
+
+== Update Task Status ==
+Manager -> Task: get Task
+activate Task
+Task --> Manager: Task found
+deactivate Task
+
+Manager -> Task: setStatus(status)
+activate Task
+Task --> Manager: status updated
+deactivate Task
+
+Manager -> Task: save Task
+activate Task
+Task --> Manager: updated successfully
+deactivate Task
+
+== Complete Task ==
+Manager -> Task: setStatus("COMPLETED")
+activate Task
+Task --> Manager: status set
+deactivate Task
+
+Manager -> Task: setCompletedAt(now)
+Manager -> Task: save Task
+activate Task
+Task --> Manager: completed successfully
+deactivate Task
+
+@enduml

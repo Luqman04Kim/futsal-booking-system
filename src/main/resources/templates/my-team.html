@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Team Info - FOOTBALLHUB</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/mobile-responsive.css">
+    <style>
+        :root {
+            --primary: #004D98;
+            --primary-dark: #002b5c;
+            --accent: #A50044;
+            --gold: #edbb00;
+            --bg: #f0f4f8;
+            --card: #ffffff;
+            --text: #1e293b;
+            --muted: #64748b;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ── Navbar ── */
+        .navbar {
+            background: rgba(0, 77, 152, 0.95) !important;
+            border-bottom: 4px solid var(--accent, #A50044) !important;
+            backdrop-filter: blur(10px) !important;
+            padding: 15px 0 !important;
+        }
+        .navbar-brand {
+            color: var(--gold) !important;
+            font-family: 'Chakra Petch';
+            letter-spacing: 2px;
+            font-weight: 800;
+            font-size: 1.3rem;
+        }
+        .profile-dropdown .dropdown-toggle {
+            color: white; text-decoration: none;
+            display: flex; align-items: center; gap: 10px;
+            padding: 6px 16px; border-radius: 30px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: .3s;
+        }
+        .profile-dropdown .dropdown-toggle:hover { background: rgba(255,255,255,0.2); }
+        .profile-dropdown .dropdown-menu {
+            background: var(--primary);
+            border: 2px solid var(--accent);
+            border-radius: 15px; padding: 10px;
+            margin-top: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,.5);
+            min-width: 220px;
+        }
+        .profile-dropdown .dropdown-item { color: white; padding: 10px 15px; border-radius: 8px; font-weight: 600; }
+        .profile-dropdown .dropdown-item:hover { background: var(--accent); color: var(--gold); transform: translateX(5px); }
+        .profile-dropdown .dropdown-divider { border-top: 1px solid rgba(255,255,255,0.1); }
+        .profile-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold); }
+
+        /* VIP styles */
+        .vip-navbar { background: linear-gradient(135deg, #000 0%, #1a1a1a 100%) !important; border-bottom: 2px solid var(--primary) !important; }
+        .vip-dropdown-toggle { background: linear-gradient(135deg, #1a1a1a, #000) !important; border: 2px solid var(--primary) !important; color: var(--primary) !important; box-shadow: 0 0 15px rgba(255,215,0,.4); font-weight: bold; padding: 5px 15px; border-radius: 30px; }
+
+        /* ── Hero Banner ── */
+        .hero-banner {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 60%, var(--accent) 100%);
+            color: white;
+            padding: 110px 0 55px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-banner::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        .hero-banner h1 { font-family: 'Chakra Petch'; font-size: 2.8rem; font-weight: 800; letter-spacing: 1px; }
+        .hero-banner p { opacity: .8; font-size: 1.05rem; }
+
+        /* ── Tab Pills ── */
+        .tab-pills-wrapper {
+            background: white;
+            border-radius: 50px;
+            padding: 6px;
+            display: inline-flex;
+            box-shadow: 0 4px 15px rgba(0,0,0,.08);
+        }
+        .tab-pills-wrapper .nav-link {
+            color: var(--muted);
+            font-weight: 600;
+            border-radius: 50px;
+            padding: 10px 28px;
+            border: none;
+            transition: .25s;
+            font-size: .95rem;
+        }
+        .tab-pills-wrapper .nav-link.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,77,152,.3);
+        }
+        .tab-pills-wrapper .nav-link:hover:not(.active) { color: var(--primary); background: #f0f4ff; }
+
+        /* ── Section Card ── */
+        .section-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,.06);
+            overflow: hidden;
+            border: none;
+        }
+        .section-header {
+            padding: 20px 24px;
+            background: white;
+            border-bottom: 2px solid #f1f5f9;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .section-header h5 {
+            font-family: 'Chakra Petch';
+            color: var(--primary);
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        /* ── Match Result Table ── */
+        .result-table th {
+            background: #f8fafc;
+            color: var(--muted);
+            font-weight: 700;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            padding: 12px 16px;
+            border: none;
+        }
+        .result-table td {
+            padding: 14px 16px;
+            vertical-align: middle;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .result-table tbody tr:last-child td { border-bottom: none; }
+        .result-table tbody tr:hover { background: #fafbff; }
+
+        /* ── Status Badges ── */
+        .badge-approved  { background: #d1fae5; color: #065f46; font-weight: 700; padding: 5px 12px; border-radius: 20px; font-size: .8rem; }
+        .badge-pending   { background: #fef3c7; color: #92400e; font-weight: 700; padding: 5px 12px; border-radius: 20px; font-size: .8rem; }
+        .badge-rejected  { background: #fee2e2; color: #991b1b; font-weight: 700; padding: 5px 12px; border-radius: 20px; font-size: .8rem; }
+        .badge-completed { background: #e0e7ff; color: #3730a3; font-weight: 700; padding: 5px 12px; border-radius: 20px; font-size: .8rem; }
+        .badge-upcoming  { background: #dbeafe; color: #1e40af; font-weight: 700; padding: 5px 12px; border-radius: 20px; font-size: .8rem; }
+        .badge-past      { background: #f1f5f9; color: #475569; font-weight: 700; padding: 5px 12px; border-radius: 20px; font-size: .8rem; }
+
+        /* ── Result Score Badge ── */
+        .score-badge {
+            font-family: 'Chakra Petch';
+            font-weight: 700;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: .95rem;
+            background: linear-gradient(135deg, #1e293b, #334155);
+            color: white;
+            letter-spacing: .5px;
+        }
+        .no-result-badge {
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: .82rem;
+            background: #f1f5f9;
+            color: var(--muted);
+            font-style: italic;
+        }
+
+        /* ── Field chip ── */
+        .field-chip {
+            background: linear-gradient(135deg, var(--primary), #1e5fa8);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: .8rem;
+            font-weight: 600;
+        }
+
+        /* ── Date display ── */
+        .date-block .date-day { font-weight: 700; font-size: 1rem; color: var(--text); }
+        .date-block .date-time { font-size: .82rem; color: var(--muted); }
+
+        /* ── User avatar row ── */
+        .user-row { display: flex; align-items: center; gap: 10px; }
+        .user-row img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid #e2e8f0; }
+        .user-row .name { font-weight: 600; font-size: .9rem; }
+
+        /* ── Filter card ── */
+        .filter-bar {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px dashed #e2e8f0;
+        }
+
+        /* ── Empty State ── */
+        .empty-state {
+            text-align: center; padding: 60px 20px;
+        }
+        .empty-state .icon-ring {
+            width: 80px; height: 80px; border-radius: 50%;
+            background: #f0f4f8;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 2rem; color: var(--muted);
+        }
+        .empty-state h6 { color: var(--text); font-weight: 700; margin-bottom: 6px; }
+        .empty-state p { color: var(--muted); font-size: .9rem; margin: 0; }
+
+        /* ── Upcoming indicator ── */
+        .upcoming-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            display: inline-block; margin-right: 6px;
+        }
+        .dot-upcoming { background: #3b82f6; animation: pulse 2s infinite; }
+        .dot-past     { background: #94a3b8; }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50%       { opacity: .6; transform: scale(1.3); }
+        }
+
+        /* ── Stats strip ── */
+        .stats-strip {
+            display: flex; gap: 12px; margin-bottom: 20px;
+        }
+        .stat-pill {
+            background: white;
+            border-radius: 12px;
+            padding: 14px 20px;
+            flex: 1;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,.05);
+            border: 1px solid #e2e8f0;
+        }
+        .stat-pill .num { font-family: 'Chakra Petch'; font-size: 1.6rem; font-weight: 800; }
+        .stat-pill .lbl { font-size: .75rem; color: var(--muted); font-weight: 600; text-transform: uppercase; }
+
+        .dropdown-menu { background: var(--primary); border: 2px solid var(--accent); }
+        .dropdown-item { color: white; }
+        .dropdown-item:hover { background: var(--accent); color: var(--gold); }
+
+        /* ── Your Match Highlight ── */
+        .my-match-row {
+            background: linear-gradient(90deg, rgba(237,187,0,.12) 0%, rgba(255,255,255,0) 100%) !important;
+            border-left: 4px solid var(--gold) !important;
+        }
+        .my-match-row:hover {
+            background: linear-gradient(90deg, rgba(237,187,0,.2) 0%, rgba(255,255,255,0) 100%) !important;
+        }
+        .you-badge {
+            display: inline-flex; align-items: center;
+            background: linear-gradient(135deg, var(--gold), #f5a623);
+            color: #1a1a1a;
+            font-size: .72rem; font-weight: 800;
+            padding: 3px 10px; border-radius: 20px;
+            letter-spacing: .03em;
+            vertical-align: middle;
+            box-shadow: 0 2px 6px rgba(237,187,0,.4);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top"
+        th:classappend="${session.loggedUser != null && session.loggedUser.vip ? 'vip-navbar' : ''}">
+        <div class="container">
+            <a class="navbar-brand" href="/home">
+                <img src="/favicon.png" style="height:28px;width:28px;object-fit:contain;margin-right:8px;border-radius:4px;"> FOOTBALLHUB
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
+                aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <div class="ms-auto d-flex flex-column flex-lg-row align-items-lg-center gap-3 mt-3 mt-lg-0">
+                    <a href="/home" class="btn btn-outline-light btn-sm rounded-pill px-3 w-fit-content">
+                        <i class="fas fa-home me-1"></i> Home
+                    </a>
+
+                    <!-- VIP STATUS -->
+                    <div th:if="${session.loggedUser != null && session.loggedUser.vip}">
+                        <span class="badge fw-bold px-3 py-2"
+                            th:style="${session.loggedUser.membershipPlan != null && session.loggedUser.membershipPlan.cardColor != null ? 'background-color:' + session.loggedUser.membershipPlan.cardColor + ';color:#fff;' : 'background-color:#fbbf24;color:#1a1a1a;'}">
+                            <i class="fas fa-crown me-2"></i><span th:text="${session.loggedUser.membershipPlan != null ? #strings.toUpperCase(session.loggedUser.membershipPlan.name) + ' MEMBER' : 'VIP MEMBER'}">VIP MEMBER</span>
+                        </span>
+                    </div>
+
+                    <!-- Profile Dropdown -->
+                    <div class="dropdown profile-dropdown" th:if="${session.loggedUser != null}">
+                        <a href="#" class="dropdown-toggle"
+                            th:classappend="${session.loggedUser.vip ? 'vip-dropdown-toggle' : ''}"
+                            data-bs-toggle="dropdown">
+                            <img th:src="${session.loggedUser.imageUrl != null ? session.loggedUser.imageUrl : 'https://ui-avatars.com/api/?name=' + session.loggedUser.username}"
+                                class="profile-avatar">
+                            <span th:text="${session.loggedUser.username}">User</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="/home"><i class="fas fa-home me-2"></i> Home</a></li>
+                            <li><a class="dropdown-item" href="/profile"><i class="fas fa-user-cog me-2"></i> Manage Profile</a></li>
+                            <li><a class="dropdown-item" href="/my-team"><i class="fas fa-users-cog me-2"></i> My Team Info</a></li>
+                            <li><a class="dropdown-item" href="/my-bookings"><i class="fas fa-calendar-alt me-2"></i> My Bookings</a></li>
+                            <li><a class="dropdown-item" href="/membership"><i class="fas fa-crown me-2"></i> Membership</a></li>
+                            <li><a class="dropdown-item" href="/contact"><i class="fas fa-envelope me-2"></i> Contact Us</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <div class="hero-banner">
+        <div class="container" style="position:relative;z-index:1">
+            <div class="mb-3">
+                <span style="background:rgba(255,255,255,.15);padding:6px 18px;border-radius:30px;font-size:.85rem;font-weight:600;letter-spacing:.5px;">
+                    <i class="fas fa-futbol me-2"></i>FOOTBALLHUB PORTAL
+                </span>
+            </div>
+            <h1 class="fw-bold mb-2">My Team Info</h1>
+            <p class="mb-0">View your match results and explore upcoming schedules by branch</p>
+        </div>
+    </div>
+
+    <div class="container mb-5 mt-4">
+
+        <!-- Tab Bar -->
+        <div class="d-flex justify-content-center mb-4">
+            <div class="tab-pills-wrapper">
+                <ul class="nav" id="pills-tab" role="tablist" style="gap:4px;">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="pills-results-tab" data-bs-toggle="pill"
+                            data-bs-target="#pills-results" type="button" role="tab">
+                            <i class="fas fa-trophy me-2"></i>Match Results
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="pills-schedule-tab" data-bs-toggle="pill"
+                            data-bs-target="#pills-schedule" type="button" role="tab">
+                            <i class="fas fa-calendar-alt me-2"></i>Match Schedule
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="tab-content" id="pills-tabContent">
+
+            <!-- ══════════════════════════════════════ -->
+            <!--           MATCH RESULTS TAB            -->
+            <!-- ══════════════════════════════════════ -->
+            <div class="tab-pane fade show active" id="pills-results" role="tabpanel">
+
+                <!-- Stats strip -->
+                <div class="stats-strip" th:if="${!#lists.isEmpty(pastBookings)}">
+                    <div class="stat-pill">
+                        <div class="num text-primary" th:text="${#lists.size(pastBookings)}">0</div>
+                        <div class="lbl">Total Matches</div>
+                    </div>
+                </div>
+
+                <div class="section-card">
+                    <div class="section-header">
+                        <h5><i class="fas fa-trophy me-2" style="color:var(--gold)"></i>My Past Match Results</h5>
+                        <span class="badge-pending" th:if="${!#lists.isEmpty(pastBookings)}"
+                            th:text="${#lists.size(pastBookings)} + ' matches'">0 matches</span>
+                    </div>
+                    <div th:if="${#lists.isEmpty(pastBookings)}">
+                        <div class="empty-state">
+                            <div class="icon-ring"><i class="fas fa-futbol"></i></div>
+                            <h6>No Past Matches Found</h6>
+                            <p>You haven't played any matches yet. Book a field to get started!</p>
+                            <a href="/home" class="btn btn-primary btn-sm rounded-pill mt-3 px-4">
+                                <i class="fas fa-plus me-2"></i>Book a Field
+                            </a>
+                        </div>
+                    </div>
+                    <div class="table-responsive" th:if="${!#lists.isEmpty(pastBookings)}">
+                        <table class="table result-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Date &amp; Time</th>
+                                    <th>Field / Branch</th>
+                                    <th>Booking Status</th>
+                                    <th>Match Result</th>
+                                    <th><i class="fas fa-images me-1" style="color:#0ea5e9;"></i>Match Photos</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="booking, stat : ${pastBookings}">
+                                    <td class="text-muted fw-bold" style="font-size:.85rem;"
+                                        th:text="${stat.count}">1</td>
+                                    <td>
+                                        <div class="date-block">
+                                            <div class="date-day"
+                                                th:text="${#temporals.format(booking.date, 'EEE, d MMM yyyy')}">Mon, 1 Jan</div>
+                                            <div class="date-time">
+                                                <i class="fas fa-clock me-1"></i>
+                                                <span th:text="${booking.startTime}">10:00</span>
+                                                –
+                                                <span th:text="${booking.endTime}">12:00</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="field-chip" th:text="${booking.field.name}">Field A</span>
+                                        <div class="text-muted mt-1" style="font-size:.78rem;"
+                                            th:if="${booking.field.branch != null}"
+                                            th:text="${booking.field.branch.name}">Branch</div>
+                                    </td>
+                                    <td>
+                                        <span th:switch="${booking.status}">
+                                            <span th:case="'APPROVED'" class="badge-approved"><i class="fas fa-check me-1"></i>Approved</span>
+                                            <span th:case="'PENDING'" class="badge-pending"><i class="fas fa-clock me-1"></i>Pending</span>
+                                            <span th:case="'REJECTED'" class="badge-rejected"><i class="fas fa-times me-1"></i>Rejected</span>
+                                            <span th:case="'COMPLETED'" class="badge-completed"><i class="fas fa-flag me-1"></i>Completed</span>
+                                            <span th:case="*" class="badge-past" th:text="${booking.status}">—</span>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span th:if="${booking.result != null}" class="score-badge"
+                                            th:text="${booking.result}">2-1</span>
+                                        <span th:if="${booking.result == null}" class="no-result-badge">
+                                            <i class="fas fa-minus me-1"></i>No result
+                                        </span>
+                                    </td>
+                                    <!-- Match Photos column -->
+                                    <td>
+                                        <a th:if="${booking.photoLink != null}"
+                                            th:href="${booking.photoLink}" target="_blank"
+                                            class="btn btn-sm fw-bold"
+                                            style="background:#0ea5e9;color:white;border:none;border-radius:20px;padding:5px 14px;font-size:.8rem;">
+                                            <i class="fas fa-images me-1"></i>View Album
+                                        </a>
+                                        <span th:if="${booking.photoLink == null}" class="text-muted" style="font-size:.82rem;">
+                                            <i class="fas fa-minus me-1"></i>No photos
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ══════════════════════════════════════ -->
+            <!--         MATCH SCHEDULE TAB             -->
+            <!-- ══════════════════════════════════════ -->
+            <div class="tab-pane fade" id="pills-schedule" role="tabpanel">
+
+                <div class="section-card">
+                    <div class="section-header">
+                        <h5><i class="fas fa-calendar-alt me-2" style="color:var(--accent)"></i>Branch Match Schedule</h5>
+                        <span class="badge-upcoming" th:if="${selectedBranchId != null && !#lists.isEmpty(matchSchedule)}"
+                            th:text="${#lists.size(matchSchedule)} + ' matches'">—</span>
+                    </div>
+
+                    <div class="p-4">
+                        <!-- Branch Filter -->
+                        <div class="filter-bar">
+                            <form action="/my-team" method="GET" class="row g-3 align-items-end">
+                                <div class="col-md-5">
+                                    <label class="form-label fw-bold text-muted small text-uppercase" style="letter-spacing:.05em;">
+                                        <i class="fas fa-building me-1"></i> Select Branch
+                                    </label>
+                                    <select name="branchId" class="form-select" onchange="this.form.submit()">
+                                        <option value="" disabled th:selected="${selectedBranchId == null}">— Choose a Branch —</option>
+                                        <option th:each="branch : ${branches}"
+                                            th:value="${branch.branchId}"
+                                            th:text="${branch.name}"
+                                            th:selected="${branch.branchId == selectedBranchId}">Branch</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="fas fa-search me-2"></i>View Schedule
+                                    </button>
+                                </div>
+                                <div class="col-md-2" th:if="${selectedBranchId != null}">
+                                    <a href="/my-team" class="btn btn-outline-secondary w-100">
+                                        <i class="fas fa-times me-1"></i>Clear
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- No branch selected -->
+                        <div th:if="${selectedBranchId == null}" class="empty-state">
+                            <div class="icon-ring"><i class="fas fa-map-marker-alt"></i></div>
+                            <h6>Choose a Branch</h6>
+                            <p>Select a branch above to view the full match schedule including upcoming and recent matches.</p>
+                        </div>
+
+                        <!-- Branch selected, matches found -->
+                        <div th:if="${selectedBranchId != null && !#lists.isEmpty(matchSchedule)}">
+                            <div class="table-responsive">
+                                <table class="table result-table mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Team / Customer</th>
+                                            <th>Date &amp; Time</th>
+                                            <th>Field</th>
+                                            <th>Status</th>
+                                            <th>Result</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="booking : ${matchSchedule}"
+                                            th:classappend="${booking.user.userId == session.loggedUser.userId ? 'my-match-row' : ''}"
+                                        >
+                                            <td>
+                                                <div class="user-row">
+                                                    <img th:src="${booking.user.imageUrl != null ? booking.user.imageUrl : 'https://ui-avatars.com/api/?name=' + booking.user.username + '&background=004D98&color=fff'}"
+                                                        alt="avatar">
+                                                    <div>
+                                                        <div class="name" th:text="${booking.user.username}">Customer</div>
+                                                        <div class="text-muted" style="font-size:.75rem;">
+                                                            <span th:text="${booking.user.email != null ? booking.user.email : ''}"></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!-- YOU badge -->
+                                                <span th:if="${booking.user.userId == session.loggedUser.userId}"
+                                                      class="you-badge ms-2"><i class="fas fa-star me-1"></i>Your Match</span>
+                                            </td>
+                                            <td>
+                                                <div class="date-block">
+                                                    <div class="d-flex align-items-center gap-1">
+                                                        <span class="upcoming-dot"
+                                                            th:classappend="${booking.date.isBefore(today) ? 'dot-past' : 'dot-upcoming'}"></span>
+                                                        <span class="date-day"
+                                                            th:text="${#temporals.format(booking.date, 'EEE, d MMM yyyy')}">Date</span>
+                                                    </div>
+                                                    <div class="date-time">
+                                                        <i class="fas fa-clock me-1"></i>
+                                                        <span th:text="${booking.startTime}">10:00</span>
+                                                        –
+                                                        <span th:text="${booking.endTime}">12:00</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="field-chip" th:text="${booking.field.name}">Field A</span>
+                                            </td>
+                                            <td>
+                                                <!-- Upcoming if date is today or future -->
+                                                <span th:if="${!booking.date.isBefore(today)}" class="badge-upcoming">
+                                                    <i class="fas fa-hourglass-half me-1"></i>Upcoming
+                                                </span>
+                                                <!-- Past match -->
+                                                <span th:if="${booking.date.isBefore(today)}" class="badge-past">
+                                                    <i class="fas fa-flag-checkered me-1"></i>Past
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span th:if="${booking.result != null}" class="score-badge"
+                                                    th:text="${booking.result}">2-1</span>
+                                                <span th:if="${booking.result == null && !booking.date.isBefore(today)}"
+                                                    class="badge-upcoming" style="font-size:.78rem;">TBD</span>
+                                                <span th:if="${booking.result == null && booking.date.isBefore(today)}"
+                                                    class="no-result-badge">No result</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Branch selected, no matches -->
+                        <div th:if="${selectedBranchId != null && #lists.isEmpty(matchSchedule)}" class="empty-state">
+                            <div class="icon-ring"><i class="fas fa-calendar-times"></i></div>
+                            <h6>No Matches Found</h6>
+                            <p>No approved or upcoming bookings found for this branch in the last 30 days.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- VIP MODAL -->
+    <div class="modal fade" id="vipModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content"
+                style="background: linear-gradient(135deg, #004D98 0%, #A50044 100%); color: white;">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title fw-bold"><i class="fas fa-crown text-warning me-2"></i>VIP Membership</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center p-4">
+                    <div class="mb-3">
+                        <i class="fas fa-gem fa-4x text-warning animate__animated animate__pulse animate__infinite"></i>
+                    </div>
+                    <h3 class="fw-bold">Become a Legend!</h3>
+                    <p class="fs-5">Get <strong>10% OFF</strong> on all field bookings for 1 Year.</p>
+                    <h2 class="text-warning fw-bold my-4 display-4">RM 1000<span
+                            class="fs-6 text-white opacity-75">/yr</span></h2>
+
+                    <form action="/subscribe-vip" method="post">
+                        <button type="submit"
+                            class="btn btn-warning w-100 fw-bold py-3 fs-5 rounded-pill shadow-lg hover-scale">
+                            SUBSCRIBE NOW
+                        </button>
+                    </form>
+                    <p class="mt-3 small opacity-75">Instant activation. Cancel anytime.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Auto-switch to Schedule tab if branchId in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('branchId')) {
+                var scheduleTab = new bootstrap.Tab(document.querySelector('#pills-schedule-tab'));
+                scheduleTab.show();
+            }
+
+            // Tab click events
+            document.querySelectorAll('#pills-tab button').forEach(function (btn) {
+                btn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    new bootstrap.Tab(btn).show();
+                });
+            });
+        });
+    </script>
+</body>
+</html>

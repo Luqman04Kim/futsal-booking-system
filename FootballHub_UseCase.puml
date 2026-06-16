@@ -1,0 +1,69 @@
+@startuml FootballHub_UseCase
+
+title FOOTBALLHUB - Use Case Diagram
+
+left to right direction
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam linetype ortho
+
+skinparam usecase {
+    BackgroundColor #D3D3D3
+    BorderColor #000000
+    BorderThickness 1
+    FontSize 11
+}
+
+skinparam actor {
+    BackgroundColor #FFFFFF
+    BorderColor #000000
+}
+
+skinparam rectangle {
+    BackgroundColor #FFFFFF
+    BorderColor #000000
+}
+
+actor Customer as C
+C -[hidden]down-> (dummy1)
+actor Staff as S
+
+actor Admin as A
+
+rectangle "FOOTBALLHUB System" {
+    usecase UC1 as "UC1: Manage User"
+    usecase UC2 as "UC2: Manage Branch"
+    usecase UC3 as "UC3: Manage Field"
+    usecase UC4 as "UC4: Manage Booking"
+    usecase UC5 as "UC5: Manage Staff"
+    usecase UC6 as "UC6: Manage Task"
+    usecase UC7 as "UC7: Manage Maintenance"
+    usecase UC8 as "UC8: Manage Payment"
+    
+    UC1 -[hidden]down-> UC2
+    UC2 -[hidden]down-> UC3
+    UC3 -[hidden]down-> UC4
+    UC4 -[hidden]down-> UC5
+    UC5 -[hidden]down-> UC6
+    UC6 -[hidden]down-> UC7
+    UC7 -[hidden]down-> UC8
+}
+
+C --> UC1
+C --> UC4
+C --> UC8
+
+S --> UC1
+S --> UC6
+S --> UC7
+
+A --> UC1
+A --> UC2
+A --> UC3
+A --> UC4
+A --> UC5
+A --> UC6
+A --> UC7
+A --> UC8
+
+@enduml

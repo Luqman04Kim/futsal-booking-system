@@ -1,0 +1,92 @@
+@startuml Manage Staff Sequence Diagram
+
+!theme plain
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+skinparam backgroundColor #FFFFFF
+skinparam maxMessageSize 200
+skinparam ParticipantPadding 80
+skinparam BoxPadding 30
+skinparam SequenceBoxBorderColor transparent
+hide footbox
+
+title Manage Staff Sequence Diagram
+
+actor Manager
+participant "User" as User <<Model>>
+participant "Branch" as Branch <<Model>>
+participant "Task" as Task <<Model>>
+
+== Add Staff ==
+Manager -> User: create Staff
+activate User
+User --> Manager: Staff created
+deactivate User
+
+Manager -> User: setRole("STAFF")
+Manager -> User: setPosition(position)
+
+alt Assign Branch to Staff
+    Manager -> Branch: get Branch
+    activate Branch
+    Branch --> Manager: Branch
+    deactivate Branch
+    Manager -> User: setBranch(branch)
+end
+
+Manager -> User: save Staff
+activate User
+User --> Manager: saved successfully
+deactivate User
+
+== View Staff ==
+Manager -> User: get staff details
+activate User
+User --> Manager: details
+deactivate User
+
+Manager -> User: getBranch()
+activate User
+User -> Branch: get Branch
+activate Branch
+Branch --> User: Branch
+deactivate Branch
+User --> Manager: Branch details
+deactivate User
+
+Manager -> User: getTasks()
+activate User
+User -> Task: get Tasks
+activate Task
+Task --> User: Tasks
+deactivate Task
+User --> Manager: Task list
+deactivate User
+
+== Update Staff ==
+Manager -> User: get Staff
+activate User
+User --> Manager: Staff found
+deactivate User
+
+Manager -> User: update details
+activate User
+User --> Manager: updated
+deactivate User
+
+Manager -> User: save Staff
+activate User
+User --> Manager: updated successfully
+deactivate User
+
+== Delete Staff ==
+Manager -> User: delete Staff
+activate User
+User -> Task: delete tasks
+activate Task
+Task --> User: deleted
+deactivate Task
+User --> Manager: deleted
+deactivate User
+
+@enduml

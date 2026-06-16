@@ -1,0 +1,542 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FOOTBALLHUB - The Ultimate Arena</title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Fonts: Chakra Petch (Sporty) & Inter (Clean) -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700;800&family=Inter:wght@400;600&display=swap"
+        rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --barca-blue: #004d98;
+            --barca-red: #a50044;
+            --barca-gold: #edbb00;
+            --dark-bg: #181733;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        /* --- FLOATING NAVBAR --- */
+        .navbar {
+            background: rgba(20, 20, 20, 0.8);
+            backdrop-filter: blur(15px);
+            padding: 15px 0;
+            transition: all 0.3s;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .navbar-brand {
+            font-family: 'Chakra Petch', sans-serif;
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: 2px;
+            color: var(--barca-gold) !important;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8) !important;
+            font-weight: 600;
+            margin: 0 10px;
+            transition: color 0.3s;
+        }
+
+        .nav-link:hover {
+            color: var(--barca-gold) !important;
+        }
+
+        .btn-login {
+            background: var(--barca-blue);
+            color: white;
+            border-radius: 30px;
+            padding: 8px 25px;
+            font-weight: 700;
+            transition: transform 0.2s;
+        }
+
+        .btn-login:hover {
+            background: #003a75;
+            transform: scale(1.05);
+            color: white;
+        }
+
+        /* --- HERO SECTION --- */
+        .hero {
+            height: 100vh;
+            background: url('https://images.unsplash.com/photo-1522778119026-d647f0596c20?q=80&w=2070&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle, rgba(0, 0, 0, 0.2) 0%, #000 100%);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 900px;
+            padding: 20px;
+        }
+
+        .hero-title {
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: 5rem;
+            font-weight: 900;
+            line-height: 1;
+            background: linear-gradient(to right, #fff, #ccc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 40px;
+        }
+
+        .btn-cta {
+            background: linear-gradient(90deg, var(--barca-red) 0%, #820036 100%);
+            color: white;
+            padding: 15px 50px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            border-radius: 50px;
+            box-shadow: 0 0 30px rgba(165, 0, 68, 0.6);
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-cta:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 50px rgba(165, 0, 68, 0.8);
+            color: white;
+        }
+
+        /* --- SECTIONS GENERIC --- */
+        .section-title {
+            font-family: 'Chakra Petch';
+            font-weight: 800;
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 60px;
+            color: white;
+            text-transform: uppercase;
+        }
+
+        .section-padding {
+            padding: 100px 0;
+        }
+
+        /* --- 1. OWNER PROFILE --- */
+        .owner-section {
+            background-color: #111;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .owner-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            display: flex;
+            align-items: center;
+            gap: 40px;
+        }
+
+        .owner-img {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 5px solid var(--barca-gold);
+            box-shadow: 0 0 30px rgba(237, 187, 0, 0.3);
+        }
+
+        .owner-info h3 {
+            font-family: 'Chakra Petch';
+            font-size: 2rem;
+            color: var(--barca-blue);
+        }
+
+        .owner-info p {
+            color: #aaa;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        /* --- 2. FACILITY QUALITY (APPLE GRID) --- */
+        .quality-section {
+            background-color: #000;
+        }
+
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .bento-card {
+            background: #1a1a1a;
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            height: 400px;
+            transition: transform 0.3s;
+        }
+
+        .bento-card:hover {
+            transform: scale(1.02);
+            z-index: 10;
+        }
+
+        .bento-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.6;
+            transition: opacity 0.3s;
+        }
+
+        .bento-card:hover .bento-img {
+            opacity: 0.3;
+        }
+
+        .bento-content {
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            right: 30px;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .bento-title {
+            font-family: 'Chakra Petch';
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        .bento-desc {
+            font-size: 1rem;
+            color: #ccc;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s;
+        }
+
+        .bento-card:hover .bento-desc {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Large Card Span */
+        .span-2 {
+            grid-column: span 2;
+        }
+
+        /* --- 3. HISTORY TIMELINE (LANDSCAPE SCROLL) --- */
+        .history-section {
+            background: linear-gradient(to bottom, #111, var(--barca-blue));
+            overflow-x: hidden;
+        }
+
+        .timeline-container {
+            display: flex;
+            gap: 50px;
+            overflow-x: auto;
+            padding: 50px 20px;
+            scroll-behavior: smooth;
+            scrollbar-width: none;
+            /* Hide scrollbar Firefox */
+        }
+
+        .timeline-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Hide scrollbar Chrome */
+
+        .timeline-card {
+            min-width: 400px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            position: relative;
+            border-top: 4px solid var(--barca-gold);
+        }
+
+        .year-badge {
+            font-size: 3rem;
+            font-weight: 900;
+            color: rgba(255, 255, 255, 0.1);
+            position: absolute;
+            top: 10px;
+            right: 20px;
+        }
+
+        .timeline-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #000;
+            border-top: 1px solid #333;
+            padding: 50px 0;
+            text-align: center;
+            color: #666;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 3rem;
+            }
+
+            .bento-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .span-2 {
+                grid-column: span 1;
+            }
+
+            .owner-card {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Floating Navbar -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#"><img src="/favicon.png"
+                    style="height:28px;width:28px;object-fit:contain;margin-right:8px;border-radius:4px;">
+                FOOTBALLHUB</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="#quality">Facilities</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#history">History</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#owner">Our Team</a></li>
+                    <li class="nav-item ms-3">
+                        <a href="/login" class="btn btn-login">LOGIN</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 1. HERO SECTION -->
+    <section class="hero">
+        <div class="hero-content" data-aos="fade-up">
+            <h1 class="hero-title">Play Like <span style="color: var(--barca-gold);">Legends</span></h1>
+            <p class="hero-subtitle">Experience world-class football facilities. Designed for champions.</p>
+            <a href="/register" class="btn btn-cta">Join the Club <i class="fas fa-arrow-right ms-2"></i></a>
+        </div>
+    </section>
+
+    <!-- 2. FACILITY QUALITY (Apple Bento Grid) -->
+    <section id="quality" class="quality-section section-padding">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">Elite Facilities</h2>
+
+            <div class="bento-grid">
+                <!-- Card 1: Turf (Large) -->
+                <div class="bento-card span-2" data-aos="fade-up" data-aos-delay="100">
+                    <img src="https://images.unsplash.com/photo-1556056504-5c7696c4c28d?q=80&w=2076" class="bento-img">
+                    <div class="bento-content">
+                        <div class="bento-title">FIFA Pro Turf</div>
+                        <p class="bento-desc">Hybrid grass technology ensuring perfect ball roll and player safety in
+                            all weather conditions.</p>
+                    </div>
+                </div>
+
+                <!-- Card 2: Lights -->
+                <div class="bento-card" data-aos="fade-up" data-aos-delay="200">
+                    <img src="https://images.unsplash.com/photo-1518091043644-c1d4457512c6?q=80&w=1931"
+                        class="bento-img">
+                    <div class="bento-content">
+                        <div class="bento-title">Stadium Lighting</div>
+                        <p class="bento-desc">1000 Lux LED floodlights for TV-quality visibility at night matches.</p>
+                    </div>
+                </div>
+
+                <!-- Card 3: Seating -->
+                <div class="bento-card" data-aos="fade-up" data-aos-delay="300">
+                    <img src="https://images.unsplash.com/photo-1624880357913-a8539238245b?q=80&w=2070"
+                        class="bento-img">
+                    <div class="bento-content">
+                        <div class="bento-title">Premium Seating</div>
+                        <p class="bento-desc">Comfortable spectator zones with excellent pitch views.</p>
+                    </div>
+                </div>
+
+                <!-- Card 4: Locker Rooms (Large) -->
+                <div class="bento-card span-2" data-aos="fade-up" data-aos-delay="400">
+                    <img src="https://images.unsplash.com/photo-1589487391730-58f20eb2c308?q=80&w=2074"
+                        class="bento-img">
+                    <div class="bento-content">
+                        <div class="bento-title">Pro Locker Rooms</div>
+                        <p class="bento-desc">Fully equipped changing rooms with showers and tactical boards.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. OWNER PROFILE -->
+    <section id="owner" class="owner-section section-padding">
+        <div class="container">
+            <h2 class="section-title" data-aos="zoom-in">The Vision</h2>
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="owner-card" data-aos="fade-up">
+                        <img src="/img/undraw_profile.svg" class="owner-img" alt="Owner">
+                        <div class="owner-info">
+                            <h3>John Doe <small style="font-size: 1rem; color: #666;">(Founder & Owner)</small></h3>
+                            <p>
+                                "Our mission was simple: bring the professional stadium experience to the local
+                                community.
+                                FOOTBALLHUB isn't just a pitch; it's a home for passion, discipline, and the beautiful
+                                game.
+                                We built this ground from a muddy lot to a state-of-the-art facility because every
+                                player deserves to feel like a pro."
+                            </p>
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Signature_sample.svg/1200px-Signature_sample.svg.png"
+                                style="height: 50px; filter: invert(1); opacity: 0.5;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. HISTORY (Horizontal Scroll) -->
+    <section id="history" class="history-section section-padding">
+        <div class="container-fluid">
+            <h2 class="section-title">Our Legacy</h2>
+            <p class="text-center text-muted mb-5">Swipe to explore our journey from 2015 to today.</p>
+
+            <div class="timeline-container">
+                <!-- 2015 -->
+                <div class="timeline-card">
+                    <span class="year-badge">2015</span>
+                    <img src="https://images.unsplash.com/photo-1529900748604-07564a03e7a6?q=80&w=500"
+                        class="timeline-img">
+                    <h4>The Beginning</h4>
+                    <p class="small text-muted">Acquired the land. It was just an empty field, but we had a vision.</p>
+                </div>
+
+                <!-- 2017 -->
+                <div class="timeline-card">
+                    <span class="year-badge">2017</span>
+                    <img src="https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?q=80&w=500"
+                        class="timeline-img">
+                    <h4>Groundbreaking</h4>
+                    <p class="small text-muted">Construction begins on the main stand and drainage systems.</p>
+                </div>
+
+                <!-- 2019 -->
+                <div class="timeline-card">
+                    <span class="year-badge">2019</span>
+                    <img src="https://images.unsplash.com/photo-1575361204480-aadea25e6e68?q=80&w=500"
+                        class="timeline-img">
+                    <h4>First Kick-off</h4>
+                    <p class="small text-muted">Field A opens to the public. The first local tournament is held.</p>
+                </div>
+
+                <!-- 2022 -->
+                <div class="timeline-card">
+                    <span class="year-badge">2022</span>
+                    <img src="https://images.unsplash.com/photo-1518609878373-06d740f60d8b?q=80&w=500"
+                        class="timeline-img">
+                    <h4>Expansion</h4>
+                    <p class="small text-muted">Added Field B (Turf) and installed professional floodlights.</p>
+                </div>
+
+                <!-- 2025 -->
+                <div class="timeline-card" style="border-color: var(--barca-red);">
+                    <span class="year-badge">2025</span>
+                    <img src="https://images.unsplash.com/photo-1556056504-5c7696c4c28d?q=80&w=500"
+                        class="timeline-img">
+                    <h4>The Digital Era</h4>
+                    <p class="small text-muted">Launch of the FOOTBALLHUB App. A fully integrated booking ecosystem.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h2 style="font-family: 'Chakra Petch'; color: white;">FOOTBALLHUB</h2>
+                    <p class="small">Official Partner of Grassroots Football</p>
+                    <div class="mt-4">
+                        <a href="#" class="text-white mx-2"><i class="fab fa-instagram fa-lg"></i></a>
+                        <a href="#" class="text-white mx-2"><i class="fab fa-twitter fa-lg"></i></a>
+                        <a href="#" class="text-white mx-2"><i class="fab fa-facebook fa-lg"></i></a>
+                    </div>
+                </div>
+            </div>
+            <hr style="border-color: #333; margin: 30px 0;">
+            <p class="mb-0 small">&copy; 2025 FOOTBALLHUB Portal. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 1000,
+            once: true
+        });
+    </script>
+</body>
+
+</html>

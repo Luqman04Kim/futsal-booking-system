@@ -1,0 +1,670 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Payment - FOOTBALLHUB</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Inter:wght@400;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/mobile-responsive.css">
+
+
+    <style>
+        :root {
+            --barca-blue: #004D98;
+            --barca-red: #A50044;
+            --barca-yellow: #edbb00;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #004d98;
+            /* Backup color */
+            background-image: url('https://images.unsplash.com/photo-1560259595-d25dc6470058?q=80&w=2070');
+            background-size: cover;
+            background-position: center;
+            min-height: 100vh;
+            /* Changed from height: 100vh to allow scrolling */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            /* Changed from center to start */
+            padding-bottom: 50px;
+            /* Add padding at bottom */
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            /* Changed to fixed so it stays during scroll */
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: -1;
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            background: rgba(0, 77, 152, 0.95);
+            border-bottom: 4px solid var(--barca-red);
+            backdrop-filter: blur(10px);
+            width: 100%;
+            position: fixed;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-brand {
+            color: var(--barca-yellow) !important;
+            font-family: 'Chakra Petch';
+            letter-spacing: 2px;
+            font-weight: 800;
+        }
+
+        /* Profile Dropdown Styles */
+        .profile-dropdown .dropdown-toggle {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 5px 15px;
+            border-radius: 30px;
+            transition: 0.3s;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .profile-dropdown .dropdown-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .profile-dropdown .dropdown-menu {
+            background: var(--barca-blue);
+            border: 2px solid var(--barca-red);
+            border-radius: 15px;
+            padding: 10px;
+            margin-top: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            min-width: 220px;
+        }
+
+        .profile-dropdown .dropdown-item {
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            transition: 0.2s;
+            font-weight: 600;
+        }
+
+        .profile-dropdown .dropdown-item:hover {
+            background: var(--barca-red);
+            color: var(--barca-yellow);
+            transform: translateX(5px);
+        }
+
+        .profile-dropdown .dropdown-divider {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .profile-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--barca-yellow);
+        }
+
+        .payment-card {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            margin-top: 120px;
+            /* Offset for fixed navbar */
+            margin-bottom: 20px;
+        }
+
+        .amount-box {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 2px dashed #003580;
+        }
+
+        .btn-pay {
+            background-color: #28a745;
+            border: none;
+            font-family: 'Chakra Petch', sans-serif;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .btn-pay:hover {
+            background-color: #218838;
+        }
+
+        .payment-option {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .payment-option:hover {
+            background-color: #f8f9fa;
+            border-color: #003580;
+        }
+
+        .payment-option.selected {
+            background-color: #e8f0fe;
+            border-color: #003580;
+            border-width: 2px;
+        }
+
+        /* Payment Timer Styles */
+        .payment-timer {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.4);
+        }
+
+        .payment-timer.warning {
+            animation: pulse 1s infinite;
+        }
+
+        .payment-timer .timer-icon {
+            font-size: 1.5rem;
+            margin-right: 10px;
+        }
+
+        .payment-timer .timer-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .payment-timer .timer-countdown {
+            font-size: 2rem;
+            font-weight: 800;
+            font-family: 'Chakra Petch', sans-serif;
+            letter-spacing: 2px;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.02);
+                opacity: 0.9;
+            }
+        }
+
+        .timer-expired {
+            background: #6c757d !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/home">
+                <img src="/favicon.png"
+                    style="height:28px;width:28px;object-fit:contain;margin-right:8px;border-radius:4px;"> FOOTBALLHUB
+            </a>
+
+            <div class="ms-auto d-flex align-items-center gap-3">
+                <a href="/home" class="btn btn-outline-light btn-sm rounded-pill px-3">
+                    <i class="fas fa-home me-1"></i> Home
+                </a>
+
+                <!-- Profile Dropdown -->
+                <div class="dropdown profile-dropdown" th:if="${session.loggedUser != null}">
+                    <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown">
+                        <img th:src="${session.loggedUser.imageUrl != null ? session.loggedUser.imageUrl : 'https://ui-avatars.com/api/?name=' + session.loggedUser.username}"
+                            class="profile-avatar">
+                        <span th:text="${session.loggedUser.username}">User</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="/profile"><i class="fas fa-user-cog me-2"></i> Manage
+                                Profile</a></li>
+                        <li><a class="dropdown-item" href="/my-team"><i class="fas fa-users-cog me-2"></i> My Team
+                                Info</a></li>
+                        <li><a class="dropdown-item" href="/my-bookings"><i class="fas fa-calendar-alt me-2"></i> My
+                                Bookings</a></li>
+                        <li><a class="dropdown-item" href="/membership"><i class="fas fa-crown me-2"></i> Membership</a>
+                        </li>
+                        <li><a class="dropdown-item" href="/contact"><i class="fas fa-envelope me-2"></i> Contact Us</a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt me-2"></i> Logout</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="payment-card">
+        <!-- Payment Timer (only for NEW/PENDING bookings) -->
+        <div class="payment-timer" id="paymentTimer" th:if="${!isOverduePayment}">
+            <div class="d-flex align-items-center justify-content-center">
+                <i class="fas fa-stopwatch timer-icon"></i>
+                <div>
+                    <div class="timer-text">Complete payment within</div>
+                    <div class="timer-countdown" id="timerCountdown">10:00</div>
+                </div>
+            </div>
+            <small class="d-block mt-2 opacity-75">Booking will be cancelled if payment is not completed in time</small>
+        </div>
+
+        <!-- Outstanding Balance Banner (only for overdue payments) -->
+        <div th:if="${isOverduePayment}" class="alert mb-3"
+            style="background:#fff3cd;border:2px solid #f59e0b;border-radius:10px;">
+            <div class="d-flex align-items-center gap-2">
+                <i class="fas fa-exclamation-triangle text-warning fa-lg"></i>
+                <div>
+                    <strong>Outstanding Balance</strong><br>
+                    <small class="text-muted">You paid a deposit for this booking. Please settle the remaining balance
+                        to remove your booking block.</small>
+                </div>
+            </div>
+        </div>
+
+        <h3 class="text-center mb-4 fw-bold" style="font-family: 'Chakra Petch'; color: #003580;">
+            <i class="fas fa-lock me-2"></i>Secure Checkout
+        </h3>
+
+        <!-- Order Summary -->
+        <!-- Order Summary -->
+        <div class="amount-box p-4"
+            style="background: #f8faff; border: 1px solid #e0e7ff; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+            <h5 class="mb-4 fw-bold"
+                style="color: #003580; font-family: 'Chakra Petch'; border-bottom: 2px solid #e0e7ff; padding-bottom: 15px;">
+                <i class="fas fa-file-invoice-dollar me-2"></i>Order Summary
+            </h5>
+
+            <!-- Summary Items -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <span class="text-secondary fw-500">
+                    <img src="/favicon.png"
+                        style="height:32px;width:32px;object-fit:contain;margin-right:8px;border-radius:4px;vertical-align:middle;">
+                    <span th:text="${booking.field != null ? booking.field.name : 'Field'}">Field</span>
+                </span>
+                <div class="text-end">
+                    <div th:if="${hasFieldDiscount}" class="d-block">
+                        <small class="text-muted text-decoration-line-through me-2" style="font-size: 0.9em;">RM <span
+                                th:text="${#numbers.formatDecimal(originalFieldPrice, 1, 2)}">120.00</span></small>
+                    </div>
+                    <span class="fw-bold" style="font-size: 1.1em;">RM <span
+                            th:text="${#numbers.formatDecimal(fieldPrice, 1, 2)}">100.00</span></span>
+                </div>
+            </div>
+
+            <div th:if="${hasFieldDiscount}" class="d-flex justify-content-between align-items-center mb-3 p-2 rounded"
+                style="background-color: rgba(16, 185, 129, 0.1);">
+                <span class="text-success fw-600"><i class="fas fa-tag me-2"></i>Discount (<span
+                        th:text="${fieldDiscountPercentage}">20</span>%)</span>
+                <span class="fw-bold text-success">- RM <span
+                        th:text="${#numbers.formatDecimal(fieldDiscountAmount, 1, 2)}">20.00</span></span>
+            </div>
+
+            <!-- Membership/VIP Field Discount Row -->
+            <div th:if="${vipDiscountPct != null && vipDiscountPct > 0}" class="d-flex justify-content-between align-items-center mb-3 p-2 rounded"
+                style="background-color: rgba(255, 193, 7, 0.15);">
+                <span class="text-warning fw-bold"><i class="fas fa-crown me-2"></i><span th:text="${planName != null ? planName : 'VIP'}">VIP</span> Field Discount (<span th:text="${vipDiscountPct}">10</span>%)</span>
+                <span class="fw-bold text-warning">- RM <span
+                        th:text="${#numbers.formatDecimal(fieldPrice * (vipDiscountPct / 100.0), 1, 2)}">10.00</span></span>
+            </div>
+
+            <!-- Legacy Addons (if any exist) -->
+            <div th:if="${booking.rentJersey}" class="d-flex justify-content-between align-items-center mb-3">
+                <span class="text-secondary"><i class="fas fa-tshirt me-2 text-info opacity-75"></i>Jersey Rental</span>
+                <div class="text-end">
+                    <div th:if="${hasFreeAddons}" class="d-inline-block">
+                        <small class="text-muted text-decoration-line-through me-2" style="font-size: 0.9em;">RM 50.00</small>
+                        <span class="fw-bold text-success" th:text="'FREE (' + ${planName} + ' Member)'">FREE (Silver Member)</span>
+                    </div>
+                    <span th:if="${!hasFreeAddons}" class="fw-bold">RM 50.00</span>
+                </div>
+            </div>
+
+            <div th:if="${booking.hirePhotographer}" class="d-flex justify-content-between align-items-center mb-3">
+                <span class="text-secondary"><i class="fas fa-camera me-2 text-warning opacity-75"></i>Photographer</span>
+                <div class="text-end">
+                    <div th:if="${hasFreeAddons}" class="d-inline-block">
+                        <small class="text-muted text-decoration-line-through me-2" style="font-size: 0.9em;">RM 200.00</small>
+                        <span class="fw-bold text-success" th:text="'FREE (' + ${planName} + ' Member)'">FREE (Silver Member)</span>
+                    </div>
+                    <span th:if="${!hasFreeAddons}" class="fw-bold">RM 200.00</span>
+                </div>
+            </div>
+
+            <!-- Dynamic Inventory Addons -->
+            <div th:each="item : ${booking.inventoryItems}" class="d-flex justify-content-between align-items-center mb-3">
+                <span class="text-secondary">
+                    <i class="fas fa-plus-circle me-2 text-primary opacity-75"></i><span th:text="${item.name}">Service Name</span>
+                </span>
+                <div class="text-end">
+                    <div th:with="isItemFree=${hasFreeAddons || (freeServiceIds != null && freeServiceIds.contains(item.id))}">
+                        <div th:if="${isItemFree}" class="d-inline-block">
+                            <small class="text-muted text-decoration-line-through me-2" style="font-size: 0.9em;">RM <span
+                                    th:text="${#numbers.formatDecimal(item.basePrice, 1, 2)}">120.00</span></small>
+                            <span class="fw-bold text-success" th:text="'FREE (' + ${planName} + ' Member)'">FREE (Silver Member)</span>
+                        </div>
+                        <div th:if="${!isItemFree}" class="d-inline-block">
+                            <div th:if="${item.basePrice != null && item.basePrice > item.getEffectivePrice()}" class="d-inline-block">
+                                <small class="text-muted text-decoration-line-through me-2" style="font-size: 0.9em;">RM <span
+                                        th:text="${#numbers.formatDecimal(item.basePrice, 1, 2)}">120.00</span></small>
+                            </div>
+                            <span class="fw-bold" th:text="${item.getEffectivePrice() > 0 ? 'RM ' + #numbers.formatDecimal(item.getEffectivePrice(), 1, 2) : 'FREE'}">RM 50.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div th:if="${vipDiscount != null && (vipDiscount - (fieldPrice * (vipDiscountPct / 100.0))) > 0}" class="d-flex justify-content-between align-items-center mb-3 p-2 rounded"
+                style="background-color: rgba(255, 193, 7, 0.1);">
+                <span class="text-warning fw-bold"><i class="fas fa-crown me-2"></i><span th:text="${planName != null ? planName : 'VIP'}">VIP</span> Addon Discount (<span th:text="${vipDiscountPct != null ? vipDiscountPct : '10'}">10</span>%)</span>
+                <span class="fw-bold text-warning">- RM <span
+                        th:text="${#numbers.formatDecimal(vipDiscount - (fieldPrice * (vipDiscountPct / 100.0)), 1, 2)}">5.00</span></span>
+            </div>
+
+            <hr class="my-4" style="border-top: 2px dashed #cbd5e1;">
+
+            <!-- Deposit already paid (overdue mode) -->
+            <div th:if="${isOverduePayment}" class="d-flex justify-content-between align-items-center mb-3 p-2 rounded"
+                style="background-color: rgba(16,185,129,0.1);">
+                <span class="text-success fw-bold"><i class="fas fa-check-circle me-2"></i>Deposit Already Paid</span>
+                <span class="fw-bold text-success">- RM 200.00</span>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center">
+                <span class="fw-bold fs-5 text-dark"
+                    th:text="${isOverduePayment} ? 'Remaining Balance' : 'Total Amount'">Total Amount</span>
+                <span class="fw-bold fs-3 text-primary" style="font-family: 'Chakra Petch';">RM <span
+                        th:text="${#numbers.formatDecimal(isOverduePayment ? remainingBalance : totalPrice, 1, 2)}">350.00</span></span>
+            </div>
+
+            <!-- Booking Meta Info -->
+            <div class="mt-4 pt-3 border-top text-center">
+                <div class="badge bg-light text-dark border p-2 mb-2">
+                    <i class="far fa-calendar-alt me-1"></i> <span th:text="${booking.date}">2025-12-01</span>
+                </div>
+                <div class="badge bg-light text-dark border p-2 mb-2 ms-2" th:if="${booking.startTime}">
+                    <i class="far fa-clock me-1"></i> <span th:text="${booking.startTime}">20:00</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Form -->
+        <form action="/payment/process" method="POST" id="paymentForm">
+            <input type="hidden" name="bookingId" th:value="${booking.bookingId}">
+            <input type="hidden" name="paymentType" id="paymentTypeInput" value="FULL">
+
+            <!-- Error Alert (shown when server redirects back with ?error=1) -->
+            <div th:if="${gatewayError}" class="alert alert-danger mb-3" id="gatewayErrorServer"
+                style="border-radius:10px;">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong>Payment gateway error.</strong> Could not connect to ToyyibPay. Please check your internet
+                connection and try again. If the issue persists, contact support.
+            </div>
+            <!-- JS-triggered error alert (fallback) -->
+            <div class="alert alert-danger d-none mb-3" id="gatewayError" style="border-radius:10px;">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                Unable to connect to payment gateway. Please try again.
+            </div>
+
+            <!-- Payment Options -->
+            <div class="mb-4">
+                <label class="form-label fw-bold mb-3" style="color: #003580;">Select Payment Option</label>
+
+                <div class="row g-3">
+                    <div class="col-12">
+                        <div class="payment-option p-0 active-border-on-select" onclick="selectPayment('FULL')"
+                            style="transition: all 0.2s; border: 2px solid #eee; border-radius: 10px; overflow: hidden;">
+                            <div class="form-check p-3 m-0 d-flex align-items-center" style="cursor: pointer;">
+                                <input class="form-check-input mt-0 me-3" type="radio" name="_paymentTypeRadio" id="payFull"
+                                    style="transform: scale(1.2);" value="FULL" checked
+                                    onchange="selectPayment('FULL')">
+                                <label class="form-check-label w-100 cursor-pointer" for="payFull">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <span class="d-block fw-bold text-dark"
+                                                th:text="${isOverduePayment} ? 'Pay Remaining Balance' : 'Full Payment'">Full
+                                                Payment</span>
+                                            <small class="text-muted"
+                                                th:text="${isOverduePayment} ? 'Settle outstanding balance to unlock new bookings' : 'Pay the entire amount now'">Pay
+                                                the entire amount now</small>
+                                        </div>
+                                        <span class="fw-bold text-success fs-5">RM <span
+                                                th:text="${#numbers.formatDecimal(isOverduePayment ? remainingBalance : totalPrice, 1, 2)}">350.00</span></span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Deposit option: hidden for overdue payments -->
+                    <div class="col-12" th:if="${!isOverduePayment}">
+                        <div class="payment-option p-0 active-border-on-select" onclick="selectPayment('DEPOSIT')"
+                            style="transition: all 0.2s; border: 2px solid #eee; border-radius: 10px; overflow: hidden;">
+                            <div class="form-check p-3 m-0 d-flex align-items-center" style="cursor: pointer;">
+                                <input class="form-check-input mt-0 me-3" type="radio" name="_paymentTypeRadio"
+                                    id="payDeposit" style="transform: scale(1.2);" value="DEPOSIT"
+                                    onchange="selectPayment('DEPOSIT')">
+                                <label class="form-check-label w-100 cursor-pointer" for="payDeposit">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <span class="d-block fw-bold text-dark">Pay Deposit</span>
+                                            <small class="text-muted">Secure your slot now, pay balance later</small>
+                                        </div>
+                                        <span class="fw-bold text-primary fs-5">RM 200.00</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ToyyibPay Gateway Banner -->
+            <div class="p-3 mb-4 rounded-3" style="background: linear-gradient(135deg, #f0f9ff, #e0f2fe); border: 1.5px solid #bae6fd;">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <img src="https://toyyibpay.com/assets/images/logo/logo.png"
+                        onerror="this.style.display='none'"
+                        style="height:28px;" alt="ToyyibPay">
+                    <span class="fw-bold text-secondary small">Secured by <strong class="text-dark">ToyyibPay</strong></span>
+                    <span class="ms-auto badge bg-success"><i class="fas fa-lock me-1"></i>SSL Secured</span>
+                </div>
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <span class="text-muted small me-1">Pay via:</span>
+                    <!-- FPX Banks -->
+                    <span class="badge border border-secondary text-dark bg-white px-2 py-1" style="font-size:0.75rem;"><i class="fas fa-university me-1 text-primary"></i>FPX</span>
+                    <span class="badge border border-secondary text-dark bg-white px-2 py-1" style="font-size:0.75rem;">Maybank2u</span>
+                    <span class="badge border border-secondary text-dark bg-white px-2 py-1" style="font-size:0.75rem;">CIMB Clicks</span>
+                    <span class="badge border border-secondary text-dark bg-white px-2 py-1" style="font-size:0.75rem;">RHB Now</span>
+                    <span class="badge border border-secondary text-dark bg-white px-2 py-1" style="font-size:0.75rem;">Public Bank</span>
+                    <!-- Cards -->
+                    <span class="badge border border-secondary text-dark bg-white px-2 py-1" style="font-size:0.75rem;"><i class="fab fa-cc-visa me-1 text-primary"></i>Visa</span>
+                    <span class="badge border border-secondary text-dark bg-white px-2 py-1" style="font-size:0.75rem;"><i class="fab fa-cc-mastercard me-1 text-danger"></i>Mastercard</span>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-pay w-100 py-3 mt-2" id="payButton"
+                style="background: linear-gradient(135deg, #16a34a, #15803d); font-size: 1.1rem; border-radius: 10px; box-shadow: 0 4px 15px rgba(22,163,74,0.35);">
+                <i class="fas fa-lock me-2"></i>
+                Pay RM <span id="payAmountDisplay" th:text="${#numbers.formatDecimal(isOverduePayment ? remainingBalance : totalPrice, 1, 2)}">350.00</span> via ToyyibPay
+            </button>
+            <p class="text-center text-muted small mt-2 mb-0">
+                <i class="fas fa-shield-alt me-1 text-success"></i>
+                You will be redirected to ToyyibPay's secure payment page
+            </p>
+        </form>
+
+        <!-- Cancel Booking Button -->
+        <div class="mt-3 text-center">
+            <button type="button" class="btn btn-link text-decoration-none text-muted small" data-bs-toggle="modal"
+                data-bs-target="#cancelBookingModal">
+                Cancel Payment & Booking
+            </button>
+        </div>
+    </div>
+
+    <!-- Cancel Booking Confirmation Modal -->
+    <div class="modal fade" id="cancelBookingModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title"><i class="fas fa-exclamation-triangle me-2"></i>Cancel Booking</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <i class="fas fa-times-circle fa-3x text-danger mb-3"></i>
+                    <p class="mb-0 fs-5">Are you sure you want to cancel this booking?</p>
+                    <p class="text-muted small mt-2">This action cannot be undone. Your booking will be permanently
+                        deleted.</p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Keep Booking</button>
+                    <form action="/payment/cancel" method="POST" class="d-inline">
+                        <input type="hidden" name="bookingId" th:value="${booking.bookingId}">
+                        <button type="submit" class="btn btn-danger">Yes, Cancel Booking</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const totalPrice = /*[[${totalPrice}]]*/ 0;
+        const remainingBalance = /*[[${remainingBalance}]]*/ 0;
+        const isOverdue = /*[[${isOverduePayment}]]*/ false;
+        const displayPrice = isOverdue ? remainingBalance : totalPrice;
+        const bookingCreatedAt = /*[[${booking.createdAt}]]*/ null;
+        const TIMER_DURATION_MINUTES = 10;
+        /*]]>*/
+
+        function selectPayment(type) {
+            // Update visual selection
+            document.querySelectorAll('.payment-option').forEach(el => el.classList.remove('selected'));
+
+            // Update the hidden paymentType input
+            document.getElementById('paymentTypeInput').value = type;
+
+            const amountDisplay = document.getElementById('payAmountDisplay');
+
+            if (type === 'FULL') {
+                document.getElementById('payFull').checked = true;
+                document.getElementById('payFull').closest('.payment-option').classList.add('selected');
+                if (amountDisplay) amountDisplay.innerText = displayPrice.toFixed(2);
+            } else {
+                document.getElementById('payDeposit').checked = true;
+                document.getElementById('payDeposit').closest('.payment-option').classList.add('selected');
+                if (amountDisplay) amountDisplay.innerText = '200.00';
+            }
+        }
+
+        // Payment Timer Logic
+        function initPaymentTimer() {
+            const timerElement = document.getElementById('timerCountdown');
+            const timerContainer = document.getElementById('paymentTimer');
+            const payButton = document.getElementById('payButton');
+
+            if (!bookingCreatedAt) {
+                console.warn('Booking creation time not available');
+                return;
+            }
+
+            // Parse the booking creation time
+            const createdTime = new Date(bookingCreatedAt);
+            const expirationTime = new Date(createdTime.getTime() + (TIMER_DURATION_MINUTES * 60 * 1000));
+
+            function updateTimer() {
+                const now = new Date();
+                const remainingMs = expirationTime - now;
+
+                if (remainingMs <= 0) {
+                    // Timer expired
+                    timerElement.textContent = '00:00';
+                    timerContainer.classList.add('timer-expired');
+                    timerContainer.classList.remove('warning');
+                    payButton.disabled = true;
+                    payButton.textContent = 'Session Expired';
+                    payButton.classList.remove('btn-pay');
+                    payButton.classList.add('btn-secondary');
+
+                    // Show alert and redirect
+                    alert('Your payment session has expired. The booking has been cancelled.');
+                    window.location.href = '/my-bookings';
+                    return;
+                }
+
+                // Calculate minutes and seconds
+                const minutes = Math.floor(remainingMs / 60000);
+                const seconds = Math.floor((remainingMs % 60000) / 1000);
+
+                // Format as MM:SS
+                const formattedTime =
+                    String(minutes).padStart(2, '0') + ':' +
+                    String(seconds).padStart(2, '0');
+
+                timerElement.textContent = formattedTime;
+
+                // Add warning class when less than 2 minutes remaining
+                if (remainingMs < 120000) {
+                    timerContainer.classList.add('warning');
+                } else {
+                    timerContainer.classList.remove('warning');
+                }
+
+                // Update every second
+                setTimeout(updateTimer, 1000);
+            }
+
+            // Start the timer
+            updateTimer();
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function () {
+            selectPayment('FULL');
+            // Only start timer for fresh (PENDING) bookings
+            const isOverdue = /*[[${isOverduePayment}]]*/ false;
+            if (!isOverdue) {
+                initPaymentTimer();
+            }
+        });
+    </script>
+</body>
+
+</html>

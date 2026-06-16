@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <meta charset="UTF-8">
+    <title>Membership Management - FOOTBALLHUB</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #0f172a;
+            --secondary-color: #334155;
+            --accent-color: #3b82f6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --gold-color: #FFD700;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Inter', sans-serif;
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            height: 100vh;
+            background-color: var(--primary-color);
+            color: white;
+            position: fixed;
+            width: 240px;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+            overflow-y: scroll;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-header h3 {
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        .sidebar-submenu a {
+            padding-left: 45px;
+            font-size: 0.88rem;
+        }
+        .sidebar-parent {
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .sidebar-parent.active {
+            color: #0d6efd;
+            background: rgba(13, 110, 253, 0.1);
+        }
+        .sidebar-chevron {
+            transition: transform 0.3s;
+            font-size: 0.75rem;
+            opacity: 0.6;
+        }
+        .sidebar-parent[aria-expanded="false"] .sidebar-chevron {
+            transform: rotate(-90deg);
+        }
+        .sidebar a {
+            color: #cbd5e1;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 12px 25px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+
+        .sidebar a.active {
+            border-left-color: var(--accent-color);
+            background: linear-gradient(90deg, rgba(59, 130, 246, 0.1) 0%, transparent 100%);
+        }
+
+        .sidebar a i {
+            width: 20px;
+            margin-right: 10px;
+            text-align: center;
+        }
+
+        /* Content */
+        .content {
+            margin-left: 240px;
+            padding: 25px;
+        }
+
+        /* Table Styles */
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table thead th {
+            background-color: #f8fafc;
+            color: var(--secondary-color);
+            font-weight: 600;
+            padding: 15px 20px;
+            border-bottom: 2px solid #e2e8f0;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+        }
+
+        .table tbody td {
+            padding: 15px 20px;
+            vertical-align: middle;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .vip-badge {
+            background: linear-gradient(135deg, #fbbf24, #d97706);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(217, 119, 6, 0.2);
+        }
+
+        /* KPI Cards */
+        .kpi-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            border-left: 5px solid var(--accent-color);
+            transition: transform 0.2s;
+            border: 1px solid #e2e8f0;
+            border-left-width: 5px;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .kpi-title {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .kpi-value {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* Tabs Styles */
+        .nav-tabs {
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .nav-tabs .nav-link {
+            border: none;
+            color: var(--text-secondary);
+            padding: 12px 20px;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        .nav-tabs .nav-link:hover {
+            color: var(--accent-color);
+            border-bottom-color: #cbd5e1;
+        }
+        .nav-tabs .nav-link.active {
+            color: var(--accent-color);
+            background: transparent;
+            border-bottom: 2px solid var(--accent-color);
+        }
+
+        /* Main Card */
+        .main-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3><img src="/favicon.png" style="height:28px;width:28px;object-fit:contain;margin-right:8px;border-radius:4px;">FOOTBALLHUB</h3>
+        </div>
+        <div class="mt-3">
+            <a href="/manager/dashboard"><i class="fas fa-th-large"></i> Dashboard</a>
+            <a href="/manager/bookings"><i class="fas fa-calendar-check"></i> Bookings</a>
+            <a href="/manager/payment-field"><i class="fas fa-credit-card"></i> Payments</a>
+            <a href="/manager/transactions"><i class="fas fa-exchange-alt"></i> Transactions</a>
+            <a href="/manager/performance"><i class="fas fa-chart-line"></i> Performance</a>
+            <a href="#branchMenu" data-bs-toggle="collapse" role="button" aria-expanded="false" class="sidebar-parent d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-building"></i> Branches</span>
+                <i class="fas fa-chevron-down sidebar-chevron"></i>
+            </a>
+            <div class="collapse" id="branchMenu">
+                <div class="sidebar-submenu">
+                    <a href="/manager/branches"><i class="fas fa-code-branch"></i> Branch List</a>
+                    <a href="/manager/fields"><i class="fas fa-map-marker-alt"></i> Fields</a>
+                    <a href="/manager/inventory"><i class="fas fa-boxes"></i> Inventory</a>
+                </div>
+            </div>
+            <a href="#usersMenu" data-bs-toggle="collapse" role="button" aria-expanded="true" class="sidebar-parent active d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-users"></i> Users</span>
+                <i class="fas fa-chevron-down sidebar-chevron"></i>
+            </a>
+            <div class="collapse show" id="usersMenu">
+                <div class="sidebar-submenu">
+                    <a href="/manager/users"><i class="fas fa-user-circle"></i> User List</a>
+                    <a href="/manager/staff"><i class="fas fa-user-tie"></i> Staff</a>
+                    <a href="/manager/memberships" class="active"><i class="fas fa-crown"></i> Memberships</a>
+                </div>
+            </div>
+            <a href="#maintMenu" data-bs-toggle="collapse" role="button" aria-expanded="false" class="sidebar-parent d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-tools"></i> Maintenance</span>
+                <i class="fas fa-chevron-down sidebar-chevron"></i>
+            </a>
+            <div class="collapse" id="maintMenu">
+                <div class="sidebar-submenu">
+                    <a href="/manager/maintenance"><i class="fas fa-wrench"></i> Maintenance Log</a>
+                    <a href="/manager/reports"><i class="fas fa-chart-bar"></i> Reports</a>
+                </div>
+            </div>
+        </div>
+        <div style="margin-top: auto; padding-bottom: 20px;">
+            <a href="/logout" class="text-danger"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold text-primary mb-1">Membership Management</h2>
+                <p class="text-muted mb-0">Monitor VIP subscriptions and upgrade user memberships.</p>
+            </div>
+            <a href="/manager/memberships/plans" class="btn btn-primary shadow-sm fw-bold">
+                <i class="fas fa-list-alt me-2"></i>Manage Plans
+            </a>
+        </div>
+
+        <!-- Success Messages -->
+        <div th:if="${param.success != null}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            <span th:if="${param.success[0] == 'assigned'}">Membership successfully assigned!</span>
+            <span th:if="${param.success[0] == 'removed'}">Membership successfully removed!</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-6">
+                <div class="kpi-card" style="border-left-color: #f59e0b;">
+                    <div class="kpi-title">Subscribed Members</div>
+                    <div class="kpi-value text-warning" th:text="${vipUsers.size()}">0</div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="kpi-card" style="border-left-color: #3b82f6;">
+                    <div class="kpi-title">Regular Customers</div>
+                    <div class="kpi-value text-primary" th:text="${regularUsers.size()}">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Membership Tabbed Card -->
+        <div class="card main-card mb-5">
+            <div class="card-header bg-white py-3 border-bottom px-4">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                    <ul class="nav nav-tabs border-bottom-0" id="membershipTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active fw-bold" id="subscribed-tab" data-bs-toggle="tab" data-bs-target="#subscribed-pane" type="button" role="tab" aria-controls="subscribed-pane" aria-selected="true">
+                                <i class="fas fa-crown text-warning me-2"></i>Subscribed Members (<span th:text="${vipUsers.size()}">0</span>)
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link fw-bold" id="regular-tab" data-bs-toggle="tab" data-bs-target="#regular-pane" type="button" role="tab" aria-controls="regular-pane" aria-selected="false">
+                                <i class="fas fa-users text-primary me-2"></i>Regular Customers (<span th:text="${regularUsers.size()}">0</span>)
+                            </button>
+                        </li>
+                    </ul>
+                    <div class="position-relative" style="min-width: 300px;">
+                        <i class="fas fa-search position-absolute text-muted" style="left: 15px; top: 50%; transform: translateY(-50%);"></i>
+                        <input type="text" id="membershipSearchInput" class="form-control ps-5" placeholder="Search members by name or email...">
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="tab-content" id="membershipTabsContent">
+                    <!-- Subscribed Members Tab Pane -->
+                    <div class="tab-pane fade show active" id="subscribed-pane" role="tabpanel" aria-labelledby="subscribed-tab" tabindex="0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Phone</th>
+                                        <th>Plan</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:if="${vipUsers.isEmpty()}">
+                                        <td colspan="6" class="text-center py-5 text-muted">
+                                            <i class="fas fa-crown fa-3x mb-3 text-warning"></i>
+                                            <p class="mb-0 fw-semibold">No members subscribed yet.</p>
+                                        </td>
+                                    </tr>
+                                    <tr th:each="user, iterStat : ${vipUsers}">
+                                        <td th:text="${iterStat.count}">1</td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <img th:src="${user.imageUrl != null ? user.imageUrl : 'https://ui-avatars.com/api/?name=' + user.username}"
+                                                    class="rounded-circle me-2" style="width: 35px; height: 35px; object-fit: cover;">
+                                                <span th:text="${user.username}" class="fw-semibold">John Doe</span>
+                                            </div>
+                                        </td>
+                                        <td th:text="${user.email}">john@example.com</td>
+                                        <td th:text="${user.phoneNumber != null ? user.phoneNumber : 'N/A'}">N/A</td>
+                                        <td>
+                                            <span th:if="${user.membershipPlan != null}" class="vip-badge" th:text="${user.membershipPlan.name}"><i class="fas fa-crown me-1"></i>Plan</span>
+                                            <span th:if="${user.membershipPlan == null}" class="vip-badge"><i class="fas fa-crown me-1"></i>Legacy VIP</span>
+                                        </td>
+                                        <td>
+                                            <form th:action="@{/manager/downgrade-user}" method="POST" style="display: inline;">
+                                                <input type="hidden" name="userId" th:value="${user.userId}">
+                                                <button type="button" class="btn btn-sm btn-outline-danger px-3 rounded-pill"
+                                                    onclick="confirmAction(this, 'removing membership from this user')">
+                                                    <i class="fas fa-times me-1"></i>Remove
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Regular Customers Tab Pane -->
+                    <div class="tab-pane fade" id="regular-pane" role="tabpanel" aria-labelledby="regular-tab" tabindex="0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Phone</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:if="${regularUsers.isEmpty()}">
+                                        <td colspan="6" class="text-center py-5 text-muted">
+                                            <i class="fas fa-users fa-3x mb-3 text-muted"></i>
+                                            <p class="mb-0 fw-semibold">No regular customers found.</p>
+                                        </td>
+                                    </tr>
+                                    <tr th:each="user, iterStat : ${regularUsers}">
+                                        <td th:text="${iterStat.count}">1</td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <img th:src="${user.imageUrl != null ? user.imageUrl : 'https://ui-avatars.com/api/?name=' + user.username}"
+                                                    class="rounded-circle me-2" style="width: 35px; height: 35px; object-fit: cover;">
+                                                <span th:text="${user.username}" class="fw-semibold">Jane Doe</span>
+                                            </div>
+                                        </td>
+                                        <td th:text="${user.email}">jane@example.com</td>
+                                        <td th:text="${user.phoneNumber != null ? user.phoneNumber : 'N/A'}">N/A</td>
+                                        <td><span class="badge bg-secondary px-3 py-1.5 rounded-pill">Regular</span></td>
+                                        <td>
+                                            <form th:action="@{/manager/upgrade-user}" method="POST" class="d-flex align-items-center gap-2">
+                                                <input type="hidden" name="userId" th:value="${user.userId}">
+                                                <select name="planId" class="form-select form-select-sm" style="width: 150px;" required>
+                                                    <option value="" selected disabled>Select Plan</option>
+                                                    <option th:each="p : ${plans}" th:value="${p.id}" th:text="${p.name}"></option>
+                                                </select>
+                                                <button type="button" class="btn btn-sm btn-warning px-3 fw-semibold rounded-pill"
+                                                    onclick="confirmAction(this, 'upgrading this user')">
+                                                    <i class="fas fa-level-up-alt me-1"></i>Upgrade
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let formToSubmit = null;
+        function confirmAction(element, itemName) {
+            const confirmBtn = document.getElementById('confirmDeleteBtn');
+            const form = element.closest('form');
+            if (form) {
+                formToSubmit = form;
+                confirmBtn.removeAttribute('href');
+                confirmBtn.onclick = function(e) {
+                    e.preventDefault();
+                    if (formToSubmit) formToSubmit.submit();
+                };
+            } else {
+                formToSubmit = null;
+                confirmBtn.href = element.getAttribute('href') || element.getAttribute('data-url');
+                confirmBtn.onclick = null;
+            }
+            document.getElementById('deleteItemName').textContent = itemName || 'this action';
+            var modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+            modal.show();
+        }
+
+        // Live client-side search across both tables
+        document.getElementById('membershipSearchInput').addEventListener('input', function() {
+            const query = this.value.toLowerCase().trim();
+            document.querySelectorAll('.table tbody tr').forEach(tr => {
+                // Skip empty states
+                if (tr.cells.length < 2) return;
+                
+                const name = tr.cells[1].textContent.toLowerCase();
+                const email = tr.cells[2].textContent.toLowerCase();
+                
+                if (name.includes(query) || email.includes(query)) {
+                    tr.style.display = '';
+                } else {
+                    tr.style.display = 'none';
+                }
+            });
+        });
+    </script>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title"><i class="fas fa-exclamation-triangle me-2"></i>Confirm Action</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <i class="fas fa-trash-alt fa-3x text-danger mb-3"></i>
+                    <p class="mb-0 fs-5">Are you sure you want to proceed with <span id="deleteItemName">this action</span>?</p>
+                    <p class="text-muted small mt-2">This action cannot be undone.</p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <a href="#" id="confirmDeleteBtn" class="btn btn-danger">Confirm</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

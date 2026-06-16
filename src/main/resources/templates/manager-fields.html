@@ -1,0 +1,560 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Field Management - FOOTBALLHUB</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/mobile-responsive.css">
+    <style>
+        :root {
+            --primary-color: #0f172a;
+            --secondary-color: #334155;
+            --accent-color: #3b82f6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Inter', sans-serif;
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            height: 100vh;
+            background-color: var(--primary-color);
+            color: white;
+            position: fixed;
+            width: 240px;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+            overflow-y: scroll;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-header h3 {
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        .sidebar-submenu a {
+            padding-left: 45px;
+            font-size: 0.88rem;
+        }
+
+        .sidebar-parent {
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-parent.active {
+            color: #0d6efd;
+            background: rgba(13, 110, 253, 0.1);
+        }
+
+        .sidebar-chevron {
+            transition: transform 0.3s;
+            font-size: 0.75rem;
+            opacity: 0.6;
+        }
+
+        .sidebar-parent[aria-expanded="false"] .sidebar-chevron {
+            transform: rotate(-90deg);
+        }
+
+        .sidebar a {
+            color: #cbd5e1;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 12px 25px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+
+        .sidebar a.active {
+            border-left-color: var(--accent-color);
+            background: linear-gradient(90deg, rgba(59, 130, 246, 0.1) 0%, transparent 100%);
+        }
+
+        .sidebar a i {
+            width: 20px;
+            margin-right: 10px;
+            text-align: center;
+        }
+
+        /* Content */
+        .content {
+            margin-left: 240px;
+            padding: 25px;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .status-available {
+            background-color: #28a745;
+        }
+
+        .status-in-game {
+            background-color: #dc3545;
+        }
+
+        .status-maintenance {
+            background-color: #ffc107;
+            color: black;
+        }
+
+        .branch-divider {
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            margin-top: 30px;
+            color: var(--secondary-color);
+            font-weight: 700;
+        }
+
+        .field-info {
+            padding: 15px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3><img src="/favicon.png"
+                    style="height:28px;width:28px;object-fit:contain;margin-right:8px;border-radius:4px;">FOOTBALLHUB
+            </h3>
+        </div>
+        <div class="mt-3">
+            <a href="/manager/dashboard"><i class="fas fa-th-large"></i> Dashboard</a>
+            <a href="/manager/bookings"><i class="fas fa-calendar-check"></i> Bookings</a>
+            <a href="/manager/payment-field"><i class="fas fa-credit-card"></i> Payments</a>
+            <a href="/manager/transactions"><i class="fas fa-exchange-alt"></i> Transactions</a>
+            <a href="/manager/performance"><i class="fas fa-chart-line"></i> Performance</a>
+            <a href="#branchMenu" data-bs-toggle="collapse" role="button" aria-expanded="true"
+                class="sidebar-parent active d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-building"></i> Branches</span>
+                <i class="fas fa-chevron-down sidebar-chevron"></i>
+            </a>
+            <div class="collapse show" id="branchMenu">
+                <div class="sidebar-submenu">
+                    <a href="/manager/branches"><i class="fas fa-code-branch"></i> Branch List</a>
+                    <a href="/manager/fields" class="active"><i class="fas fa-map-marker-alt"></i> Fields</a>
+                    <a href="/manager/inventory"><i class="fas fa-boxes"></i> Inventory</a>
+                </div>
+            </div>
+            <a href="#usersMenu" data-bs-toggle="collapse" role="button" aria-expanded="false"
+                class="sidebar-parent d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-users"></i> Users</span>
+                <i class="fas fa-chevron-down sidebar-chevron"></i>
+            </a>
+            <div class="collapse" id="usersMenu">
+                <div class="sidebar-submenu">
+                    <a href="/manager/users"><i class="fas fa-user-circle"></i> User List</a>
+                    <a href="/manager/staff"><i class="fas fa-user-tie"></i> Staff</a>
+                    <a href="/manager/memberships"><i class="fas fa-crown" style="color: #FFD700;"></i> Memberships</a>
+                </div>
+            </div>
+            <a href="#maintMenu" data-bs-toggle="collapse" role="button" aria-expanded="false"
+                class="sidebar-parent d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-tools"></i> Maintenance</span>
+                <i class="fas fa-chevron-down sidebar-chevron"></i>
+            </a>
+            <div class="collapse" id="maintMenu">
+                <div class="sidebar-submenu">
+                    <a href="/manager/maintenance"><i class="fas fa-wrench"></i> Maintenance Log</a>
+                    <a href="/manager/reports"><i class="fas fa-chart-bar"></i> Reports</a>
+                </div>
+            </div>
+        </div>
+        <div style="margin-top: auto; padding-bottom: 20px;">
+            <a href="/logout" class="text-danger"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold text-primary">FIELDS MANAGEMENT</h2>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addFieldModal">
+                <i class="fas fa-plus me-2"></i> Add New Field
+            </button>
+        </div>
+
+        <!-- Fields Grid (Grouped by Branch) -->
+        <div class="row">
+            <div class="col-12">
+                <div th:each="entry : ${fieldsByBranch}">
+                    <h5 class="branch-divider" th:text="${entry.key}">Branch Name</h5>
+                    <div class="row g-4">
+                        <div class="col-md-4 col-lg-3" th:each="field : ${entry.value}">
+                            <div class="card shadow-sm border-0 h-100">
+                                <div style="position: relative; height:200px; overflow:hidden;">
+                                    <!-- Carousel for field photos -->
+                                    <div th:id="'mCarousel' + ${field.fieldId}" class="carousel slide h-100"
+                                        data-bs-ride="carousel">
+                                        <div class="carousel-inner h-100">
+                                            <div class="carousel-item active h-100">
+                                                <img th:src="${field.imageUrl != null ? field.imageUrl : 'https://images.unsplash.com/photo-1556056504-5c7696c4c28d'}"
+                                                    class="card-img-top"
+                                                    style="height:200px;object-fit:cover;width:100%;" alt="Field">
+                                            </div>
+                                            <div th:if="${field.imageUrl2 != null}" class="carousel-item h-100">
+                                                <img th:src="${field.imageUrl2}" class="card-img-top"
+                                                    style="height:200px;object-fit:cover;width:100%;" alt="2">
+                                            </div>
+                                            <div th:if="${field.imageUrl3 != null}" class="carousel-item h-100">
+                                                <img th:src="${field.imageUrl3}" class="card-img-top"
+                                                    style="height:200px;object-fit:cover;width:100%;" alt="3">
+                                            </div>
+                                            <div th:if="${field.imageUrl4 != null}" class="carousel-item h-100">
+                                                <img th:src="${field.imageUrl4}" class="card-img-top"
+                                                    style="height:200px;object-fit:cover;width:100%;" alt="4">
+                                            </div>
+                                            <div th:if="${field.imageUrl5 != null}" class="carousel-item h-100">
+                                                <img th:src="${field.imageUrl5}" class="card-img-top"
+                                                    style="height:200px;object-fit:cover;width:100%;" alt="5">
+                                            </div>
+                                        </div>
+                                        <button th:if="${field.imageUrl2 != null}" class="carousel-control-prev"
+                                            type="button" th:data-bs-target="'#mCarousel' + ${field.fieldId}"
+                                            data-bs-slide="prev">
+                                            <span class="carousel-control-prev-icon"></span>
+                                        </button>
+                                        <button th:if="${field.imageUrl2 != null}" class="carousel-control-next"
+                                            type="button" th:data-bs-target="'#mCarousel' + ${field.fieldId}"
+                                            data-bs-slide="next">
+                                            <span class="carousel-control-next-icon"></span>
+                                        </button>
+                                    </div>
+                                    <!-- STATUS BADGE LOGIC -->
+                                    <span class="status-badge status-available"
+                                        th:if="${field.status == 'Available'}">Available</span>
+                                    <span class="status-badge status-in-game" th:if="${field.status == 'In Game'}">In
+                                        Game</span>
+                                    <span class="status-badge status-maintenance"
+                                        th:if="${field.status == 'Maintenance'}">Maintenance</span>
+                                </div>
+                                <div class="field-info">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h5 class="font-weight-bold mb-0" th:text="${field.name}">Field A</h5>
+                                        <small class="text-muted border px-2 rounded"
+                                            th:text="${field.size}">5v5</small>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <small class="text-muted"><i class="fas fa-grass me-1"></i> <span
+                                                th:text="${field.type}">Grass</span></small>
+                                        <small class="text-muted" th:if="${field.supervisor != null}">
+                                            <i class="fas fa-user-tie me-1"></i>
+                                            <!-- NEW: Link to Staff Search -->
+                                            <a th:href="@{/manager/staff(search=${field.supervisor.username})}"
+                                                class="text-decoration-none text-dark fw-bold">
+                                                <span th:text="${field.supervisor.username}">Ali</span>
+                                            </a>
+                                        </small>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-outline-primary btn-sm flex-grow-1"
+                                            th:data-id="${field.fieldId}" th:data-name="${field.name}"
+                                            th:data-size="${field.size}" th:data-type="${field.type}"
+                                            th:data-status="${field.status}"
+                                            th:data-branch="${field.branch != null ? field.branch.branchId : ''}"
+                                            th:data-supervisor="${field.supervisor != null ? field.supervisor.userId : ''}"
+                                            onclick="openEditFieldModal(this)">
+                                            Edit
+                                        </button>
+                                        <a th:href="@{/pricing/matrix/{id}(id=${field.fieldId})}"
+                                            class="btn btn-outline-dark btn-sm flex-grow-1"><i class="fas fa-tags"></i>
+                                            Prices</a>
+                                        <!-- NEW: Delete Button -->
+                                        <a th:href="@{/manager/delete-field/{id}(id=${field.fieldId})}"
+                                            class="btn btn-outline-danger btn-sm"
+                                            onclick="confirmDelete(this, 'field'); return false;">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Empty State -->
+                <div th:if="${fieldsByBranch.isEmpty()}" class="text-center py-5">
+                    <i class="fas fa-wind fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">No fields found. Add one to get started!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title"><i class="fas fa-exclamation-triangle me-2"></i>Confirm Delete</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <i class="fas fa-trash-alt fa-3x text-danger mb-3"></i>
+                    <p class="mb-0 fs-5">Are you sure you want to delete this <span id="deleteItemName">item</span>?</p>
+                    <p class="text-muted small mt-2">This action cannot be undone.</p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <a href="#" id="confirmDeleteBtn" class="btn btn-danger">Delete</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Toast -->
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+        <div id="deleteSuccessToast" class="toast align-items-center text-bg-success border-0" role="alert">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="fas fa-check-circle me-2"></i>Deleted successfully!
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- ADD FIELD MODAL -->
+    <div class="modal fade" id="addFieldModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">Add New Field</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="/manager/add-field" method="POST" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label class="small font-weight-bold text-secondary">Field Name</label>
+                            <input type="text" name="name" class="form-control" placeholder="e.g. Field A" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="small font-weight-bold text-secondary">Branch</label>
+                            <select name="branchId" class="form-control" required>
+                                <option value="">-- Select --</option>
+                                <option th:each="branch : ${branches}" th:value="${branch.branchId}"
+                                    th:text="${branch.name}">Branch</option>
+                            </select>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label class="small font-weight-bold text-secondary">Size</label>
+                                <select name="size" class="form-control">
+                                    <option value="5v5">5 vs 5</option>
+                                    <option value="7v7">7 vs 7</option>
+                                    <option value="11v11">11 vs 11</option>
+                                </select>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="small font-weight-bold text-secondary">Type</label>
+                                <select name="type" class="form-control">
+                                    <option value="Grass">Grass</option>
+                                    <option value="Turf">Turf</option>
+                                    <option value="Indoor">Indoor</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="small font-weight-bold text-secondary">Status</label>
+                            <select name="status" class="form-control">
+                                <option value="Available">Available</option>
+                                <option value="Maintenance">Maintenance</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="small font-weight-bold text-secondary">Assign Staff</label>
+                            <select name="supervisorId" class="form-control">
+                                <option value="">-- None --</option>
+                                <option th:each="staff : ${staffList}" th:value="${staff.userId}"
+                                    th:text="${staff.username}">Staff Name</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="small font-weight-bold text-secondary">Field Photos <span
+                                    class="text-muted fw-normal">(up to 5 images)</span></label>
+                            <input type="file" name="fieldImages" class="form-control" accept="image/*" multiple>
+                            <small class="text-muted">Select up to 5 photos â€” they will appear as a slideshow on the
+                                customer page.</small>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary fw-bold">Create Field</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT FIELD MODAL -->
+    <div class="modal fade" id="editFieldModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">Edit Field</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="/manager/update-field" method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="fieldId" id="editFieldId">
+                        <div class="mb-3">
+                            <label class="small font-weight-bold text-secondary">Field Name</label>
+                            <input type="text" name="name" id="editFieldName" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="small font-weight-bold text-secondary">Branch</label>
+                            <select name="branchId" id="editFieldBranch" class="form-control" required>
+                                <option value="">-- Select --</option>
+                                <option th:each="branch : ${branches}" th:value="${branch.branchId}"
+                                    th:text="${branch.name}">Branch</option>
+                            </select>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label class="small font-weight-bold text-secondary">Size</label>
+                                <select name="size" id="editFieldSize" class="form-control">
+                                    <option value="5v5">5 vs 5</option>
+                                    <option value="7v7">7 vs 7</option>
+                                    <option value="11v11">11 vs 11</option>
+                                </select>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="small font-weight-bold text-secondary">Type</label>
+                                <select name="type" id="editFieldType" class="form-control">
+                                    <option value="Grass">Grass</option>
+                                    <option value="Turf">Turf</option>
+                                    <option value="Indoor">Indoor</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="small font-weight-bold text-secondary">Status</label>
+                            <select name="status" id="editFieldStatus" class="form-control">
+                                <option value="Available">Available</option>
+                                <option value="Maintenance">Maintenance</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="small font-weight-bold text-secondary">Assign Staff</label>
+                            <select name="supervisorId" id="editFieldSupervisor" class="form-control">
+                                <option value="">-- None --</option>
+                                <option th:each="staff : ${staffList}" th:value="${staff.userId}"
+                                    th:text="${staff.username}">Staff Name</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="small font-weight-bold text-secondary">Field Photos (Optional â€” up to
+                                5)</label>
+                            <input type="file" name="fieldImages" class="form-control" accept="image/*" multiple>
+                            <small class="text-muted">Leave empty to keep existing photos. Uploading new photos replaces
+                                all current ones.</small>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary fw-bold">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openEditFieldModal(button) {
+            var id = button.getAttribute('data-id');
+            var name = button.getAttribute('data-name');
+            var size = button.getAttribute('data-size');
+            var type = button.getAttribute('data-type');
+            var status = button.getAttribute('data-status');
+            var branch = button.getAttribute('data-branch');
+            var supervisor = button.getAttribute('data-supervisor');
+
+            document.getElementById('editFieldId').value = id;
+            document.getElementById('editFieldName').value = name;
+            document.getElementById('editFieldSize').value = size;
+            document.getElementById('editFieldType').value = type;
+            document.getElementById('editFieldStatus').value = status;
+            document.getElementById('editFieldBranch').value = branch;
+            document.getElementById('editFieldSupervisor').value = supervisor;
+
+            var modal = new bootstrap.Modal(document.getElementById('editFieldModal'));
+            modal.show();
+        }
+
+        // Delete confirmation modal
+        function confirmDelete(element, itemName) {
+            const deleteUrl = element.getAttribute('href') || element.getAttribute('data-delete-url');
+            document.getElementById('deleteItemName').textContent = itemName || 'item';
+            document.getElementById('confirmDeleteBtn').href = deleteUrl;
+            var modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+            modal.show();
+        }
+
+        // Show success toast if deleted=true in URL
+        document.addEventListener('DOMContentLoaded', function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('deleted') && urlParams.get('deleted') === 'true') {
+                const toast = new bootstrap.Toast(document.getElementById('deleteSuccessToast'));
+                toast.show();
+                // Clean up URL
+                const url = new URL(window.location);
+                url.searchParams.delete('deleted');
+                window.history.replaceState({}, document.title, url);
+            }
+        });
+    </script>
+</body>
+
+</html>

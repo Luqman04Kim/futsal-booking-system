@@ -1,0 +1,44 @@
+@startuml Manage Booking Activity Diagram
+
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam ActivityFontSize 14
+skinparam PartitionBorderColor #333333
+skinparam PartitionBackgroundColor #F5F5F5
+
+title Manage Booking Activity Diagram
+
+|Customer|
+start
+:Login to System;
+:Select Branch;
+:Select Field;
+
+if (Has Overdue Payments?) then (yes)
+  :Cannot Proceed;
+  stop
+else (no)
+  :Select Date & Time;
+  :Select Services (Optional);
+  :View Price;
+  :Submit Booking;
+  
+  if (Payment Type?) then (Deposit)
+    :Pay Deposit;
+  else (Full Payment)
+    :Pay Full Amount;
+  endif
+  
+  :Booking Confirmed;
+endif
+
+|Manager|
+:View All Bookings;
+:Manage Bookings;
+
+|Staff|
+:View Branch Bookings;
+
+stop
+
+@enduml

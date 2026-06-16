@@ -1,0 +1,42 @@
+@startuml Manage Branch Activity Diagram
+
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam ActivityFontSize 14
+skinparam PartitionBorderColor #333333
+skinparam PartitionBackgroundColor #F5F5F5
+
+title Manage Branch Activity Diagram
+
+|Manager|
+start
+:Login to System;
+:Access Branch Management;
+
+if (Action?) then (Add Branch)
+  :Enter Branch Details;
+  :Set Location;
+  :Assign Manager;
+  :Save Branch;
+  :Branch Created;
+elseif (View Branches) then
+  :View All Branches;
+  :View Branch Details;
+elseif (Update Branch) then
+  :Select Branch;
+  :Edit Details;
+  :Update Manager;
+  :Save Changes;
+elseif (Delete Branch) then
+  :Select Branch;
+  :Confirm Deletion;
+  :Branch Deleted;
+endif
+
+|Staff|
+:View Assigned Branch;
+:View Branch Fields;
+
+stop
+
+@enduml

@@ -1,0 +1,47 @@
+@startuml Manage Field Activity Diagram
+
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam ActivityFontSize 14
+skinparam PartitionBorderColor #333333
+skinparam PartitionBackgroundColor #F5F5F5
+
+title Manage Field Activity Diagram
+
+|Manager|
+start
+:Login to System;
+:Access Field Management;
+
+if (Action?) then (Add Field)
+  :Enter Field Details;
+  :Select Branch;
+  :Set Pricing;
+  :Assign Supervisor;
+  :Save Field;
+  :Field Created;
+elseif (View Fields) then
+  :View All Fields;
+  :View Field Status;
+elseif (Update Field) then
+  :Select Field;
+  :Edit Details;
+  :Update Pricing;
+  :Save Changes;
+elseif (Delete Field) then
+  :Select Field;
+  :Confirm Deletion;
+  :Field Deleted;
+endif
+
+|Staff|
+:View Assigned Fields;
+:Monitor Field Status;
+
+|Customer|
+:Browse Available Fields;
+:View Field Details;
+
+stop
+
+@enduml
