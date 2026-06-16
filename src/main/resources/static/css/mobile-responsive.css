@@ -1,447 +1,26 @@
 /**
- * FOOTBALLHUB - Mobile Responsive Styles
- * These styles only activate at smaller screen sizes
- * Desktop design remains completely intact
+ * FOOTBALLHUB - Complete Mobile Responsive Styles
+ * Covers: sidebar panel, customer pages, admin pages, forms, tables, modals
+ * Breakpoints: 991px (tablet), 768px (mobile), 576px (small phone)
  */
 
 /* ==========================================
-   TABLET BREAKPOINT (max-width: 991px)
+   GLOBAL MOBILE BASE
    ========================================== */
-@media (max-width: 991px) {
-
-    /* Sidebar - Hide on tablet and smaller */
-    .sidebar {
-        position: fixed;
-        left: -260px;
-        top: 0;
-        height: 100vh;
-        width: 240px;
-        transition: left 0.3s ease;
-        z-index: 1100 !important;
-        pointer-events: auto;
-    }
-
-    .sidebar.show {
-        left: 0;
-    }
-
-    /* Ensure sidebar links are clickable */
-    .sidebar a {
-        pointer-events: auto !important;
-        position: relative;
-        z-index: 1;
-    }
-
-    /* Sidebar Overlay */
-    .sidebar-overlay {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 1090;
-    }
-
-    .sidebar-overlay.show {
-        display: block;
-    }
-
-    /* Content - Full width on tablet */
-    .content {
-        margin-left: 0 !important;
-        padding: 15px !important;
-    }
-
-    /* Dashboard Header */
-    .dashboard-header {
-        flex-direction: column;
-        gap: 15px;
-        align-items: flex-start !important;
-    }
-
-    .dashboard-header>div:last-child {
-        width: 100%;
-        justify-content: flex-start !important;
-        flex-wrap: wrap;
-    }
-
-    /* Date badges - smaller on tablet */
-    .date-badge {
-        font-size: 0.8rem !important;
-        padding: 6px 12px !important;
-    }
-
-    /* Welcome Card */
-    .welcome-card h1 {
-        font-size: 1.5rem !important;
-    }
-
-    /* Chart Cards */
-    .chart-card {
-        margin-bottom: 20px;
-    }
+* {
+    box-sizing: border-box;
 }
 
-/* ==========================================
-   MOBILE BREAKPOINT (max-width: 768px)
-   ========================================== */
-@media (max-width: 768px) {
-
-    /* Typography - Scale down headings */
-    h1,
-    .hero-title {
-        font-size: 2rem !important;
-    }
-
-    h2,
-    .section-title {
-        font-size: 1.5rem !important;
-    }
-
-    h3 {
-        font-size: 1.25rem !important;
-    }
-
-    /* Navbar */
-    .navbar {
-        padding: 10px 0 !important;
-    }
-
-    .navbar-brand {
-        font-size: 1.1rem !important;
-    }
-
-    /* Profile Dropdown */
-    .profile-dropdown .dropdown-toggle {
-        padding: 5px 10px !important;
-        font-size: 0.85rem !important;
-    }
-
-    .profile-avatar {
-        width: 28px !important;
-        height: 28px !important;
-    }
-
-    /* VIP Badge/Button */
-    .btn.btn-warning.fw-bold,
-    .badge.bg-warning {
-        font-size: 0.75rem !important;
-        padding: 6px 10px !important;
-    }
-
-    /* Hero Section */
-    .hero-title {
-        font-size: 2.5rem !important;
-        line-height: 1.1 !important;
-    }
-
-    .hero-subtitle,
-    .hero-sub {
-        font-size: 1rem !important;
-        margin-bottom: 25px !important;
-    }
-
-    /* Branch Buttons */
-    .branch-btn-group {
-        gap: 10px !important;
-    }
-
-    .btn-branch {
-        padding: 12px 25px !important;
-        font-size: 0.85rem !important;
-    }
-
-    /* Ticket Cards (Home Page) */
-    .ticket-card {
-        border-radius: 12px !important;
-    }
-
-    .card-img-wrapper {
-        height: 180px !important;
-    }
-
-    .card-body {
-        padding: 15px !important;
-    }
-
-    .card-title {
-        font-size: 1.2rem !important;
-    }
-
-    /* Ticket Card Notches - Adjust position */
-    .ticket-card::before,
-    .ticket-card::after {
-        top: 165px !important;
-        height: 25px !important;
-        width: 25px !important;
-    }
-
-    /* Booking Page - Stack ticket visual and details */
-    .ticket-card.w-100 {
-        flex-direction: column !important;
-    }
-
-    .ticket-visual {
-        width: 100% !important;
-        min-height: 250px !important;
-        border-right: none !important;
-        border-bottom: 3px dashed #ccc !important;
-    }
-
-    .ticket-details {
-        width: 100% !important;
-        padding: 25px 20px !important;
-    }
-
-    /* Hide ticket notches on horizontal layout when stacked */
-    .ticket-card.w-100::before,
-    .ticket-card.w-100::after {
-        display: none !important;
-    }
-
-    .ticket-container {
-        margin-top: 60px !important;
-    }
-
-    /* Slot Grid - 2 columns on mobile */
-    .slot-grid {
-        grid-template-columns: repeat(2, 1fr) !important;
-        gap: 8px !important;
-    }
-
-    .btn-slot {
-        padding: 10px !important;
-    }
-
-    .slot-time {
-        font-size: 0.85rem !important;
-    }
-
-    /* Add-on Cards */
-    .addon-card {
-        padding: 12px !important;
-    }
-
-    .addon-card h6 {
-        font-size: 0.9rem !important;
-    }
-
-    .addon-icon {
-        font-size: 1.2rem !important;
-    }
-
-    /* Total Bar */
-    .total-bar {
-        flex-direction: column !important;
-        gap: 10px !important;
-        text-align: center !important;
-    }
-
-    .total-price {
-        font-size: 1.3rem !important;
-    }
-
-    /* Stat Cards */
-    .stat-card {
-        padding: 15px !important;
-    }
-
-    .stat-value {
-        font-size: 1.4rem !important;
-    }
-
-    .stat-label {
-        font-size: 0.75rem !important;
-    }
-
-    /* Tables */
-    .table thead th,
-    .table tbody td {
-        padding: 10px 8px !important;
-        font-size: 0.8rem !important;
-    }
-
-    .table-responsive {
-        font-size: 0.85rem;
-    }
-
-    /* Glass Panel (My Bookings) */
-    .glass-panel {
-        padding: 20px 15px !important;
-        margin-top: 15px !important;
-    }
-
-    /* Chat Widget */
-    .chat-btn {
-        width: 50px !important;
-        height: 50px !important;
-        font-size: 20px !important;
-        bottom: 20px !important;
-        right: 20px !important;
-    }
-
-    .chat-window {
-        width: calc(100% - 30px) !important;
-        right: 15px !important;
-        left: 15px !important;
-        bottom: 80px !important;
-        height: 400px !important;
-    }
-
-    /* VIP Banner */
-    .vip-gold-banner {
-        padding: 18px !important;
-        margin-bottom: 25px !important;
-    }
-
-    .vip-gold-banner h2 {
-        font-size: 1.1rem !important;
-    }
-
-    /* Welcome Banner */
-    .welcome-banner {
-        padding: 15px !important;
-    }
-
-    .welcome-banner p {
-        font-size: 0.95rem !important;
-    }
-
-    /* Weather Widget */
-    .chart-card #weatherTemp {
-        font-size: 2.5rem !important;
-    }
-
-    /* Modal Dialogs */
-    .modal-dialog {
-        margin: 10px !important;
-    }
-
-    .modal-body {
-        padding: 15px !important;
-    }
-
-    /* Forms */
-    .form-control {
-        padding: 10px 12px !important;
-        font-size: 0.9rem !important;
-    }
-
-    /* Buttons */
-    .btn {
-        padding: 10px 15px !important;
-    }
-
-    .btn-sm {
-        padding: 6px 10px !important;
-        font-size: 0.75rem !important;
-    }
-
-    /* Login/Register Forms */
-    .login-card,
-    .register-card {
-        padding: 25px 20px !important;
-        margin: 15px !important;
-    }
+html {
+    scroll-behavior: smooth;
 }
 
-/* ==========================================
-   SMALL PHONE BREAKPOINT (max-width: 576px)
-   ========================================== */
-@media (max-width: 576px) {
+body {
+    overflow-x: hidden !important;
+}
 
-    /* Extreme small screens */
-    .hero-title {
-        font-size: 2rem !important;
-    }
-
-    /* Branch buttons - stack vertically */
-    .branch-btn-group {
-        flex-direction: column !important;
-        align-items: center !important;
-    }
-
-    .btn-branch {
-        width: 80% !important;
-        text-align: center !important;
-    }
-
-    /* Slot Grid - Keep 2 columns */
-    .slot-grid {
-        grid-template-columns: repeat(2, 1fr) !important;
-    }
-
-    /* Navbar items */
-    .navbar .d-flex.align-items-center.gap-3 {
-        gap: 8px !important;
-    }
-
-    /* Profile dropdown - Hide username on very small screens */
-    .profile-dropdown .dropdown-toggle span:not(.profile-avatar) {
-        display: none !important;
-    }
-
-    /* Date badges - Stack vertically */
-    .dashboard-header .d-flex.align-items-center.gap-3 {
-        flex-direction: column !important;
-        align-items: flex-start !important;
-        gap: 8px !important;
-    }
-
-    /* Stat cards - Single column */
-    .row-cols-md-2>.col,
-    .row-cols-xl-5>.col {
-        flex: 0 0 100% !important;
-        max-width: 100% !important;
-    }
-
-    /* Task cards */
-    .task-card {
-        padding: 12px !important;
-    }
-
-    .task-card h5 {
-        font-size: 0.95rem !important;
-    }
-
-    .task-card .d-flex.gap-2 {
-        flex-wrap: wrap !important;
-        gap: 5px !important;
-    }
-
-    /* Bento Grid (Landing Page) */
-    .bento-grid {
-        grid-template-columns: 1fr !important;
-    }
-
-    .bento-card,
-    .span-2 {
-        grid-column: span 1 !important;
-        height: 300px !important;
-    }
-
-    /* Timeline Cards */
-    .timeline-card {
-        min-width: 280px !important;
-    }
-
-    /* Owner Card */
-    .owner-card {
-        flex-direction: column !important;
-        text-align: center !important;
-    }
-
-    .owner-img {
-        width: 150px !important;
-        height: 150px !important;
-    }
-
-    /* Footer */
-    footer {
-        padding: 30px 0 !important;
-    }
+img {
+    max-width: 100%;
 }
 
 /* ==========================================
@@ -450,38 +29,131 @@
 .mobile-menu-btn {
     display: none;
     position: fixed;
-    top: 15px;
-    left: 15px;
+    top: 12px;
+    left: 12px;
     background: #0f172a;
     border: none;
     color: white;
-    font-size: 1.5rem;
-    padding: 10px 14px;
+    font-size: 1.3rem;
+    padding: 10px 13px;
     cursor: pointer;
-    z-index: 1060;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 1200;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.35);
+    transition: background 0.2s;
+    line-height: 1;
 }
 
-.mobile-menu-btn:hover {
+.mobile-menu-btn:hover,
+.mobile-menu-btn:focus {
     background: #1e293b;
+    outline: none;
 }
 
+/* Default hide mobile-only elements */
+.show-on-mobile {
+    display: none !important;
+}
+
+/* ==========================================
+   TABLET BREAKPOINT (max-width: 991px)
+   ========================================== */
 @media (max-width: 991px) {
+
+    /* --- Show hamburger button --- */
     .mobile-menu-btn {
-        display: block !important;
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
     }
 
     /* Add padding-top to content so hamburger doesn't overlap */
     .content {
-        padding-top: 70px !important;
+        padding-top: 68px !important;
+        margin-left: 0 !important;
+        padding-left: 15px !important;
+        padding-right: 15px !important;
+    }
+
+    /* --- Sidebar --- */
+    .sidebar {
+        position: fixed !important;
+        left: -260px !important;
+        top: 0 !important;
+        height: 100vh !important;
+        width: 248px !important;
+        transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        z-index: 1150 !important;
+        overflow-y: auto !important;
+    }
+
+    .sidebar.show {
+        left: 0 !important;
+        box-shadow: 6px 0 30px rgba(0, 0, 0, 0.4) !important;
+    }
+
+    /* Ensure sidebar links are clickable */
+    .sidebar a,
+    .sidebar button {
+        pointer-events: auto !important;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* --- Sidebar Overlay --- */
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.55);
+        z-index: 1100;
+        backdrop-filter: blur(2px);
+    }
+
+    .sidebar-overlay.show {
+        display: block;
+    }
+
+    /* --- Dashboard Header --- */
+    .dashboard-header {
+        flex-direction: column !important;
+        gap: 12px !important;
+        align-items: flex-start !important;
+    }
+
+    .dashboard-header > div:last-child {
+        width: 100%;
+        justify-content: flex-start !important;
+        flex-wrap: wrap;
+        gap: 8px !important;
+    }
+
+    /* --- Date badges --- */
+    .date-badge {
+        font-size: 0.8rem !important;
+        padding: 6px 12px !important;
+    }
+
+    /* --- Welcome Card --- */
+    .welcome-card h1 {
+        font-size: 1.4rem !important;
+    }
+
+    /* --- Chart Cards --- */
+    .chart-card {
+        margin-bottom: 18px;
     }
 }
 
 /* ==========================================
-   UTILITY CLASSES FOR MOBILE
+   MOBILE BREAKPOINT (max-width: 768px)
    ========================================== */
 @media (max-width: 768px) {
+
+    /* --- Utility --- */
     .hide-on-mobile {
         display: none !important;
     }
@@ -505,9 +177,644 @@
     .mb-mobile {
         margin-bottom: 15px !important;
     }
+
+    /* --- Typography --- */
+    h1, .hero-title {
+        font-size: 2rem !important;
+        line-height: 1.15 !important;
+    }
+
+    h2, .section-title {
+        font-size: 1.5rem !important;
+    }
+
+    h3 {
+        font-size: 1.2rem !important;
+    }
+
+    h4 {
+        font-size: 1.05rem !important;
+    }
+
+    /* --- Navbar (customer pages) --- */
+    .navbar {
+        padding: 10px 0 !important;
+    }
+
+    .navbar-brand {
+        font-size: 1.05rem !important;
+    }
+
+    .navbar-collapse {
+        background: rgba(0, 0, 0, 0.95);
+        border-radius: 12px;
+        padding: 12px;
+        margin-top: 8px;
+    }
+
+    /* --- Profile Dropdown --- */
+    .profile-dropdown .dropdown-toggle {
+        padding: 5px 10px !important;
+        font-size: 0.85rem !important;
+    }
+
+    .profile-avatar {
+        width: 30px !important;
+        height: 30px !important;
+    }
+
+    /* --- Hero Section (home.html) --- */
+    .hero-title {
+        font-size: 2.2rem !important;
+        line-height: 1.1 !important;
+        margin-top: 30px !important;
+    }
+
+    .hero-sub {
+        font-size: 0.95rem !important;
+        margin-bottom: 25px !important;
+    }
+
+    /* --- Branch Buttons (home.html) --- */
+    .branch-btn-group {
+        gap: 10px !important;
+    }
+
+    .btn-branch {
+        padding: 12px 22px !important;
+        font-size: 0.85rem !important;
+    }
+
+    /* --- Field / Ticket Cards (home.html) --- */
+    .ticket-card {
+        border-radius: 14px !important;
+    }
+
+    .card-img-wrapper {
+        height: 185px !important;
+    }
+
+    .card-body {
+        padding: 16px !important;
+    }
+
+    .card-title {
+        font-size: 1.15rem !important;
+    }
+
+    /* Ticket card notches - adjust for shorter image */
+    .ticket-card::before,
+    .ticket-card::after {
+        top: 168px !important;
+        height: 24px !important;
+        width: 24px !important;
+    }
+
+    /* --- Booking Page ticket layout --- */
+    .ticket-card.w-100 {
+        flex-direction: column !important;
+    }
+
+    .ticket-visual {
+        width: 100% !important;
+        min-height: 230px !important;
+        border-right: none !important;
+        border-bottom: 3px dashed #ccc !important;
+    }
+
+    .ticket-details {
+        width: 100% !important;
+        padding: 22px 18px !important;
+    }
+
+    .ticket-card.w-100::before,
+    .ticket-card.w-100::after {
+        display: none !important;
+    }
+
+    .ticket-container {
+        margin-top: 55px !important;
+    }
+
+    /* --- Time Slot Grid --- */
+    .slot-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
+    }
+
+    .btn-slot {
+        padding: 10px 6px !important;
+        font-size: 0.8rem !important;
+    }
+
+    .slot-time {
+        font-size: 0.82rem !important;
+    }
+
+    /* --- Add-on Cards (book.html) --- */
+    .addon-card {
+        padding: 12px !important;
+    }
+
+    .addon-card h6 {
+        font-size: 0.88rem !important;
+    }
+
+    .addon-icon {
+        font-size: 1.2rem !important;
+    }
+
+    /* --- Total Bar (book.html) --- */
+    .total-bar {
+        flex-direction: column !important;
+        gap: 10px !important;
+        text-align: center !important;
+    }
+
+    .total-price {
+        font-size: 1.3rem !important;
+    }
+
+    /* --- Stat Cards (dashboard, staff-dashboard) --- */
+    .stat-card {
+        padding: 16px !important;
+    }
+
+    .stat-value {
+        font-size: 1.5rem !important;
+    }
+
+    .stat-label {
+        font-size: 0.75rem !important;
+    }
+
+    /* --- Tables --- */
+    .table-responsive {
+        font-size: 0.82rem;
+        border-radius: 8px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table thead th,
+    .table tbody td {
+        padding: 10px 8px !important;
+        font-size: 0.8rem !important;
+        white-space: nowrap;
+    }
+
+    /* --- Glass Panel (my-bookings.html) --- */
+    .glass-panel {
+        padding: 18px 14px !important;
+        margin-top: 15px !important;
+    }
+
+    /* --- Chat Widget --- */
+    .chat-btn {
+        width: 50px !important;
+        height: 50px !important;
+        font-size: 20px !important;
+        bottom: 18px !important;
+        right: 18px !important;
+    }
+
+    .chat-window {
+        width: calc(100vw - 30px) !important;
+        max-width: 380px !important;
+        right: 15px !important;
+        left: auto !important;
+        bottom: 78px !important;
+        height: 410px !important;
+    }
+
+    /* --- VIP Banner --- */
+    .vip-gold-banner {
+        padding: 16px !important;
+        margin-bottom: 22px !important;
+    }
+
+    .vip-gold-banner h2 {
+        font-size: 1rem !important;
+    }
+
+    /* --- Welcome Banner --- */
+    .welcome-banner {
+        padding: 14px !important;
+    }
+
+    .welcome-banner p {
+        font-size: 0.92rem !important;
+    }
+
+    /* --- Weather Widget --- */
+    .chart-card #weatherTemp {
+        font-size: 2.2rem !important;
+    }
+
+    /* --- Modal Dialogs --- */
+    .modal-dialog {
+        margin: 8px !important;
+        max-width: calc(100vw - 16px) !important;
+    }
+
+    .modal-dialog-centered {
+        align-items: flex-end !important;
+        margin-bottom: 0 !important;
+    }
+
+    .modal-content {
+        border-radius: 20px 20px 0 0 !important;
+    }
+
+    .modal-body {
+        padding: 18px !important;
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+
+    .modal-header {
+        padding: 14px 18px !important;
+    }
+
+    .modal-footer {
+        padding: 12px 18px !important;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .modal-footer .btn {
+        flex: 1 1 auto;
+    }
+
+    /* --- Forms --- */
+    .form-control,
+    .form-select {
+        padding: 10px 12px !important;
+        font-size: 0.9rem !important;
+        border-radius: 8px !important;
+    }
+
+    .form-label {
+        font-size: 0.88rem !important;
+        margin-bottom: 4px !important;
+    }
+
+    .input-group-text {
+        font-size: 0.88rem !important;
+    }
+
+    /* --- Buttons --- */
+    .btn {
+        padding: 10px 14px !important;
+        font-size: 0.88rem !important;
+    }
+
+    .btn-sm {
+        padding: 6px 10px !important;
+        font-size: 0.78rem !important;
+    }
+
+    .btn-lg {
+        padding: 12px 20px !important;
+        font-size: 0.95rem !important;
+    }
+
+    /* --- Login/Register Cards --- */
+    .login-container,
+    .login-card,
+    .register-card {
+        padding: 25px 18px !important;
+        margin: 10px !important;
+        width: calc(100vw - 20px) !important;
+        max-width: 420px !important;
+    }
+
+    /* --- Branches Page cards --- */
+    .branch-card-img {
+        height: 160px !important;
+        object-fit: cover !important;
+    }
+
+    /* --- Staff Page --- */
+    .staff-card {
+        padding: 14px !important;
+    }
+
+    /* --- Inventory Page --- */
+    .inventory-table th,
+    .inventory-table td {
+        padding: 8px !important;
+        font-size: 0.8rem !important;
+    }
+
+    /* --- Performance / Charts --- */
+    .chart-canvas-container {
+        height: 220px !important;
+    }
+
+    /* --- Report/Maintenance cards --- */
+    .report-card,
+    .maintenance-card {
+        padding: 12px !important;
+    }
+
+    /* --- Profile page --- */
+    .profile-avatar-lg {
+        width: 80px !important;
+        height: 80px !important;
+    }
+
+    /* --- Payment pages --- */
+    .payment-summary-card {
+        padding: 16px !important;
+    }
+
+    /* --- My Bookings page --- */
+    .booking-row-badge {
+        font-size: 0.72rem !important;
+    }
+
+    /* --- Staff Dashboard --- */
+    .task-card {
+        padding: 12px !important;
+    }
+
+    .task-card h5 {
+        font-size: 0.9rem !important;
+    }
+
+    .task-card .d-flex.gap-2 {
+        flex-wrap: wrap !important;
+        gap: 6px !important;
+    }
 }
 
-/* Default hide mobile-only elements */
-.show-on-mobile {
-    display: none;
+/* ==========================================
+   SMALL PHONE BREAKPOINT (max-width: 576px)
+   ========================================== */
+@media (max-width: 576px) {
+
+    /* --- Hero --- */
+    .hero-title {
+        font-size: 1.75rem !important;
+        margin-top: 20px !important;
+    }
+
+    /* --- Branch buttons: stack --- */
+    .branch-btn-group {
+        flex-direction: column !important;
+        align-items: center !important;
+    }
+
+    .btn-branch {
+        width: 88% !important;
+        text-align: center !important;
+        padding: 12px 16px !important;
+    }
+
+    /* --- Time slot grid: 2 columns --- */
+    .slot-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+
+    /* --- Navbar items --- */
+    .navbar .d-flex.align-items-center.gap-3 {
+        gap: 6px !important;
+    }
+
+    /* Hide username label on tiny screens, keep avatar */
+    .profile-dropdown .dropdown-toggle span:not(.profile-avatar) {
+        display: none !important;
+    }
+
+    /* --- Date badges: stack --- */
+    .dashboard-header .d-flex.align-items-center.gap-3 {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 6px !important;
+    }
+
+    /* --- Stat cards: single column --- */
+    .row-cols-md-2 > .col,
+    .row-cols-xl-5 > .col,
+    .row-cols-sm-2 > .col {
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+    }
+
+    /* --- Bento Grid (landing) --- */
+    .bento-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .bento-card,
+    .span-2 {
+        grid-column: span 1 !important;
+        height: 260px !important;
+    }
+
+    /* --- Timeline Cards --- */
+    .timeline-card {
+        min-width: 260px !important;
+    }
+
+    /* --- Owner Card --- */
+    .owner-card {
+        flex-direction: column !important;
+        text-align: center !important;
+    }
+
+    .owner-img {
+        width: 130px !important;
+        height: 130px !important;
+    }
+
+    /* --- Footer --- */
+    footer {
+        padding: 25px 0 !important;
+        text-align: center;
+    }
+
+    footer .col-md-4 {
+        margin-bottom: 20px;
+    }
+
+    /* --- Modals: full-screen on tiny phones --- */
+    .modal-dialog {
+        margin: 0 !important;
+        max-width: 100vw !important;
+    }
+
+    .modal-content {
+        border-radius: 18px 18px 0 0 !important;
+        min-height: 60vh;
+    }
+
+    /* --- Content area extra top padding --- */
+    .content {
+        padding-top: 62px !important;
+    }
+
+    /* --- Tables: hide less important columns on very small screens --- */
+    .table .hide-xs {
+        display: none !important;
+    }
+
+    /* --- VIP banner text --- */
+    .vip-gold-banner h2 {
+        font-size: 0.9rem !important;
+        letter-spacing: 0.5px !important;
+    }
+
+    /* --- Login container full screen --- */
+    .login-container {
+        min-height: 100vh;
+        border-radius: 0 !important;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        width: 100vw !important;
+        margin: 0 !important;
+        padding: 30px 20px !important;
+    }
+
+    /* --- Register form full width --- */
+    .register-card,
+    .login-card {
+        border-radius: 0 !important;
+        width: 100vw !important;
+        margin: 0 !important;
+    }
+
+    /* --- Chat window: stretch full on small phones --- */
+    .chat-window {
+        width: calc(100vw - 20px) !important;
+        right: 10px !important;
+        bottom: 75px !important;
+        height: 380px !important;
+    }
+
+    /* --- Staff/user profile image --- */
+    .profile-avatar-lg,
+    .staff-avatar-lg {
+        width: 70px !important;
+        height: 70px !important;
+    }
+
+    /* --- Branch card image --- */
+    .branch-card-img {
+        height: 140px !important;
+    }
+
+    /* --- Performance chart --- */
+    .chart-canvas-container {
+        height: 190px !important;
+    }
+
+    /* --- Payment page - summary card stretch --- */
+    .payment-summary-card {
+        width: 100% !important;
+    }
+
+    /* --- Membership plan cards --- */
+    .plan-card {
+        padding: 16px !important;
+    }
+}
+
+/* ==========================================
+   TOUCH-FRIENDLY ENHANCEMENTS
+   ========================================== */
+@media (hover: none) and (pointer: coarse) {
+
+    /* Increase tap target sizes */
+    .btn,
+    .nav-link,
+    .dropdown-item,
+    .sidebar a {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    /* Remove hover-only transforms (they stick on mobile) */
+    .ticket-card:hover {
+        transform: none !important;
+    }
+
+    .stat-card:hover {
+        transform: none !important;
+    }
+
+    .btn-branch:hover {
+        transform: none !important;
+    }
+
+    /* Add active state instead */
+    .ticket-card:active {
+        transform: scale(0.98) !important;
+    }
+
+    .btn:active {
+        transform: scale(0.97) !important;
+    }
+
+    /* Smooth scrolling for horizontal areas */
+    .table-responsive,
+    #hourlyForecast,
+    .overflow-auto {
+        -webkit-overflow-scrolling: touch;
+        scroll-snap-type: x mandatory;
+    }
+}
+
+/* ==========================================
+   LANDSCAPE PHONE (height-based)
+   ========================================== */
+@media (max-height: 500px) and (orientation: landscape) {
+
+    .login-container {
+        padding: 15px 25px !important;
+        min-height: auto !important;
+    }
+
+    .brand-header {
+        margin-bottom: 15px !important;
+    }
+
+    .brand-title {
+        font-size: 1.5rem !important;
+    }
+
+    .hero-title {
+        margin-top: 10px !important;
+        font-size: 1.6rem !important;
+    }
+
+    .chat-window {
+        height: 320px !important;
+        bottom: 65px !important;
+    }
+
+    .sidebar {
+        overflow-y: auto !important;
+    }
+}
+
+/* ==========================================
+   PRINT MEDIA - Hide sidebar, chatbot
+   ========================================== */
+@media print {
+    .sidebar,
+    .mobile-menu-btn,
+    .sidebar-overlay,
+    .chat-btn,
+    .chat-window {
+        display: none !important;
+    }
+
+    .content {
+        margin-left: 0 !important;
+        padding: 0 !important;
+    }
 }

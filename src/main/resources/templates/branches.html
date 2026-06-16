@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
@@ -184,6 +184,14 @@
 </head>
 
 <body>
+    <!-- Mobile Menu Button -->
+    <button class="mobile-menu-btn" onclick="toggleSidebar()" aria-label="Open menu">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
 
     <!-- Sidebar -->
     <div class="sidebar">
@@ -236,8 +244,8 @@
 
     <!-- Main Content -->
     <div class="content">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="fw-bold text-primary">Branch Management</h2>
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+            <h2 class="fw-bold text-primary mb-0">Branch Management</h2>
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBranchModal">
                 <i class="fas fa-plus me-2"></i> Add New Branch
             </button>
@@ -258,6 +266,7 @@
             <div class="col-md-6 col-lg-4" th:each="branch : ${branches}">
                 <div class="card branch-card shadow-sm">
                     <!-- Image Header -->
+
                     <div class="card-header-img">
                         <img th:src="${branch.imageUrl != null ? branch.imageUrl : 'https://images.unsplash.com/photo-1522778119026-d647f0565c6a'}"
                             class="branch-img">
@@ -691,6 +700,24 @@
                 nameInput.classList.remove('is-invalid');
                 submitBtn.disabled = false;
             });
+        });
+    </script>
+    <script>
+        // Mobile sidebar toggle
+        function toggleSidebar() {
+            var sidebar = document.querySelector('.sidebar');
+            var overlay = document.getElementById('sidebarOverlay');
+            if (sidebar) sidebar.classList.toggle('show');
+            if (overlay) overlay.classList.toggle('show');
+        }
+        // Close sidebar on ESC key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                var sidebar = document.querySelector('.sidebar');
+                var overlay = document.getElementById('sidebarOverlay');
+                if (sidebar) sidebar.classList.remove('show');
+                if (overlay) overlay.classList.remove('show');
+            }
         });
     </script>
 </body>
