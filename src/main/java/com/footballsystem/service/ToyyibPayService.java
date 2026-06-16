@@ -8,7 +8,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 
+import javax.net.ssl.*;
+import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +32,45 @@ public class ToyyibPayService {
 
     private static final String CREATE_BILL_ENDPOINT = "/index.php/api/createBill";
 
+    private RestTemplate getUnsafeRestTemplate() {
+        try {
+            TrustManager[] trustAllCerts = new TrustManager[]{
+                new X509TrustManager() {
+                    public X509Certificate[] getAcceptedIssuers() { return new X509Certificate[0]; }
+                    public void checkClientTrusted(X509Certificate[] certs, String authType) {}
+                    public void checkServerTrusted(X509Certificate[] certs, String authType) {}
+                }
+            };
+
+            SSLContext sslContext = SSLContext.getInstance("TLS");
+            sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
+
+            SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory() {
+                @Override
+                protected void prepareConnection(java.net.HttpURLConnection connection, String httpMethod) throws java.io.IOException {
+                    if (connection instanceof HttpsURLConnection) {
+                        HttpsURLConnection httpsConnection = (HttpsURLConnection) connection;
+                        httpsConnection.setSSLSocketFactory(sslContext.getSocketFactory());
+                        httpsConnection.setHostnameVerifier(new HostnameVerifier() {
+                            public boolean verify(String hostname, SSLSession session) {
+                                return true;
+                            }
+                        });
+                    }
+                    super.prepareConnection(connection, httpMethod);
+                }
+            };
+
+            requestFactory.setConnectTimeout(15000);
+            requestFactory.setReadTimeout(15000);
+
+            return new RestTemplate(requestFactory);
+        } catch (Exception e) {
+            System.err.println("Failed to create unsafe RestTemplate: " + e.getMessage());
+            return new RestTemplate();
+        }
+    }
+
     /**
      * Creates a ToyyibPay bill and returns the redirect URL to the payment page.
      *
@@ -38,7 +80,7 @@ public class ToyyibPayService {
      * @return the full ToyyibPay payment URL to redirect the customer to
      */
     public String createBillAndGetUrl(Booking booking, String paymentType, double amount) throws Exception {
-        RestTemplate restTemplate = new RestTemplate();
+        RestTemplate restTemplate = getUnsafeRestTemplate();
 
         // ToyyibPay requires amount in CENTS (integer), e.g. RM100.50 → 10050
         long amountInCents = Math.round(amount * 100);

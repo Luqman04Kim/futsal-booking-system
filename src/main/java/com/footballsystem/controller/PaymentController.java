@@ -166,6 +166,7 @@ public class PaymentController {
             // Pass gateway error message if redirected back after failure
             if (error != null) {
                 model.addAttribute("gatewayError", true);
+                model.addAttribute("gatewayErrorMessage", error);
             }
 
             return "payment";
@@ -215,7 +216,12 @@ public class PaymentController {
             System.err.println("ToyyibPay createBill failed: " + e.getClass().getSimpleName() + " - " + e.getMessage());
             e.printStackTrace();
             // Redirect back to payment page with error flag
-            return "redirect:/payment/" + bookingId + "?error=1";
+            String errMsg = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
+            try {
+                return "redirect:/payment/" + bookingId + "?error=" + java.net.URLEncoder.encode(errMsg, "UTF-8");
+            } catch (java.io.UnsupportedEncodingException ex) {
+                return "redirect:/payment/" + bookingId + "?error=connection_error";
+            }
         }
     }
 
