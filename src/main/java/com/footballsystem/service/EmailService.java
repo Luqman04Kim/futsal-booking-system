@@ -1,40 +1,58 @@
 package com.footballsystem.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ByteArrayResource;
-
 import com.footballsystem.model.Booking;
-import jakarta.mail.internet.MimeMessage;
 
 import java.time.format.DateTimeFormatter;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class EmailService {
 
-    @Autowired
-    private JavaMailSender mailSender;
+    @Value("${resend.api.key:re_4i4LAHST_GVcHnzXr8DdUyugNxdTbqntg}")
+    private String resendApiKey;
 
-    @Value("${spring.mail.username}")
-    private String senderEmail;
+    @Value("${resend.from:onboarding@resend.dev}")
+    private String fromEmail;
+
+    private final HttpClient httpClient = HttpClient.newHttpClient();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     // Core method to send simple text emails
     public void sendSimpleEmail(String toEmail, String subject, String body) {
         try {
-            SimpleMailMessage message = new SimpleMailMessage();
-            // Sets the sender. Note: Gmail SMTP will usually overwrite this with the
-            // authenticated account email.
-            message.setFrom("FOOTBALLHUB Manager <" + senderEmail + ">");
-            message.setTo(toEmail);
-            message.setSubject(subject);
-            message.setText(body);
+            Map<String, Object> payload = new HashMap<>();
+            payload.put("from", "FOOTBALLHUB <" + fromEmail + ">");
+            payload.put("to", List.of(toEmail));
+            payload.put("subject", subject);
+            payload.put("text", body);
 
-            mailSender.send(message);
-            System.out.println("Email sent successfully to " + toEmail);
+            String jsonPayload = objectMapper.writeValueAsString(payload);
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create("https://api.resend.com/emails"))
+                    .header("Authorization", "Bearer " + resendApiKey)
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(jsonPayload, StandardCharsets.UTF_8))
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() >= 200 && response.statusCode() < 300) {
+                System.out.println("Email sent successfully to " + toEmail + ". Response: " + response.body());
+            } else {
+                System.err.println("Failed to send email to " + toEmail + ". Status: " + response.statusCode() + ", Response: " + response.body());
+            }
         } catch (Exception e) {
             System.err.println("Error sending email: " + e.getMessage());
         }
@@ -60,13 +78,6 @@ public class EmailService {
     // 1b. Booking Confirmation Email WITH PDF Receipt Attachment
     public void sendBookingConfirmationWithReceipt(String toEmail, String userName, Booking booking, byte[] pdfBytes) {
         try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-
-            helper.setFrom("FOOTBALLHUB Manager <" + senderEmail + ">");
-            helper.setTo(toEmail);
-            helper.setSubject("Booking Confirmed - FOOTBALLHUB (Receipt Attached)");
-
             String fieldName = booking.getField() != null ? booking.getField().getName() : "N/A";
             DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("hh:mm a");
 
@@ -88,14 +99,37 @@ public class EmailService {
                     "Regards,\n" +
                     "FOOTBALLHUB Manager Team";
 
-            helper.setText(body);
-
-            // Attach PDF
             String filename = "Receipt_" + booking.getBookingId() + ".pdf";
-            helper.addAttachment(filename, new ByteArrayResource(pdfBytes));
+            String base64Content = Base64.getEncoder().encodeToString(pdfBytes);
 
-            mailSender.send(message);
-            System.out.println("Email with receipt sent successfully to " + toEmail);
+            Map<String, Object> attachment = new HashMap<>();
+            attachment.put("filename", filename);
+            attachment.put("content", base64Content);
+
+            Map<String, Object> payload = new HashMap<>();
+            payload.put("from", "FOOTBALLHUB <" + fromEmail + ">");
+            payload.put("to", List.of(toEmail));
+            payload.put("subject", "Booking Confirmed - FOOTBALLHUB (Receipt Attached)");
+            payload.put("text", body);
+            payload.put("attachments", List.of(attachment));
+
+            String jsonPayload = objectMapper.writeValueAsString(payload);
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create("https://api.resend.com/emails"))
+                    .header("Authorization", "Bearer " + resendApiKey)
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(jsonPayload, StandardCharsets.UTF_8))
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() >= 200 && response.statusCode() < 300) {
+                System.out.println("Email with receipt sent successfully to " + toEmail + ". Response: " + response.body());
+            } else {
+                System.err.println("Failed to send email with receipt to " + toEmail + ". Status: " + response.statusCode() + ", Response: " + response.body());
+                throw new RuntimeException("Failed to send receipt email: Status " + response.statusCode() + ", Response " + response.body());
+            }
         } catch (Exception e) {
             System.err.println("Error sending email with receipt: " + e.getMessage());
             e.printStackTrace();
@@ -118,7 +152,7 @@ public class EmailService {
     // 3. Password Reset Email (UPDATED)
     public void sendPasswordReset(String toEmail, String token) {
         String subject = "Password Reset Request - FOOTBALLHUB";
-        String resetLink = "http://localhost:8082/reset-password?token=" + token;
+        String resetLink = "https://s72510.up.railway.app/reset-password?token=" + token;
 
         String body = "Hello,\n\n" +
                 "We received a request to reset your password.\n" +

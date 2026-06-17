@@ -326,6 +326,8 @@ public class PaymentController {
             // Payment failed or cancelled
             model.addAttribute("paymentSuccess", false);
             model.addAttribute("bookingId", bookingId);
+            Optional<Booking> bookingOpt = bookingId != null ? bookingRepository.findById(bookingId) : Optional.empty();
+            model.addAttribute("booking", bookingOpt.orElse(null));
             model.addAttribute("errorMsg", msg != null ? msg : "Payment was not completed.");
             return "payment-success";
         }

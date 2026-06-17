@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
@@ -102,8 +102,8 @@
             <div class="success-icon ok">
                 <i class="fas fa-check"></i>
             </div>
-            <h3 class="brand-title mb-1">Payment Successful!</h3>
-            <p class="text-muted mb-4">Your booking has been confirmed. A receipt has been sent to your email.</p>
+            <h3 class="brand-title mb-1" th:text="${booking != null && booking.field == null} ? 'Subscription Successful!' : 'Payment Successful!'">Payment Successful!</h3>
+            <p class="text-muted mb-4" th:text="${booking != null && booking.field == null} ? 'Your membership subscription is now active.' : 'Your booking has been confirmed. A receipt has been sent to your email.'">Your booking has been confirmed. A receipt has been sent to your email.</p>
 
             <!-- Booking Details -->
             <div th:if="${booking != null}" class="text-start mb-4 p-3 rounded-3" style="background:#f8faff; border:1px solid #e0e7ff;">
@@ -139,7 +139,10 @@
             </div>
 
             <div class="d-grid gap-2 mt-4">
-                <a href="/my-bookings" class="btn btn-primary rounded-pill py-2 fw-bold">
+                <a th:if="${booking != null && booking.field == null}" href="/membership" class="btn btn-primary rounded-pill py-2 fw-bold">
+                    <i class="fas fa-crown me-2"></i>Back to Membership
+                </a>
+                <a th:unless="${booking != null && booking.field == null}" href="/my-bookings" class="btn btn-primary rounded-pill py-2 fw-bold">
                     <i class="fas fa-calendar-check me-2"></i>View My Bookings
                 </a>
                 <a th:if="${booking != null}" th:href="'/receipt/' + ${booking.bookingId}" class="btn btn-outline-secondary rounded-pill py-2">
@@ -158,14 +161,24 @@
             <p class="text-muted mb-3" th:text="${errorMsg != null ? errorMsg : 'Your payment was cancelled or did not go through.'}">
                 Your payment was cancelled or did not go through.
             </p>
-            <p class="text-muted small mb-4">Your booking has <strong>not</strong> been confirmed. You can try again or cancel the booking.</p>
+            <p class="text-muted small mb-4" th:text="${booking != null && booking.field == null} ? 'Your membership subscription is not active. You can try again.' : 'Your booking has not been confirmed. You can try again or cancel the booking.'">Your booking has <strong>not</strong> been confirmed. You can try again or cancel the booking.</p>
 
             <div class="d-grid gap-2 mt-3">
-                <a th:if="${bookingId != null}" th:href="'/payment/' + ${bookingId}"
+                <!-- If it's a field booking, retry payment -->
+                <a th:if="${bookingId != null && booking != null && booking.field != null}" th:href="'/payment/' + ${bookingId}"
                    class="btn btn-primary rounded-pill py-2 fw-bold">
                     <i class="fas fa-redo me-2"></i>Try Again
                 </a>
-                <a href="/my-bookings" class="btn btn-outline-secondary rounded-pill py-2">
+                <!-- If it's a membership payment, retry subscription flow -->
+                <a th:if="${booking != null && booking.field == null}" href="/membership"
+                   class="btn btn-primary rounded-pill py-2 fw-bold">
+                    <i class="fas fa-redo me-2"></i>Try Subscription Again
+                </a>
+                
+                <a th:if="${booking != null && booking.field == null}" href="/membership" class="btn btn-outline-secondary rounded-pill py-2">
+                    <i class="fas fa-crown me-2"></i>Back to Membership
+                </a>
+                <a th:unless="${booking != null && booking.field == null}" href="/my-bookings" class="btn btn-outline-secondary rounded-pill py-2">
                     <i class="fas fa-calendar-alt me-2"></i>My Bookings
                 </a>
                 <a href="/home" class="btn btn-link text-muted">Return to Home</a>
