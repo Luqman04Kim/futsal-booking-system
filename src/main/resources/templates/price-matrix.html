@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
@@ -123,7 +123,9 @@
     <div class="header-card">
         <div class="field-info">
             <div class="mb-2">
-                <a href="/manager/fields" class="btn-back"><i class="fas fa-arrow-left"></i> Back to Fields</a>
+                <a href="/manager/fields" class="btn btn-sm btn-outline-secondary mb-2 d-inline-flex align-items-center gap-1">
+                    <i class="fas fa-arrow-left"></i> Back to Fields
+                </a>
             </div>
             <h2 th:text="${field.name}">Field Name</h2>
             <div class="field-meta">
