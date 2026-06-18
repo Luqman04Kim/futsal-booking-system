@@ -218,11 +218,199 @@
             <div class="footer-title">USER SUPPORT</div>
             <div>Email: support@footballhub.com</div>
 
-            <div class="mt-2 text-decoration-underline">Technical Requirements</div>
+            <div class="mt-2 d-flex gap-3">
+                <span class="text-decoration-underline" style="cursor:pointer; color:rgba(255,255,255,0.6);"
+                    data-bs-toggle="modal" data-bs-target="#privacyPolicyModal">
+                    Privacy Policy
+                </span>
+                <span style="color:rgba(255,255,255,0.4);">|</span>
+                <span class="text-decoration-underline" style="cursor:pointer; color:rgba(255,255,255,0.6);"
+                    data-bs-toggle="modal" data-bs-target="#contactUsModal">
+                    Contact Us
+                </span>
+            </div>
         </div>
 
     </div>
 
+
+    <!-- ===================== CONTACT US MODAL ===================== -->
+    <div class="modal fade" id="contactUsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header text-white" style="background: linear-gradient(135deg, #a50044, #004d98);">
+                    <h5 class="modal-title fw-bold"><i class="fas fa-envelope me-2"></i>Contact Us</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body px-4 py-3" style="font-size:0.9rem; color:#333;">
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-12">
+                            <div class="d-flex align-items-start gap-3 p-3 bg-light rounded">
+                                <i class="fas fa-map-marker-alt text-danger mt-1 fa-lg"></i>
+                                <div>
+                                    <strong>Head Office</strong><br>
+                                    <span class="text-muted">FOOTBALLHUB Arena, Jalan Sukan 1,<br>Kuala Terengganu, Terengganu, Malaysia</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="d-flex align-items-center gap-3 p-3 bg-light rounded">
+                                <i class="fas fa-envelope text-primary fa-lg"></i>
+                                <div>
+                                    <strong>Email</strong><br>
+                                    <a href="mailto:support@footballhub.com" class="text-decoration-none">support@footballhub.com</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="d-flex align-items-center gap-3 p-3 bg-light rounded">
+                                <i class="fas fa-phone text-success fa-lg"></i>
+                                <div>
+                                    <strong>Phone</strong><br>
+                                    <span class="text-muted">+60 9-123 4567</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="d-flex align-items-center gap-3 p-3 bg-light rounded">
+                                <i class="fas fa-clock text-warning fa-lg"></i>
+                                <div>
+                                    <strong>Operating Hours</strong><br>
+                                    <span class="text-muted">Monday – Sunday: 8:00 AM – 12:00 AM</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+                    <p class="fw-bold mb-2"><i class="fas fa-paper-plane me-1 text-primary"></i>Send Us a Message</p>
+                    <form onsubmit="event.preventDefault(); alert('Message sent! We will reply within 24 hours.'); this.reset();">
+                        <div class="mb-2">
+                            <input type="text" class="form-control form-control-sm" placeholder="Your Name" required>
+                        </div>
+                        <div class="mb-2">
+                            <input type="email" class="form-control form-control-sm" placeholder="Your Email" required>
+                        </div>
+                        <div class="mb-2">
+                            <textarea class="form-control form-control-sm" rows="3" placeholder="Your message..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-sm w-100 text-white fw-bold"
+                            style="background: linear-gradient(135deg, #a50044, #004d98);">Send Message</button>
+                    </form>
+                </div>
+                <div class="modal-footer border-0">
+                    <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== PRIVACY POLICY MODAL ===================== -->
+    <div class="modal fade" id="privacyPolicyModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header text-white" style="background: linear-gradient(135deg, #a50044, #004d98);">
+                    <h5 class="modal-title fw-bold"><i class="fas fa-shield-alt me-2"></i>Privacy Policy</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body px-4 py-3" style="font-size:0.88rem; color:#333; line-height:1.7;">
+
+                    <p class="text-muted small mb-4"><strong>Effective Date:</strong> 1 January 2025 &nbsp;|&nbsp;
+                        <strong>Last Updated:</strong> 1 June 2026</p>
+
+                    <p>FOOTBALLHUB ("we", "our", or "us") is committed to protecting your personal data and
+                        respecting your privacy. This Privacy Policy explains how we collect, use, store, and
+                        disclose your information when you use the FOOTBALLHUB Portal — our online futsal field
+                        booking and management system.</p>
+
+                    <hr>
+
+                    <h6 class="fw-bold text-primary mt-3">1. Information We Collect</h6>
+                    <p>We collect the following types of personal information when you register and use our system:</p>
+                    <ul>
+                        <li><strong>Account Information:</strong> Full name, email address, phone number, and password (hashed).</li>
+                        <li><strong>Booking Data:</strong> Field selected, date, time slot, branch, and booking history.</li>
+                        <li><strong>Payment Data:</strong> Transaction ID, amount paid, payment method (FPX/Online Banking). We do <strong>not</strong> store your full bank account or card details.</li>
+                        <li><strong>Usage Data:</strong> IP address, browser type, device information, and log data collected automatically when you access our portal.</li>
+                        <li><strong>Membership Data:</strong> VIP membership tier and subscription dates if applicable.</li>
+                    </ul>
+
+                    <h6 class="fw-bold text-primary mt-3">2. How We Use Your Information</h6>
+                    <p>Your data is used solely for the following purposes:</p>
+                    <ul>
+                        <li>To create and manage your user account.</li>
+                        <li>To process and confirm futsal field bookings.</li>
+                        <li>To facilitate payment and issue receipts via QR code.</li>
+                        <li>To send booking confirmations and system notifications.</li>
+                        <li>To manage staff attendance and task assignments (staff users only).</li>
+                        <li>To generate performance and revenue reports for managers.</li>
+                        <li>To improve our system features and user experience.</li>
+                        <li>To comply with legal obligations under Malaysian law.</li>
+                    </ul>
+
+                    <h6 class="fw-bold text-primary mt-3">3. Data Sharing & Disclosure</h6>
+                    <p>We do <strong>not sell, rent, or trade</strong> your personal information to third parties. We may share data only in the following limited circumstances:</p>
+                    <ul>
+                        <li><strong>Payment Processors:</strong> FPX / online banking gateway partners, solely for transaction processing.</li>
+                        <li><strong>Legal Requirements:</strong> When required by Malaysian law, court order, or regulatory authority.</li>
+                        <li><strong>Branch Managers:</strong> Booking and user data is accessible to authorised branch managers and staff within the FOOTBALLHUB system for operational purposes.</li>
+                    </ul>
+
+                    <h6 class="fw-bold text-primary mt-3">4. Data Retention</h6>
+                    <p>We retain your personal data for as long as your account is active or as needed to provide services. Booking and payment records are retained for a minimum of <strong>7 years</strong> for financial compliance purposes. You may request deletion of your account by contacting us.</p>
+
+                    <h6 class="fw-bold text-primary mt-3">5. Cookies & Session Data</h6>
+                    <p>Our portal uses session cookies to maintain your login state. These are essential cookies and do not track you across other websites. No third-party advertising cookies are used.</p>
+
+                    <h6 class="fw-bold text-primary mt-3">6. Data Security</h6>
+                    <p>We implement appropriate technical and organisational measures to protect your data, including:</p>
+                    <ul>
+                        <li>Password hashing using BCrypt.</li>
+                        <li>HTTPS/TLS encryption for all data in transit.</li>
+                        <li>Role-based access control (Customer, Staff, Manager).</li>
+                        <li>Server-side session management via Spring Security.</li>
+                    </ul>
+
+                    <h6 class="fw-bold text-primary mt-3">7. Your Rights</h6>
+                    <p>Under the <strong>Personal Data Protection Act 2010 (PDPA) Malaysia</strong>, you have the right to:</p>
+                    <ul>
+                        <li>Access the personal data we hold about you.</li>
+                        <li>Correct inaccurate or incomplete data.</li>
+                        <li>Withdraw consent for data processing (may affect service availability).</li>
+                        <li>Request deletion of your account and associated data.</li>
+                    </ul>
+                    <p>To exercise these rights, contact us at <strong>support@footballhub.com</strong>.</p>
+
+                    <h6 class="fw-bold text-primary mt-3">8. Children's Privacy</h6>
+                    <p>Our services are not directed to children under the age of 13. We do not knowingly collect personal data from minors.</p>
+
+                    <h6 class="fw-bold text-primary mt-3">9. Changes to This Policy</h6>
+                    <p>We may update this Privacy Policy from time to time. Any changes will be posted on this page with the updated effective date. Continued use of the portal after changes constitutes acceptance of the revised policy.</p>
+
+                    <h6 class="fw-bold text-primary mt-3">10. Contact Us</h6>
+                    <p>For any privacy-related inquiries or data requests, please contact:</p>
+                    <div class="bg-light rounded p-3 mt-2">
+                        <strong>FOOTBALLHUB Data Protection Officer</strong><br>
+                        Email: <a href="mailto:support@footballhub.com">support@footballhub.com</a><br>
+                        Address: FOOTBALLHUB Headquarters, Malaysia
+                    </div>
+
+                    <p class="text-muted small mt-4 mb-0">
+                        <i class="fas fa-balance-scale me-1"></i>
+                        This policy is governed by and construed in accordance with the laws of Malaysia.
+                        By using FOOTBALLHUB, you acknowledge that you have read and understood this Privacy Policy.
+                    </p>
+                </div>
+                <div class="modal-footer border-0 justify-content-between">
+                    <small class="text-muted">FOOTBALLHUB Portal &copy; 2025. All Rights Reserved.</small>
+                    <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
-</html>
+</html>
