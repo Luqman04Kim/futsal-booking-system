@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FootballHub - System Architecture Flow</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Devicon for brand logos -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css">
+
+    <style>
+        :root {
+            --bg-color: #06090f;
+            --card-bg: rgba(13, 20, 35, 0.75);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --futsal-green: #10b981;
+            --accent-blue: #3b82f6;
+            --accent-purple: #a855f7;
+            --accent-yellow: #f59e0b;
+            --line-color: rgba(255, 255, 255, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.05) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.05) 0px, transparent 50%);
+            color: var(--text-primary);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            z-index: 10;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.4rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            background: linear-gradient(to right, #ffffff, #cbd5e1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.25rem;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            font-weight: 400;
+        }
+
+        /* Flow Columns Layout */
+        .arch-grid {
+            display: grid;
+            grid-template-columns: 220px 1fr 1fr 240px;
+            gap: 1.5rem;
+            position: relative;
+            align-items: start;
+        }
+
+        .column-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            text-align: center;
+            margin-bottom: 1.25rem;
+            padding: 0.5rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .col-users .column-title { background: rgba(16, 185, 129, 0.1); color: var(--futsal-green); border: 1px solid rgba(16, 185, 129, 0.2); }
+        .col-frontend .column-title { background: rgba(59, 130, 246, 0.1); color: var(--accent-blue); border: 1px solid rgba(59, 130, 246, 0.2); }
+        .col-backend .column-title { background: rgba(168, 85, 247, 0.1); color: var(--accent-purple); border: 1px solid rgba(168, 85, 247, 0.2); }
+        .col-external .column-title { background: rgba(245, 158, 11, 0.1); color: var(--accent-yellow); border: 1px solid rgba(245, 158, 11, 0.2); }
+
+        .arch-col {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        /* Card Elements */
+        .node-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1.25rem;
+            position: relative;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+        }
+
+        .node-card:hover {
+            border-color: rgba(255,255,255,0.15);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+            transform: translateY(-2px);
+        }
+
+        /* User Profile Style */
+        .user-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--futsal-green);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .user-info h3 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .user-info p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 0.1rem;
+            line-height: 1.2;
+        }
+
+        /* Features List inside Frontend/Backend */
+        .feature-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 0.75rem;
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .card-backend .feature-icon {
+            background: linear-gradient(135deg, #a855f7, #6d28d9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .feature-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .feature-list {
+            width: 100%;
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .feature-item {
+            font-size: 0.8rem;
+            background: rgba(255,255,255,0.02);
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.03);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-align: left;
+        }
+
+        .feature-item i {
+            font-size: 0.85rem;
+        }
+
+        .col-frontend .feature-item i { color: var(--accent-blue); }
+        .col-backend .feature-item i { color: var(--accent-purple); }
+
+        /* External API Item Style */
+        .api-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .api-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.03);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .api-info h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .api-info p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        /* Database Layer Block */
+        .database-section {
+            margin-top: 3.5rem;
+            width: 100%;
+            background: rgba(245, 158, 11, 0.03);
+            border: 1px solid rgba(245, 158, 11, 0.1);
+            border-radius: 20px;
+            padding: 1.5rem;
+            position: relative;
+        }
+
+        .db-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .db-header i {
+            font-size: 1.6rem;
+            color: var(--accent-yellow);
+        }
+
+        .db-header h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--accent-yellow);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .db-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .db-table-card {
+            background: rgba(8, 11, 17, 0.7);
+            border: 1px solid rgba(245, 158, 11, 0.15);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .db-table-card:hover {
+            border-color: rgba(245, 158, 11, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .table-icon {
+            font-size: 1.25rem;
+            color: var(--accent-yellow);
+            margin-bottom: 0.5rem;
+        }
+
+        .table-name {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 0.25rem;
+        }
+
+        .table-fields {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            line-height: 1.3;
+        }
+
+        /* Flow Connective Indicators */
+        .flow-line {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--line-color);
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .horizontal-arrow {
+            width: 100%;
+            height: 2px;
+            background: var(--line-color);
+            position: relative;
+        }
+
+        .horizontal-arrow::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: -4px;
+            width: 0;
+            height: 0;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+            border-left: 8px solid var(--line-color);
+        }
+
+        .horizontal-arrow::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: -4px;
+            width: 0;
+            height: 0;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+            border-right: 8px solid var(--line-color);
+        }
+
+        /* Diagram Legend */
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 2rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            background: rgba(255,255,255,0.02);
+            padding: 0.6rem 1.5rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .legend-line {
+            width: 24px;
+            height: 2px;
+        }
+
+        .line-reqres { background: var(--line-color); position: relative; }
+        .line-reqres::after { content: '➔'; position: absolute; font-size: 8px; right: 0; top: -5px; }
+
+        .line-ext { border-top: 2px dashed var(--accent-yellow); }
+        .line-db { border-top: 2px solid var(--accent-purple); }
+
+        footer {
+            margin-top: 2.5rem;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 1rem;
+            width: 100%;
+        }
+
+        /* SVG flow overlays */
+        .svg-connector {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>FootballHub - Architecture & Data Flow</h1>
+            <div class="subtitle">High-level components and communication layers</div>
+        </header>
+
+        <!-- Main Horizontal Flow -->
+        <div class="arch-grid">
+            
+            <!-- COLUMN 1: USERS -->
+            <div class="arch-col col-users">
+                <div class="column-title">System Users</div>
+                
+                <!-- Customer Node -->
+                <div class="node-card">
+                    <div class="user-item">
+                        <div class="user-avatar"><i class="fa-solid fa-user-tie"></i></div>
+                        <div class="user-info">
+                            <h3>Customer</h3>
+                            <p>Book fields, track payments, chat with AI bot, manage VIP membership</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Staff Node -->
+                <div class="node-card">
+                    <div class="user-item">
+                        <div class="user-avatar"><i class="fa-solid fa-user-gear"></i></div>
+                        <div class="user-info">
+                            <h3>Staff Member</h3>
+                            <p>Track assigned tasks, upload work proof, submit maintenance reports</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Manager Node -->
+                <div class="node-card">
+                    <div class="user-item">
+                        <div class="user-avatar"><i class="fa-solid fa-user-shield"></i></div>
+                        <div class="user-info">
+                            <h3>Manager</h3>
+                            <p>Manage fields, assign tasks, analyze revenue/analytics, configure prices</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COLUMN 2: FRONTEND LAYER -->
+            <div class="arch-col col-frontend">
+                <div class="column-title">Web Application (Frontend)</div>
+                
+                <div class="node-card" style="height: 100%; display: flex; align-items: center; justify-content: center;">
+                    <div class="feature-box">
+                        <div class="feature-icon"><i class="fa-solid fa-window-restore"></i></div>
+                        <div class="feature-title">Responsive Web Portal</div>
+                        <p style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Thymeleaf, HTML5, CSS3, JS</p>
+                        <ul class="feature-list">
+                            <li class="feature-item"><i class="fa-solid fa-circle-check"></i> Self-Service Booking Interface</li>
+                            <li class="feature-item"><i class="fa-solid fa-chart-pie"></i> Analytics Dashboard (Chart.js)</li>
+                            <li class="feature-item"><i class="fa-solid fa-list-check"></i> Staff Task & Progress Panel</li>
+                            <li class="feature-item"><i class="fa-solid fa-wrench"></i> Maintenance Log Forms</li>
+                            <li class="feature-item"><i class="fa-solid fa-comments"></i> AI Assistant Floating Window</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COLUMN 3: BACKEND SERVICES -->
+            <div class="arch-col col-backend">
+                <div class="column-title">Backend Services (Spring Boot)</div>
+                
+                <div class="node-card" style="height: 100%; display: flex; align-items: center; justify-content: center;">
+                    <div class="feature-box">
+                        <div class="feature-icon"><i class="devicon-spring-plain colored" style="font-size: 2.2rem;"></i></div>
+                        <div class="feature-title">Application Layer</div>
+                        <p style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Java 17, Spring Data JPA / Tomcat</p>
+                        <ul class="feature-list">
+                            <li class="feature-item"><i class="fa-solid fa-shield-halved"></i> Auth & Role Access Guard</li>
+                            <li class="feature-item"><i class="fa-solid fa-calculator"></i> Dynamic Pricing Matrix Engine</li>
+                            <li class="feature-item"><i class="fa-solid fa-clock"></i> Task Scheduling & Auto-Cleanup</li>
+                            <li class="feature-item"><i class="fa-solid fa-file-pdf"></i> PDF Receipt Generation (OpenPDF)</li>
+                            <li class="feature-item"><i class="fa-solid fa-robot"></i> Chatbot Query Resolver</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COLUMN 4: EXTERNAL SERVICES -->
+            <div class="arch-col col-external">
+                <div class="column-title">External Integrations</div>
+                
+                <!-- Gemini Node -->
+                <div class="node-card">
+                    <div class="api-item">
+                        <div class="api-logo"><i class="fa-solid fa-wand-magic-sparkles" style="color: #60a5fa;"></i></div>
+                        <div class="api-info">
+                            <h4>Google Gemini AI</h4>
+                            <p>Natural query response</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ToyyibPay Node -->
+                <div class="node-card">
+                    <div class="api-item">
+                        <div class="api-logo"><i class="fa-solid fa-money-bill-wave" style="color: #f97316;"></i></div>
+                        <div class="api-info">
+                            <h4>ToyyibPay API</h4>
+                            <p>Payment Processing</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resend API Node -->
+                <div class="node-card">
+                    <div class="api-item">
+                        <div class="api-logo"><i class="fa-solid fa-paper-plane" style="color: #a855f7;"></i></div>
+                        <div class="api-info">
+                            <h4>Resend Email API</h4>
+                            <p>Transactional Emails</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Railway Node -->
+                <div class="node-card">
+                    <div class="api-item">
+                        <div class="api-logo"><i class="devicon-railway-plain" style="color: #fff;"></i></div>
+                        <div class="api-info">
+                            <h4>Railway Cloud</h4>
+                            <p>Application Hosting</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- DATABASE PERSISTENCE LAYER -->
+        <div class="database-section">
+            <div class="db-header">
+                <i class="fa-solid fa-database"></i>
+                <h2>Database Persistence Layer (MySQL)</h2>
+            </div>
+            
+            <div class="db-grid">
+                <!-- users Table -->
+                <div class="db-table-card">
+                    <div class="table-icon"><i class="fa-solid fa-users"></i></div>
+                    <div class="table-name">Users</div>
+                    <div class="table-fields">Credentials, Roles & VIP Data</div>
+                </div>
+
+                <!-- branches Table -->
+                <div class="db-table-card">
+                    <div class="table-icon"><i class="fa-solid fa-map-location-dot"></i></div>
+                    <div class="table-name">Branches & Fields</div>
+                    <div class="table-fields">Multi-Branch Sport Facilities</div>
+                </div>
+
+                <!-- bookings Table -->
+                <div class="db-table-card">
+                    <div class="table-icon"><i class="fa-solid fa-calendar-check"></i></div>
+                    <div class="table-name">Bookings & Payments</div>
+                    <div class="table-fields">Real-Time Schedules & Receipts</div>
+                </div>
+
+                <!-- tasks Table -->
+                <div class="db-table-card">
+                    <div class="table-icon"><i class="fa-solid fa-list-check"></i></div>
+                    <div class="table-name">Staff Tasks</div>
+                    <div class="table-fields">Maintenance Assignments</div>
+                </div>
+
+                <!-- problem_reports Table -->
+                <div class="db-table-card">
+                    <div class="table-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                    <div class="table-name">Maintenance Reports</div>
+                    <div class="table-fields">Facility Incident Logs</div>
+                </div>
+
+                <!-- price_matrix Table -->
+                <div class="db-table-card">
+                    <div class="table-icon"><i class="fa-solid fa-tags"></i></div>
+                    <div class="table-name">Price Matrix</div>
+                    <div class="table-fields">Peak & Off-Peak Configurations</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Flow Diagram Legend -->
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-line line-reqres"></div>
+                <span>HTTP Request / Response (REST & HTML)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-line line-ext"></div>
+                <span>External Integration Call</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-line line-db"></div>
+                <span>ORM Database Queries (JPA / Hibernate)</span>
+            </div>
+        </div>
+
+        <footer>
+            FootballHub Architecture Visualization &copy; 2026. Made for Final Year Project (FYP) Documentation.
+        </footer>
+    </div>
+</body>
+</html>

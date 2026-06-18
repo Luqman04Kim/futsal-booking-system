@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
@@ -152,6 +152,29 @@
             border-radius: 15px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
             overflow: hidden;
+        }
+
+        /* Mobile horizontal scroll for transactions table */
+        @media (max-width: 991px) {
+            .table-container {
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch;
+                border-radius: 15px;
+            }
+            .table-container table {
+                min-width: 700px;
+            }
+            .search-filter-container {
+                flex-direction: column !important;
+                gap: 10px !important;
+            }
+            .search-box, .filter-box {
+                width: 100% !important;
+            }
+            .filter-box select {
+                width: 100% !important;
+                min-width: unset !important;
+            }
         }
 
         .table {

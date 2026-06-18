@@ -799,7 +799,7 @@
             async function fetchWeather(location) {
                 try {
                     // Fetch Forecast (includes current)
-                    const response = await fetch(`http://api.weatherapi.com/v1/forecast.json?key=${WEATHER_API_KEY}&q=${location}&days=3&aqi=no&alerts=no`);
+                    const response = await fetch(`https://api.weatherapi.com/v1/forecast.json?key=${WEATHER_API_KEY}&q=${location}&days=3&aqi=no&alerts=no`);
                     if (!response.ok) throw new Error('Weather API Error');
                     const data = await response.json();
 
@@ -808,7 +808,7 @@
 
                     // Current Weather
                     document.getElementById('weatherLocationDisplay').textContent = `${data.location.name}, ${data.location.country}`;
-                    document.getElementById('weatherTemp').textContent = `${data.current.temp_c}ï¿½C`;
+                    document.getElementById('weatherTemp').textContent = `${data.current.temp_c}°C`;
                     document.getElementById('weatherCondition').textContent = data.current.condition.text;
                     document.getElementById('weatherWind').textContent = `${data.current.wind_kph} km/h`;
                     document.getElementById('weatherHumidity').textContent = `${data.current.humidity}%`;
@@ -852,7 +852,7 @@
                             <div class="text-center flex-shrink-0 ${isPast ? 'opacity-50' : ''}" style="min-width: 60px; background: rgba(255,255,255,0.1); border-radius: 10px; padding: 8px;">
                                 <p class="mb-1 small fw-bold ${hourNum === currentHour || hourNum === currentHour + 1 ? 'text-warning' : ''}">${timeStr}</p>
                                 <img src="${icon}" alt="icon" style="width: 28px; height: 28px;">
-                                <p class="mb-0 small fw-bold">${temp}ï¿½C</p>
+                                 <p class="mb-0 small fw-bold">${temp}°C</p>
                             </div>
                         `;
                     });
@@ -870,7 +870,7 @@
                             <div class="col-4">
                                 <p class="mb-1 small fw-bold">${dayName}</p>
                                 <img src="${icon}" alt="icon" style="width: 32px; height: 32px;">
-                                <p class="mb-0 small">${temp}ï¿½C</p>
+                                 <p class="mb-0 small">${temp}°C</p>
                             </div>
                         `;
                     });
@@ -1323,200 +1323,6 @@
                     }
                 }
 
-                // Next month filler
-                const totalCells = startingDay + daysInMonth;
-                let nextMonthDays = 0;
-                if (totalCells <= 35) {
-                    nextMonthDays = 35 - totalCells;
-                } else {
-                    nextMonthDays = 42 - totalCells;
-                }
-
-                for (let i = 1; i <= nextMonthDays; i++) {
-                    grid.innerHTML += `<div class="calendar-day other-month"><div>${i}</div></div>`;
-                }
-            }
-        </script>
-            }
-
-            .calendar-day {
-                min-height: 80px;
-                border: 1px solid #eee;
-                border-radius: 8px;
-                padding: 5px;
-                position: relative;
-                background: #fff;
-            }
-
-            .calendar-day:hover {
-                background-color: #f8f9fa;
-            }
-
-            .calendar-day.today {
-                background-color: #e3f2fd;
-                border-color: #90caf9;
-            }
-
-            .calendar-day.today div:first-child {
-                background: #0d6efd;
-                color: white;
-                width: 24px;
-                height: 24px;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 0.8rem;
-            }
-
-            .calendar-day.other-month {
-                opacity: 0.4;
-                background-color: #fafafa;
-            }
-
-            .holiday-badge {
-                font-size: 0.65rem;
-                display: block;
-                margin-top: 4px;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                cursor: pointer;
-                padding: 2px 4px;
-            }
-        </style>
-
-        <script>
-            // Calendar Logic (Robust)
-            let currentCalendarDate = new Date();
-            const CALENDAR_API_KEY = 'VcJpWp7BC4qUFhUXrM2jIBVwMeqiOLxB';
-            let holidaysCache = {};
-
-            function openCalendarModal() {
-                var myModal = new bootstrap.Modal(document.getElementById('calendarModal'));
-                myModal.show();
-                fetchHolidays(currentCalendarDate.getFullYear());
-                renderCalendar();
-            }
-
-            function changeMonth(delta) {
-                currentCalendarDate.setMonth(currentCalendarDate.getMonth() + delta);
-                renderCalendar();
-                fetchHolidays(currentCalendarDate.getFullYear());
-            }
-
-            async function fetchHolidays(year) {
-                // If we have cached holidays (and it's a valid array), use them
-                if (holidaysCache[year] && Array.isArray(holidaysCache[year]) && holidaysCache[year].length > 0) {
-                    return;
-                }
-
-                const holidayList = document.getElementById('holidayList');
-                holidayList.innerHTML = '<li class="list-group-item text-center text-muted py-2"><i class="fas fa-spinner fa-spin me-2"></i>Loading holidays...</li>';
-
-                try {
-                    // Using Malaysia (MY)
-                    console.log(`Fetching holidays for MY/${year}...`);
-                    const response = await fetch(`https://calendarific.com/api/v2/holidays?api_key=${CALENDAR_API_KEY}&country=MY&year=${year}`);
-                    const data = await response.json();
-
-                    if (data.meta && data.meta.code !== 200) {
-                        console.error('API Error:', data.meta);
-                        holidayList.innerHTML = `<li class="list-group-item text-danger">Error: ${data.meta.error_detail || 'Could not fetch holidays'}</li>`;
-                        return;
-                    }
-
-                    if (data.response && data.response.holidays) {
-                        holidaysCache[year] = data.response.holidays;
-                        console.log('Holidays fetched:', data.response.holidays.length);
-                        renderCalendar();
-                    } else {
-                        holidayList.innerHTML = '<li class="list-group-item text-muted">No holiday data received.</li>';
-                    }
-                } catch (error) {
-                    console.error('Error fetching holidays:', error);
-                    holidayList.innerHTML = '<li class="list-group-item text-danger">Failed to connect to holiday service.</li>';
-                }
-            }
-
-            function renderCalendar() {
-                const year = currentCalendarDate.getFullYear();
-                const month = currentCalendarDate.getMonth(); // 0-indexed (0=Jan)
-
-                document.getElementById('calendarMonthYear').textContent = new Date(year, month).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-
-                const firstDay = new Date(year, month, 1);
-                const lastDay = new Date(year, month + 1, 0);
-                const daysInMonth = lastDay.getDate();
-                const startingDay = firstDay.getDay(); // 0 = Sunday
-
-                const grid = document.getElementById('calendarGrid');
-                grid.innerHTML = `
-                <div class="calendar-day-header text-danger">Sun</div>
-                <div class="calendar-day-header">Mon</div>
-                <div class="calendar-day-header">Tue</div>
-                <div class="calendar-day-header">Wed</div>
-                <div class="calendar-day-header">Thu</div>
-                <div class="calendar-day-header text-success">Fri</div>
-                <div class="calendar-day-header">Sat</div>
-            `;
-
-                // Previous month filler
-                const prevMonthLastDay = new Date(year, month, 0).getDate();
-                for (let i = 0; i < startingDay; i++) {
-                    grid.innerHTML += `<div class="calendar-day other-month"><div>${prevMonthLastDay - startingDay + 1 + i}</div></div>`;
-                }
-
-                // Current month days
-                const today = new Date();
-                const holidayList = document.getElementById('holidayList');
-                holidayList.innerHTML = '';
-                let hasHolidays = false;
-
-                const yearHolidays = holidaysCache[year] || [];
-
-                for (let day = 1; day <= daysInMonth; day++) {
-                    const isToday = day === today.getDate() && month === today.getMonth() && year === today.getFullYear();
-
-                    // Check for holiday using robust datetime properties (1-indexed month)
-                    const currentMonthNum = month + 1;
-
-                    const dayHolidays = yearHolidays.filter(h => {
-                        // Ensure datetime property exists
-                        if (h.date && h.date.datetime) {
-                            return h.date.datetime.year === year &&
-                                h.date.datetime.month === currentMonthNum &&
-                                h.date.datetime.day === day;
-                        }
-                        return false;
-                    });
-
-                    let holidayHtml = '';
-                    dayHolidays.forEach(h => {
-                        holidayHtml += `<span class="badge bg-danger holiday-badge" title="${h.name}">${h.name}</span>`;
-
-                        const li = document.createElement('li');
-                        li.className = 'list-group-item d-flex justify-content-between align-items-center';
-                        li.innerHTML = `<span><strong class="text-primary">${day} ${new Date(year, month).toLocaleString('default', { month: 'short' })}:</strong> ${h.name}</span> <span class="badge bg-light text-dark border">${h.type[0] || 'Holiday'}</span>`;
-                        holidayList.appendChild(li);
-                        hasHolidays = true;
-                    });
-
-                    grid.innerHTML += `
-                    <div class="calendar-day ${isToday ? 'today' : ''}">
-                        <div>${day}</div>
-                        ${holidayHtml}
-                    </div>
-                `;
-                }
-
-                if (!hasHolidays) {
-                    if (!holidaysCache[year]) {
-                        holidayList.innerHTML = '<li class="list-group-item text-muted">Fetching data...</li>';
-                    } else {
-                        holidayList.innerHTML = '<li class="list-group-item text-center text-muted py-3">No holidays found for this month ??</li>';
-                    }
-                }
 
                 // Next month filler
                 const totalCells = startingDay + daysInMonth;
@@ -1543,17 +1349,16 @@
                 if (sidebar) sidebar.classList.toggle('show');
                 if (overlay) overlay.classList.toggle('show');
             }
-        // Close sidebar on ESC key
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                var sidebar = document.querySelector('.sidebar');
-                var overlay = document.getElementById('sidebarOverlay');
-                if (sidebar) sidebar.classList.remove('show');
-                if (overlay) overlay.classList.remove('show');
-            }
-        });
+            // Close sidebar on ESC key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    var sidebar = document.querySelector('.sidebar');
+                    var overlay = document.getElementById('sidebarOverlay');
+                    if (sidebar) sidebar.classList.remove('show');
+                    if (overlay) overlay.classList.remove('show');
+                }
+            });
         </script>
 </body>
 
 </html>
-

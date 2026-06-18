@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
@@ -93,7 +93,7 @@
             content: '';
             position: absolute;
             inset: 0;
-            background: radial-gradient(circle, rgba(0, 0, 0, 0.2) 0%, #000 100%);
+            background: radial-gradient(circle, rgba(0, 0, 0, 0.3) 0%, rgba(0,0,0,0.75) 100%);
         }
 
         .hero-content {
@@ -103,22 +103,46 @@
             padding: 20px;
         }
 
+        /* ============================================
+           HERO TITLE — Bold outlined text so it pops
+           ============================================ */
         .hero-title {
             font-family: 'Chakra Petch', sans-serif;
             font-size: 5rem;
             font-weight: 900;
             line-height: 1;
-            background: linear-gradient(to right, #fff, #ccc);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: #ffffff;
+            /* Solid black outline on all sides for legibility */
+            text-shadow:
+                -3px -3px 0 #000,
+                 3px -3px 0 #000,
+                -3px  3px 0 #000,
+                 3px  3px 0 #000,
+                 0    0  18px rgba(0,0,0,0.95),
+                 0    0  40px rgba(0,0,0,0.8);
             margin-bottom: 20px;
             text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* "Legends" word — gold with glow outline */
+        .hero-title .legend-word {
+            color: var(--barca-gold);
+            text-shadow:
+                -3px -3px 0 #000,
+                 3px -3px 0 #000,
+                -3px  3px 0 #000,
+                 3px  3px 0 #000,
+                 0    0  25px rgba(237,187,0,0.9),
+                 0    0  55px rgba(237,187,0,0.6),
+                 0    0  80px rgba(237,187,0,0.3);
         }
 
         .hero-subtitle {
             font-size: 1.5rem;
-            color: rgba(255, 255, 255, 0.8);
+            color: rgba(255, 255, 255, 0.9);
             margin-bottom: 40px;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.8);
         }
 
         .btn-cta {
@@ -179,13 +203,14 @@
             object-fit: cover;
             border-radius: 50%;
             border: 5px solid var(--barca-gold);
-            box-shadow: 0 0 30px rgba(237, 187, 0, 0.3);
+            box-shadow: 0 0 30px rgba(237, 187, 0, 0.4);
+            flex-shrink: 0;
         }
 
         .owner-info h3 {
             font-family: 'Chakra Petch';
             font-size: 2rem;
-            color: var(--barca-blue);
+            color: var(--barca-gold);
         }
 
         .owner-info p {
@@ -279,14 +304,11 @@
             padding: 50px 20px;
             scroll-behavior: smooth;
             scrollbar-width: none;
-            /* Hide scrollbar Firefox */
         }
 
         .timeline-container::-webkit-scrollbar {
             display: none;
         }
-
-        /* Hide scrollbar Chrome */
 
         .timeline-card {
             min-width: 400px;
@@ -374,7 +396,7 @@
     <!-- 1. HERO SECTION -->
     <section class="hero">
         <div class="hero-content" data-aos="fade-up">
-            <h1 class="hero-title">Play Like <span style="color: var(--barca-gold);">Legends</span></h1>
+            <h1 class="hero-title">Play Like <span class="legend-word">Legends</span></h1>
             <p class="hero-subtitle">Experience world-class football facilities. Designed for champions.</p>
             <a href="/register" class="btn btn-cta">Join the Club <i class="fas fa-arrow-right ms-2"></i></a>
         </div>
@@ -436,9 +458,9 @@
             <div class="row justify-content-center">
                 <div class="col-lg-10">
                     <div class="owner-card" data-aos="fade-up">
-                        <img src="/img/undraw_profile.svg" class="owner-img" alt="Owner">
+                        <img src="/img/luqman.jpg" class="owner-img" alt="Luqman Hakim">
                         <div class="owner-info">
-                            <h3>John Doe <small style="font-size: 1rem; color: #666;">(Founder & Owner)</small></h3>
+                            <h3>Luqman Hakim <small style="font-size: 1rem; color: #888;">(Founder &amp; Owner)</small></h3>
                             <p>
                                 "Our mission was simple: bring the professional stadium experience to the local
                                 community.

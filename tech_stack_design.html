@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FootballHub - Tech Stack & Development Tools</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Devicon CDN for Developer Logos -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #080b11;
+            --card-bg: rgba(17, 25, 40, 0.75);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --accent-primary: #10b981; /* Futsal Green */
+            --accent-glow: rgba(16, 185, 129, 0.2);
+            --gradient-1: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            --gradient-2: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            --gradient-3: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+            --gradient-4: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            --gradient-5: linear-gradient(135deg, #ec4899 0%, #be185d 100%);
+            --gradient-6: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 10% 20%, rgba(16, 185, 129, 0.08) 0px, transparent 50%),
+                radial-gradient(at 90% 80%, rgba(59, 130, 246, 0.08) 0px, transparent 50%);
+            color: var(--text-primary);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 1.5rem;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            z-index: 10;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3.5rem;
+            position: relative;
+        }
+
+        header::after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 4px;
+            background: var(--gradient-1);
+            margin: 1rem auto 0;
+            border-radius: 2px;
+            box-shadow: 0 0 12px var(--accent-glow);
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.8rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            background: linear-gradient(to right, #ffffff, #cbd5e1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            font-weight: 400;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, transparent 100%);
+            pointer-events: none;
+        }
+
+        .card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            gap: 1rem;
+        }
+
+        .icon-wrapper {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            color: #fff;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Gradient Map for Cards */
+        .card-frontend .icon-wrapper { background: var(--gradient-1); }
+        .card-backend .icon-wrapper { background: var(--gradient-2); }
+        .card-database .icon-wrapper { background: var(--gradient-3); }
+        .card-deployment .icon-wrapper { background: var(--gradient-4); }
+        .card-apis .icon-wrapper { background: var(--gradient-5); }
+        .card-tools .icon-wrapper { background: var(--gradient-6); }
+
+        h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.35rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .tech-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+        }
+
+        .tech-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.6rem 0.8rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.02);
+            transition: background 0.2s ease;
+        }
+
+        .tech-item:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .tech-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .tech-name {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .tech-desc {
+            margin-left: auto;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+            background: rgba(255, 255, 255, 0.04);
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+        }
+
+        footer {
+            margin-top: 4rem;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 1.5rem;
+            width: 100%;
+        }
+
+        /* Glass Glow Decorative Dots */
+        .glow-dot-1 {
+            position: absolute;
+            top: 15%;
+            left: 5%;
+            width: 120px;
+            height: 120px;
+            background: #10b981;
+            filter: blur(120px);
+            opacity: 0.15;
+            pointer-events: none;
+        }
+
+        .glow-dot-2 {
+            position: absolute;
+            bottom: 10%;
+            right: 5%;
+            width: 150px;
+            height: 150px;
+            background: #3b82f6;
+            filter: blur(150px);
+            opacity: 0.15;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="glow-dot-1"></div>
+    <div class="glow-dot-2"></div>
+
+    <div class="container">
+        <header>
+            <h1>FootballHub</h1>
+            <div class="subtitle">System Development Tech Stack & Tooling</div>
+        </header>
+
+        <main class="grid">
+            <!-- Frontend Card -->
+            <div class="card card-frontend">
+                <div class="card-header">
+                    <div class="icon-wrapper">
+                        <i class="fa-solid fa-code"></i>
+                    </div>
+                    <h2>Frontend</h2>
+                </div>
+                <ul class="tech-list">
+                    <li class="tech-item">
+                        <span class="tech-icon"><i class="fa-solid fa-leaf" style="color: #00b981;"></i></span>
+                        <span class="tech-name">Thymeleaf</span>
+                        <span class="tech-desc">Template Engine</span>
+                    </li>
+                    <li class="tech-item">
+                        <span class="tech-icon"><i class="devicon-html5-plain colored"></i></span>
+                        <span class="tech-name">HTML5</span>
+                        <span class="tech-desc">Structure</span>
+                    </li>
+                    <li class="tech-item">
+                        <span class="tech-icon"><i class="devicon-css3-plain colored"></i></span>
+                        <span class="tech-name">CSS3 & Bootstrap</span>
+                        <span class="tech-desc">SB Admin 2</span>
+                    </li>
+                    <li class="tech-item">
+                        <span class="tech-icon"><i class="devicon-javascript-plain colored"></i></span>
+                        <span class="tech-name">JavaScript</span>
+                        <span class="tech-desc">jQuery & Chart.js</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Backend Card -->
+            <div class="card card-backend">
+                <div class="card-header">
+                    <div class="icon-wrapper">
+                        <i class="fa-solid fa-gears"></i>
+                    </div>
+                    <h2>Backend</h2>
+                </div>
+                <ul class="tech-list">
+                    <li class="tech-item">
+                        <span class="tech-icon"><i class="devicon-spring-plain colored"></i></span>
+                        <span class="tech-name">Spring Boot</span>
+                        <span class="tech-desc">Framework</span>
+                    </li>
+                    <li class="tech-item">
+                        <span class="tech-icon"><i class="devicon-tomcat-line colored"></i></span>
+                        <span class="tech-name">Apache Tomcat</span>
+                        <span class="tech-desc">Server</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Database Card -->
+            <div class="card card-database">
+                <div class="card-header">
+                    <div class="icon-wrapper">
+                        <i class="fa-solid fa-database"></i>
+                    </div>
+                    <h2>Database</h2>
+                </div>
+                <ul class="tech-list">
+                    <li class="tech-item">
+                        <span class="tech-icon"><i class="devicon-mysql-plain colored"></i></span>
+                        <span class="tech-name">MySQL</span>
+                        <span class="tech-desc">RDBMS</span>
+                    </li>
+                    <li class="tech-item">
+                        <span class="tech-icon"><i class="devicon-mysql-plain" style="color: #94a3b8;"></i></span>
+                        <span class="tech-name">Local Instance</span>
+                        <span class="tech-desc">development</span>
+                    </li>
+                    <li class="tech-item">
+                        <span class="tech-icon"><i class="devicon-mysql-plain" style="color: #3b82f6;"></i></span>
+                        <span class="tech-name">Railway MySQL</span>
+                        <span class="tech-desc">production</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Deployment Card -->
+            <div class="card card-deployment">
+                <div class="card-header">
+                    <div class="icon-wrapper">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                    </div>
+                    <h2>Deployment</h2>
+                </div>
+                <ul class="tech-list">
+                    <li class="tech-item">
+                        <span class="tech-icon"><i class="devicon-github-original" style="color: #ffffff;"></i></span>
+                        <span class="tech-name">GitHub</span>
+                        <span class="tech-desc">Repository / CI</span>
+                    </li>
+                    <li class="tech-item">
+                        <span class="tech-icon"><i class="devicon-railway-plain" style="color: #ffffff;"></i></span>
+                        <span class="tech-name">Railway</span>
+                        <span class="tech-desc">Cloud PaaS</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- APIs & Integrations Card -->
+            <div class="card card-apis">
+                <div class="card-header">
+                    <div class="icon-wrapper">
+                        <i class="fa-solid fa-circle-nodes"></i>
+                    </div>
+                    <h2>APIs & Integrations</h2>
+                </div>
+                <ul class="tech-list">
+                    <li class="tech-item">
+                        <span class="tech-icon"><i class="fa-solid fa-wand-magic-sparkles" style="color: #60a5fa;"></i></span>
+                        <span class="tech-name">Google Gemini AI</span>
+                        <span class="tech-desc">Smart Chatbot SDK</span>
+                    </li>
+                    <li class="tech-item">
+                        <span class="tech-icon"><i class="fa-solid fa-money-bill-wave" style="color: #f97316;"></i></span>
+                        <span class="tech-name">ToyyibPay API</span>
+                        <span class="tech-desc">Payment Gateway</span>
+                    </li>
+                    <li class="tech-item">
+                        <span class="tech-icon"><i class="fa-solid fa-paper-plane" style="color: #a855f7;"></i></span>
+                        <span class="tech-name">Resend Email API</span>
+                        <span class="tech-desc">System Emails</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Development Tools Card -->
+            <div class="card card-tools">
+                <div class="card-header">
+                    <div class="icon-wrapper">
+                        <i class="fa-solid fa-screwdriver-wrench"></i>
+                    </div>
+                    <h2>Development Tools</h2>
+                </div>
+                <ul class="tech-list">
+                    <li class="tech-item">
+                        <span class="tech-icon"><i class="devicon-vscode-plain colored"></i></span>
+                        <span class="tech-name">Visual Studio Code</span>
+                        <span class="tech-desc">Code IDE</span>
+                    </li>
+                    <li class="tech-item">
+                        <span class="tech-icon"><i class="fa-solid fa-diagram-project" style="color: #34d399;"></i></span>
+                        <span class="tech-name">PlantUML</span>
+                        <span class="tech-desc">UML Diagrams</span>
+                    </li>
+                    <li class="tech-item">
+                        <span class="tech-icon"><i class="devicon-mysql-plain colored"></i></span>
+                        <span class="tech-name">MySQL Workbench</span>
+                        <span class="tech-desc">DB Modeler</span>
+                    </li>
+                    <li class="tech-item">
+                        <span class="tech-icon"><i class="fa-solid fa-star" style="color: #fbbf24;"></i></span>
+                        <span class="tech-name">StarUML</span>
+                        <span class="tech-desc">Design Tool</span>
+                    </li>
+                </ul>
+            </div>
+        </main>
+
+        <footer>
+            FootballHub &copy; 2026. Design optimized for system report documentation and presentations.
+        </footer>
+    </div>
+</body>
+</html>
