@@ -140,7 +140,7 @@ public class QrController {
             response.put("success", false);
             java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("hh:mm a, dd MMM yyyy");
             String formattedTime = booking.getCheckedInAt() != null ? booking.getCheckedInAt().format(formatter) : "unknown time";
-            response.put("message", "❌ Code already scanned before on " + formattedTime);
+            response.put("message", "QR invalid, already scanned. Scanned on: " + formattedTime);
             return response;
         }
 
@@ -151,7 +151,7 @@ public class QrController {
             if (booking.getDate().isBefore(today) ||
                     (booking.getDate().isEqual(today) && booking.getEndTime().isBefore(now))) {
                 response.put("success", false);
-                response.put("message", "QR Code was invalid");
+                response.put("message", "QR Code was expired");
                 return response;
             }
         }
