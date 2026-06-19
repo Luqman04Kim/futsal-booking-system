@@ -325,6 +325,7 @@
                             th:data-position="${staff.position}" th:data-age="${staff.age}"
                             th:data-phone="${staff.phoneNumber}" th:data-staff-id="${staff.staffId}"
                             th:data-branch="${staff.branch != null ? staff.branch.branchId : ''}"
+                            th:data-image-url="${staff.imageUrl != null ? staff.imageUrl : ''}"
                             onclick="openEditModal(this)" title="Edit Staff">
                             <i class="fas fa-edit"></i>
                         </button>
@@ -521,6 +522,8 @@
                     </div>
                     <form action="/manager/update-staff" method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="userId" id="editUserId">
+                        <!-- Carries current image URL so backend preserves it if no new file uploaded -->
+                        <input type="hidden" name="existingImageUrl" id="editStaffExistingImageUrl">
                         <div class="modal-body">
                             <div class="mb-3">
                                 <label class="form-label">Username</label>
@@ -557,7 +560,14 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Profile Photo (Optional)</label>
-                                <input type="file" name="imageFile" class="form-control" accept="image/*" />
+                                <!-- Current photo preview -->
+                                <div id="editStaffCurrentImgContainer" class="mb-2" style="display:none;">
+                                    <small class="text-muted d-block mb-1">Current photo:</small>
+                                    <img id="editStaffCurrentImg" src="" alt="Current"
+                                        style="height:70px;width:70px;border-radius:50%;object-fit:cover;border:3px solid #e2e8f0;">
+                                    <small class="text-muted d-block mt-1">Leave empty to keep this photo.</small>
+                                </div>
+                                <input type="file" name="imageFile" id="editStaffImageFile" class="form-control" accept="image/*" />
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -961,6 +971,7 @@
             const phone = button.getAttribute('data-phone');
             const branch = button.getAttribute('data-branch');
             const staffId = button.getAttribute('data-staff-id');
+            const imageUrl = button.getAttribute('data-image-url') || '';
 
             document.getElementById('editUserId').value = id;
             document.getElementById('editUsername').value = username;
@@ -970,6 +981,22 @@
             document.getElementById('editPhone').value = phone;
             document.getElementById('editBranch').value = branch;
             document.getElementById('editStaffId').value = staffId;
+
+            // Carry current image URL so backend preserves it when no new file chosen
+            document.getElementById('editStaffExistingImageUrl').value = imageUrl;
+
+            // Show current photo preview
+            const imgContainer = document.getElementById('editStaffCurrentImgContainer');
+            const imgEl = document.getElementById('editStaffCurrentImg');
+            if (imageUrl && imageUrl.trim() !== '') {
+                imgEl.src = imageUrl;
+                imgContainer.style.display = 'block';
+            } else {
+                imgContainer.style.display = 'none';
+            }
+
+            // Reset file input so it doesn't accidentally carry a previous selection
+            document.getElementById('editStaffImageFile').value = '';
 
             var modal = new bootstrap.Modal(document.getElementById('editStaffModal'));
             modal.show();

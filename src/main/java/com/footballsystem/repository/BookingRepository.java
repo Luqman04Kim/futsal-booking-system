@@ -34,4 +34,10 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
        @org.springframework.transaction.annotation.Transactional
        @Query(value = "DELETE FROM booking_inventory_items WHERE inventory_item_id = :itemId", nativeQuery = true)
        void deleteInventoryItemAssociations(@Param("itemId") Long itemId);
+
+       // Efficient QR token lookup — avoids full table scan in QrController
+       java.util.Optional<Booking> findByQrToken(String qrToken);
+
+       // Find by PENDING status created before a given time (for cleanup service)
+       List<Booking> findByStatusAndCreatedAtBefore(String status, java.time.LocalDateTime before);
 }

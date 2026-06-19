@@ -276,6 +276,7 @@
                                 th:data-location="${branch.location}" th:data-contact="${branch.contactNumber}"
                                 th:data-manager="${branch.manager != null ? branch.manager.userId : ''}"
                                 th:data-lat="${branch.latitude}" th:data-lng="${branch.longitude}"
+                                th:data-image-url="${branch.imageUrl != null ? branch.imageUrl : ''}"
                                 onclick="openEditBranchModal(this)">
                                 <i class="fas fa-pen text-primary"></i>
                             </button>
@@ -403,6 +404,8 @@
                 <div class="modal-body">
                     <form action="/manager/update-branch" method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="branchId" id="editBranchId">
+                        <!-- Carries current image URL so backend preserves it if no new image uploaded -->
+                        <input type="hidden" name="existingImageUrl" id="editBranchExistingImageUrl">
                         <div class="mb-3">
                             <label class="small font-weight-bold text-secondary">Branch Name</label>
                             <input type="text" name="name" id="editBranchName" class="form-control" required>
@@ -439,7 +442,14 @@
                         </div>
                         <div class="mb-4">
                             <label class="small font-weight-bold text-secondary">Branch Image (Optional)</label>
-                            <input type="file" name="imageFile" class="form-control" accept="image/*">
+                            <!-- Current image preview -->
+                            <div id="editBranchCurrentImgContainer" class="mb-2" style="display:none;">
+                                <small class="text-muted d-block mb-1">Current image:</small>
+                                <img id="editBranchCurrentImg" src="" alt="Current"
+                                    style="height:80px; border-radius:6px; object-fit:cover;">
+                                <small class="text-muted d-block mt-1">Leave file input empty to keep this image.</small>
+                            </div>
+                            <input type="file" name="imageFile" id="editBranchImageFile" class="form-control" accept="image/*">
                         </div>
                         <div class="d-grid">
                             <button type="submit" class="btn btn-primary fw-bold">Save Changes</button>
@@ -496,7 +506,7 @@
         // Helper: Reverse Geocoding (Nominatim)
         function getAddressFromLatLon(lat, lon, inputId) {
             const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`;
-            fetch(url, { headers: { 'Accept-Language': 'en' } }) // Request English address
+            fetch(url, { headers: { 'Accept-Language': 'en' } })
                 .then(response => response.json())
                 .then(data => {
                     if (data && data.display_name) {
@@ -548,7 +558,7 @@
             if (!map) {
                 map = L.map('map').setView([defaultLat, defaultLng], 13);
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: 'Â© OpenStreetMap contributors'
+                    attribution: '&copy; OpenStreetMap contributors'
                 }).addTo(map);
 
                 map.on('click', function (e) {
@@ -573,8 +583,8 @@
         });
 
         // Initialize map when Edit Branch modal is shown
-        var editBranchModal = document.getElementById('editBranchModal');
-        editBranchModal.addEventListener('shown.bs.modal', function () {
+        var editBranchModalEl = document.getElementById('editBranchModal');
+        editBranchModalEl.addEventListener('shown.bs.modal', function () {
             if (editMap) {
                 editMap.invalidateSize();
             }
@@ -588,6 +598,7 @@
             var manager = button.getAttribute('data-manager');
             var lat = button.getAttribute('data-lat');
             var lng = button.getAttribute('data-lng');
+            var imageUrl = button.getAttribute('data-image-url') || '';
 
             document.getElementById('editBranchId').value = id;
             document.getElementById('editBranchName').value = name;
@@ -597,6 +608,22 @@
             document.getElementById('editLat').value = lat;
             document.getElementById('editLng').value = lng;
 
+            // Carry the current image URL so backend preserves it when no new file is chosen
+            document.getElementById('editBranchExistingImageUrl').value = imageUrl;
+
+            // Show current image preview
+            var imgContainer = document.getElementById('editBranchCurrentImgContainer');
+            var imgEl = document.getElementById('editBranchCurrentImg');
+            if (imageUrl && imageUrl.trim() !== '') {
+                imgEl.src = imageUrl;
+                imgContainer.style.display = 'block';
+            } else {
+                imgContainer.style.display = 'none';
+            }
+
+            // Reset file input so it doesn't accidentally carry a previous selection
+            document.getElementById('editBranchImageFile').value = '';
+
             var modal = new bootstrap.Modal(document.getElementById('editBranchModal'));
             modal.show();
 
@@ -604,12 +631,12 @@
                 if (!editMap) {
                     editMap = L.map('editMap');
                     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        attribution: 'Â© OpenStreetMap contributors'
+                        attribution: '&copy; OpenStreetMap contributors'
                     }).addTo(editMap);
 
                     editMap.on('click', function (e) {
-                        var lat = e.latlng.lat;
-                        var lng = e.latlng.lng;
+                        var eLat = e.latlng.lat;
+                        var eLng = e.latlng.lng;
 
                         if (editMarker) {
                             editMarker.setLatLng(e.latlng);
@@ -617,11 +644,11 @@
                             editMarker = L.marker(e.latlng).addTo(editMap);
                         }
 
-                        document.getElementById('editLat').value = lat;
-                        document.getElementById('editLng').value = lng;
+                        document.getElementById('editLat').value = eLat;
+                        document.getElementById('editLng').value = eLng;
 
                         // Auto-fill address
-                        getAddressFromLatLon(lat, lng, 'editBranchLocation');
+                        getAddressFromLatLon(eLat, eLng, 'editBranchLocation');
                     });
                 }
 

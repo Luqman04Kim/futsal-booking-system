@@ -125,9 +125,12 @@ public class QrController {
         }
 
         String trimmedToken = token.trim();
-        Booking booking = bookingRepository.findAll().stream()
-                .filter(b -> trimmedToken.equals(b.getQrToken()) || (b.getQrToken() != null && b.getQrToken().equals("USED_" + trimmedToken)))
-                .findFirst().orElse(null);
+        // First try direct token match (normal scan)
+        Booking booking = bookingRepository.findByQrToken(trimmedToken).orElse(null);
+        // If not found, try the "USED_" prefix (already-checked-in token)
+        if (booking == null) {
+            booking = bookingRepository.findByQrToken("USED_" + trimmedToken).orElse(null);
+        }
 
         if (booking == null) {
             response.put("success", false);

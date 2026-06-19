@@ -388,6 +388,7 @@ public class ManagerController {
             @RequestParam String status, @RequestParam Long branchId,
             @RequestParam(required = false) Long supervisorId,
             @RequestParam(value = "fieldImages", required = false) List<MultipartFile> fieldImages,
+            @RequestParam(value = "existingImageUrl", required = false) String existingImageUrl,
             HttpSession session) {
         if (!isManager(session))
             return "redirect:/login";
@@ -412,6 +413,9 @@ public class ManagerController {
             boolean hasNewImages = fieldImages != null && fieldImages.stream().anyMatch(f -> !f.isEmpty());
             if (hasNewImages) {
                 saveFieldImages(fieldImages, field);
+            } else if (existingImageUrl != null && !existingImageUrl.isBlank() && field.getImageUrl() == null) {
+                // Restore from form if DB somehow lost it
+                field.setImageUrl(existingImageUrl);
             }
 
             fieldRepository.save(field);
@@ -509,6 +513,7 @@ public class ManagerController {
             @RequestParam(required = false) Double latitude,
             @RequestParam(required = false) Double longitude,
             @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
+            @RequestParam(value = "existingImageUrl", required = false) String existingImageUrl,
             HttpSession session) {
         if (!isManager(session))
             return "redirect:/login";
@@ -532,10 +537,15 @@ public class ManagerController {
                 branch.setLongitude(longitude);
 
             if (imageFile != null && !imageFile.isEmpty()) {
+                // New image uploaded — save it
                 String imageUrl = saveImage(imageFile, "branch");
                 if (imageUrl != null)
                     branch.setImageUrl(imageUrl);
+            } else if (existingImageUrl != null && !existingImageUrl.isBlank()) {
+                // No new image — restore the existing URL passed from the form
+                branch.setImageUrl(existingImageUrl);
             }
+            // If both are null/empty, leave whatever the DB entity already has
 
             branchRepository.save(branch);
         }
@@ -557,8 +567,8 @@ public class ManagerController {
     public String showStaffPage(@RequestParam(required = false) String search,
             @RequestParam(required = false) String filter,
             HttpSession session, Model model) {
-//        if (!isManager(session))
-//            return "redirect:/login";
+        if (!isManager(session))
+            return "redirect:/login";
 
         List<User> allUsers = userRepository.findAll();
         List<User> staffList = allUsers.stream()
@@ -576,10 +586,6 @@ public class ManagerController {
             if ("MANAGER".equalsIgnoreCase(filter)) {
                 staffList = staffList.stream()
                         .filter(u -> "MANAGER".equalsIgnoreCase(u.getRole()))
-                        .collect(Collectors.toList());
-            } else if ("MANAGER".equalsIgnoreCase(filter)) {
-                staffList = staffList.stream()
-                        .filter(u -> "MANAGER".equalsIgnoreCase(u.getPosition()))
                         .collect(Collectors.toList());
             } else if ("MAINTENANCE TEAM".equalsIgnoreCase(filter)) {
                 staffList = staffList.stream()
@@ -694,6 +700,7 @@ public class ManagerController {
             @RequestParam(required = false) String phoneNumber,
             @RequestParam(required = false) Integer age,
             @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
+            @RequestParam(value = "existingImageUrl", required = false) String existingImageUrl,
             HttpSession session) {
         if (!isManager(session))
             return "redirect:/login";
@@ -718,10 +725,15 @@ public class ManagerController {
             }
 
             if (imageFile != null && !imageFile.isEmpty()) {
+                // New image uploaded — save it
                 String imageUrl = saveImage(imageFile, "staff");
                 if (imageUrl != null)
                     staff.setImageUrl(imageUrl);
+            } else if (existingImageUrl != null && !existingImageUrl.isBlank()) {
+                // No new image — restore the existing URL passed from the form
+                staff.setImageUrl(existingImageUrl);
             }
+            // If both are null/empty, leave whatever the DB entity already has
 
             userRepository.save(staff);
         }
