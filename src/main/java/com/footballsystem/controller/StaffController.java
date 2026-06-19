@@ -91,8 +91,25 @@ public class StaffController {
             // Get tasks assigned to the logged-in staff
             List<Task> tasks = taskRepository.findByAssignedStaff(user);
 
+            // Calculate KPI metrics
+            long totalTasks = tasks.size();
+            long pendingTasks = tasks.stream().filter(t -> "PENDING".equalsIgnoreCase(t.getStatus())).count();
+            long completedTasks = tasks.stream().filter(t -> "COMPLETED".equalsIgnoreCase(t.getStatus())).count();
+
+            long branchFieldsCount = 0;
+            if (user != null && user.getBranch() != null) {
+                final Long branchId = user.getBranch().getBranchId();
+                branchFieldsCount = fieldRepository.findAll().stream()
+                        .filter(f -> f.getBranch() != null && f.getBranch().getBranchId().equals(branchId))
+                        .count();
+            }
+
             model.addAttribute("myTasks", tasks); // Fixed: changed "tasks" to "myTasks"
             model.addAttribute("user", user); // Pass user to display name etc.
+            model.addAttribute("totalTasksCount", totalTasks);
+            model.addAttribute("pendingTasksCount", pendingTasks);
+            model.addAttribute("completedTasksCount", completedTasks);
+            model.addAttribute("branchFieldsCount", branchFieldsCount);
 
             // --- NEW: Top 5 Staff Leaderboard Logic (Same as Manager) ---
             List<User> allStaff = userRepository.findAll().stream()

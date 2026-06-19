@@ -346,6 +346,53 @@
                 padding: 15px;
             }
         }
+
+        /* Stat Cards styling */
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, 0.03);
+            height: 100%;
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-label {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0;
+        }
+
+        .stat-icon-bg {
+            position: absolute;
+            right: -8px;
+            bottom: -8px;
+            font-size: 4.5rem;
+            opacity: 0.06;
+            transform: rotate(-15deg);
+            color: var(--primary-color);
+        }
     </style>
 </head>
 
@@ -413,10 +460,42 @@
             </p>
         </div>
 
+        <!-- Stats Cards Row -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <a href="#myTasksHeader" class="stat-card text-decoration-none">
+                    <div class="stat-label">Total Tasks</div>
+                    <div class="stat-value" th:text="${totalTasksCount}">0</div>
+                    <div class="stat-icon-bg"><i class="fas fa-tasks"></i></div>
+                </a>
+            </div>
+            <div class="col-md-3 mb-3">
+                <a href="#myTasksHeader" class="stat-card text-decoration-none">
+                    <div class="stat-label">Pending Tasks</div>
+                    <div class="stat-value" th:text="${pendingTasksCount}">0</div>
+                    <div class="stat-icon-bg"><i class="fas fa-clock"></i></div>
+                </a>
+            </div>
+            <div class="col-md-3 mb-3">
+                <a href="/staff/reports" class="stat-card text-decoration-none">
+                    <div class="stat-label">Completed Tasks</div>
+                    <div class="stat-value" th:text="${completedTasksCount}">0</div>
+                    <div class="stat-icon-bg"><i class="fas fa-check-circle"></i></div>
+                </a>
+            </div>
+            <div class="col-md-3 mb-3">
+                <a href="/staff/bookings" class="stat-card text-decoration-none">
+                    <div class="stat-label">Branch Fields</div>
+                    <div class="stat-value" th:text="${branchFieldsCount}">0</div>
+                    <div class="stat-icon-bg"><i class="fas fa-futbol"></i></div>
+                </a>
+            </div>
+        </div>
+
         <div class="row">
             <!-- LEFT: Task List -->
             <div class="col-lg-8">
-                <h4 class="mb-3 text-secondary">My Assigned Tasks</h4>
+                <h4 id="myTasksHeader" class="mb-3 text-secondary">My Assigned Tasks</h4>
 
                 <!-- Loop through tasks -->
                 <div class="task-card shadow-sm p-3" th:each="task : ${myTasks}"
@@ -1136,200 +1215,7 @@
             for (let i = 1; i <= nextMonthDays; i++) {
                 grid.innerHTML += `<div class="calendar-day other-month"><div>${i}</div></div>`;
             }
-    <style>
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 5px;
-        }
 
-        .calendar-day-header {
-            text-align: center;
-            font-weight: bold;
-            padding: 10px 0;
-            color: #666;
-            text-transform: uppercase;
-            font-size: 0.85rem;
-        }
-
-        .calendar-day {
-            min-height: 80px;
-            border: 1px solid #eee;
-            border-radius: 8px;
-            padding: 5px;
-            position: relative;
-            background: #fff;
-        }
-
-        .calendar-day:hover {
-            background-color: #f8f9fa;
-        }
-
-        .calendar-day.today {
-            background-color: #e3f2fd;
-            border-color: #90caf9;
-        }
-
-        .calendar-day.today div:first-child {
-            background: #0d6efd;
-            color: white;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.8rem;
-        }
-
-        .calendar-day.other-month {
-            opacity: 0.4;
-            background-color: #fafafa;
-        }
-
-        .holiday-badge {
-            font-size: 0.65rem;
-            display: block;
-            margin-top: 4px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            cursor: pointer;
-            padding: 2px 4px;
-        }
-    </style>
-
-    <!-- Bootstrap JS (Required for Modals) -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script>
-        // Calendar Logic (Robust)
-        let currentCalendarDate = new Date();
-        const CALENDAR_API_KEY = 'VcJpWp7BC4qUFhUXrM2jIBVwMeqiOLxB';
-        let holidaysCache = {};
-
-        function openCalendarModal() {
-            var myModal = new bootstrap.Modal(document.getElementById('calendarModal'));
-            myModal.show();
-            fetchHolidays(currentCalendarDate.getFullYear());
-            renderCalendar();
-        }
-
-        function changeMonth(delta) {
-            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + delta);
-            renderCalendar();
-            fetchHolidays(currentCalendarDate.getFullYear());
-        }
-
-        async function fetchHolidays(year) {
-            if (holidaysCache[year] && Array.isArray(holidaysCache[year]) && holidaysCache[year].length > 0) {
-                return;
-            }
-
-            const holidayList = document.getElementById('holidayList');
-            holidayList.innerHTML = '<li class="list-group-item text-center text-muted py-2"><i class="fas fa-spinner fa-spin me-2"></i>Loading holidays...</li>';
-
-            try {
-                console.log(`Fetching holidays for MY/${year}...`);
-                const response = await fetch(`https://calendarific.com/api/v2/holidays?api_key=${CALENDAR_API_KEY}&country=MY&year=${year}`);
-                const data = await response.json();
-
-                if (data.meta && data.meta.code !== 200) {
-                    console.error('API Error:', data.meta);
-                    holidayList.innerHTML = `<li class="list-group-item text-danger">Error: ${data.meta.error_detail || 'Could not fetch holidays'}</li>`;
-                    return;
-                }
-
-                if (data.response && data.response.holidays) {
-                    holidaysCache[year] = data.response.holidays;
-                    renderCalendar();
-                } else {
-                    holidayList.innerHTML = '<li class="list-group-item text-muted">No holiday data received.</li>';
-                }
-            } catch (error) {
-                console.error('Error fetching holidays:', error);
-                holidayList.innerHTML = '<li class="list-group-item text-danger">Failed to connect to holiday service.</li>';
-            }
-        }
-
-        function renderCalendar() {
-            const year = currentCalendarDate.getFullYear();
-            const month = currentCalendarDate.getMonth();
-            document.getElementById('calendarMonthYear').textContent = new Date(year, month).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-
-            const firstDay = new Date(year, month, 1);
-            const lastDay = new Date(year, month + 1, 0);
-            const daysInMonth = lastDay.getDate();
-            const startingDay = firstDay.getDay();
-
-            const grid = document.getElementById('calendarGrid');
-            grid.innerHTML = `
-                <div class="calendar-day-header text-danger">Sun</div>
-                <div class="calendar-day-header">Mon</div>
-                <div class="calendar-day-header">Tue</div>
-                <div class="calendar-day-header">Wed</div>
-                <div class="calendar-day-header">Thu</div>
-                <div class="calendar-day-header text-success">Fri</div>
-                <div class="calendar-day-header">Sat</div>
-            `;
-
-            const prevMonthLastDay = new Date(year, month, 0).getDate();
-            for (let i = 0; i < startingDay; i++) {
-                grid.innerHTML += `<div class="calendar-day other-month"><div>${prevMonthLastDay - startingDay + 1 + i}</div></div>`;
-            }
-
-            const today = new Date();
-            const holidayList = document.getElementById('holidayList');
-            holidayList.innerHTML = '';
-            let hasHolidays = false;
-
-            const yearHolidays = holidaysCache[year] || [];
-
-            for (let day = 1; day <= daysInMonth; day++) {
-                const isToday = day === today.getDate() && month === today.getMonth() && year === today.getFullYear();
-                const currentMonthNum = month + 1;
-
-                const dayHolidays = yearHolidays.filter(h => {
-                    if (h.date && h.date.datetime) {
-                        return h.date.datetime.year === year &&
-                            h.date.datetime.month === currentMonthNum &&
-                            h.date.datetime.day === day;
-                    }
-                    return false;
-                });
-
-                let holidayHtml = '';
-                dayHolidays.forEach(h => {
-                    holidayHtml += `<span class="badge bg-danger holiday-badge" title="${h.name}">${h.name}</span>`;
-                    const li = document.createElement('li');
-                    li.className = 'list-group-item d-flex justify-content-between align-items-center';
-                    li.innerHTML = `<span><strong class="text-primary">${day} ${new Date(year, month).toLocaleString('default', { month: 'short' })}:</strong> ${h.name}</span> <span class="badge bg-light text-dark border">${h.type[0] || 'Holiday'}</span>`;
-                    holidayList.appendChild(li);
-                    hasHolidays = true;
-                });
-
-                grid.innerHTML += `
-                    <div class="calendar-day ${isToday ? 'today' : ''}">
-                        <div>${day}</div>
-                        ${holidayHtml}
-                    </div>
-                `;
-            }
-
-            if (!hasHolidays) {
-                if (!holidaysCache[year]) {
-                    holidayList.innerHTML = '<li class="list-group-item text-muted">Fetching data...</li>';
-                } else {
-                    holidayList.innerHTML = '<li class="list-group-item text-center text-muted py-3">No holidays found for this month 🌴</li>';
-                }
-            }
-
-            const totalCells = startingDay + daysInMonth;
-            let nextMonthDays = 0;
-            if (totalCells <= 35) { nextMonthDays = 35 - totalCells; } else { nextMonthDays = 42 - totalCells; }
-            for (let i = 1; i <= nextMonthDays; i++) {
-                grid.innerHTML += `<div class="calendar-day other-month"><div>${i}</div></div>`;
-            }
         }
     </script>
 

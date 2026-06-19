@@ -267,7 +267,7 @@
                 <div class="card branch-card shadow-sm">
                     <!-- Image Header -->
                     <div class="card-header-img">
-                        <img th:src="${branch.imageUrl != null ? branch.imageUrl : 'https://images.unsplash.com/photo-1522778119026-d647f0565c6a'}"
+                        <img th:src="${branch.imageUrl != null and branch.imageUrl != '' ? branch.imageUrl : 'https://images.unsplash.com/photo-1522778119026-d647f0565c6a'}"
                             onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1522778119026-d647f0565c6a';"
                             class="branch-img">
                         <div style="position:absolute; top:10px; right:10px;">

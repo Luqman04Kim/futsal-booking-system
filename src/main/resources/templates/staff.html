@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
@@ -276,6 +276,204 @@
             <i class="fas fa-exclamation-circle me-2"></i> <span th:text="${error}">Error</span>
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i> <span th:text="${success}">Success</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div class="d-flex gap-2 mb-4">
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addStaffModal">
+                <i class="fas fa-user-plus me-2"></i> Hire Staff
+            </button>
+            <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#addManagerModal">
+                <i class="fas fa-user-shield me-2"></i> Add Manager
+            </button>
+
+        </div>
+
+        <!-- SEARCH & FILTER BAR -->
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <form action="/manager/staff" method="GET" class="d-flex gap-2">
+                    <div class="input-group">
+                        <input type="text" name="search" class="form-control" placeholder="Search by name or email..."
+                            th:value="${param.search}" />
+                        <button class="btn btn-outline-primary" type="submit"><i class="fas fa-search"></i>
+                            Search</button>
+                    </div>
+
+                    <!-- Filter Dropdown -->
+                    <select name="filter" class="form-select w-auto" onchange="this.form.submit()">
+                        <option value="ALL" th:selected="${selectedFilter == 'ALL'}">All Roles</option>
+                        <option value="MANAGER" th:selected="${selectedFilter == 'MANAGER'}">Managers</option>
+                        <option value="MANAGER" th:selected="${selectedFilter == 'MANAGER'}">Managers</option>
+                        <option value="MAINTENANCE TEAM" th:selected="${selectedFilter == 'MAINTENANCE TEAM'}">Maintenance Team</option>
+                        <option value="OTHER" th:selected="${selectedFilter == 'OTHER'}">Other Staff</option>
+                    </select>
+
+                    <a href="/manager/staff" class="btn btn-outline-secondary"
+                        th:if="${param.search} or ${selectedFilter != 'ALL'}"><i class="fas fa-times"></i> Clear</a>
+                </form>
+            </div>
+        </div>
+
+        <!-- STAFF GRID -->
+        <div class="row g-4">
+            <div class="col-md-4 col-lg-3" th:each="staff : ${staffList}">
+                <div class="card staff-card shadow-sm"
+                    th:classappend="${staff.role == 'MANAGER'} ? 'manager-card' : (${staff.position == 'MAINTENANCE TEAM'} ? 'maintenance-card' : '')">
+                    <!-- EDIT & DELETE BUTTONS -->
+                    <div style="position: absolute; top: 10px; right: 10px; z-index: 10;">
+                        <button class="btn btn-sm btn-link text-white p-0 me-2" th:data-id="${staff.userId}"
+                            th:data-username="${staff.username}" th:data-email="${staff.email}"
+                            th:data-position="${staff.position}" th:data-age="${staff.age}"
+                            th:data-phone="${staff.phoneNumber}" th:data-staff-id="${staff.staffId}"
+                            th:data-branch="${staff.branch != null ? staff.branch.branchId : ''}"
+                            onclick="openEditModal(this)" title="Edit Staff">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <a th:href="@{/manager/delete-staff/{id}(id=${staff.userId})}" class="text-white opacity-75"
+                            onclick="confirmDelete(this, 'staff member'); return false;" title="Remove Staff">
+                            <i class="fas fa-trash-alt"></i>
+                        </a>
+                    </div>
+
+                    <div class="staff-header">
+                        <h5 class="mb-0" th:text="${staff.username}">Staff Name</h5>
+                        <small class="opacity-75" th:text="${staff.email}">email@test.com</small>
+                    </div>
+                    <div class="staff-body">
+                        <img th:src="${staff.imageUrl != null ? staff.imageUrl : 'https://ui-avatars.com/api/?name=' + staff.username}"
+                            class="staff-avatar shadow-sm" style="cursor: pointer;"
+                            th:data-image-url="${staff.imageUrl != null ? staff.imageUrl : 'https://ui-avatars.com/api/?name=' + staff.username}"
+                            th:data-staff-name="${staff.username}"
+                            onclick="setStaffImageModal(this.getAttribute('data-image-url'), this.getAttribute('data-staff-name'))"
+                            data-bs-toggle="modal" data-bs-target="#viewStaffImageModal" />
+
+                        <div class="mt-3">
+                            <!-- Detailed Info -->
+                            <p class="small text-muted mb-1" th:if="${staff.staffId != null}">
+                                <i class="fas fa-id-card me-1"></i> <span th:text="${staff.staffId}"
+                                    class="fw-bold">ID</span>
+                            </p>
+                            <p class="small text-muted mb-1">
+                                <i class="fas fa-id-badge me-1"></i> <span th:text="${staff.position}">Position</span>
+                            </p>
+                            <p class="small text-muted mb-1" th:if="${staff.age != null}">
+                                <i class="fas fa-birthday-cake me-1"></i> <span
+                                    th:text="${staff.age} + ' years'">Age</span>
+                            </p>
+                            <p class="small text-muted mb-1" th:if="${staff.phoneNumber != null}">
+                                <i class="fas fa-phone me-1"></i> <span th:text="${staff.phoneNumber}">Phone</span>
+                            </p>
+                            <p class="small text-muted mb-2" th:if="${staff.branch != null}">
+                                <i class="fas fa-building me-1"></i> <span th:text="${staff.branch.name}">Branch</span>
+                            </p>
+
+
+                            <!-- MANAGE TASKS BUTTON -->
+                            <button th:if="${staff.role != 'MANAGER'}" class="btn btn-sm btn-outline-primary w-100 mb-3"
+                                th:data-id="${staff.userId}" th:data-username="${staff.username}"
+                                onclick="openManageTasksModal(this)">
+                                <i class="fas fa-tasks me-1"></i> Manage Tasks
+                            </button>
+
+                            <!-- Simple Task Summary -->
+                            <div class="text-center mb-2" th:if="${not #lists.isEmpty(staff.tasks)}">
+                                <small class="text-muted fw-bold">
+                                    <i class="fas fa-check-circle text-success me-1"></i>
+                                    <span th:text="${staffTaskCounts[staff.userId]}">0</span>/<span
+                                        th:text="${staffTotalTaskCounts[staff.userId]}">0</span> Tasks Completed
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MANAGE TASKS MODAL -->
+        <div class="modal fade" id="manageTasksModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title"><i class="fas fa-tasks me-2"></i>Manage Tasks: <span
+                                id="manageTaskStaffName"></span></h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Task List -->
+                        <h6 class="fw-bold mb-3 border-bottom pb-2">Current Tasks</h6>
+                        <div id="staffTaskList" class="mb-4">
+                            <!-- Tasks will be injected here via JS -->
+                            <p class="text-muted text-center fst-italic">Loading tasks...</p>
+                        </div>
+
+                        <!-- Assign New Task Form -->
+                        <div class="card bg-light border-0">
+                            <div class="card-body">
+                                <h6 class="fw-bold mb-3 text-primary"><i class="fas fa-plus-circle me-2"></i>Assign New
+                                    Task</h6>
+                                <form action="/manager/assign-task" method="POST" enctype="multipart/form-data">
+                                    <input type="hidden" name="staffId" id="manageTaskStaffId">
+                                    <div class="row g-3">
+                                        <div class="col-md-12">
+                                            <textarea name="description" class="form-control" rows="2"
+                                                placeholder="Task Description..." required></textarea>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">Due Date</label>
+                                            <input type="datetime-local" name="dueDate"
+                                                class="form-control form-control-sm" required />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">Ref Image (Optional)</label>
+                                            <input type="file" name="taskImage" class="form-control form-control-sm"
+                                                accept="image/*" />
+                                        </div>
+                                        <div class="col-12 text-end">
+                                            <button type="submit" class="btn btn-primary btn-sm px-4">Assign
+                                                Task</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADD STAFF MODAL -->
+        <div class="modal fade" id="addStaffModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-success text-white">
+                        <h5 class="modal-title">Hire New Staff</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form action="/manager/add-staff" method="POST" enctype="multipart/form-data">
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label">Username</label>
+                                <input type="text" name="username" class="form-control" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" name="email" class="form-control" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Password</label>
+                                <input type="password" name="password" class="form-control" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Staff ID</label>
+                                <input type="text" name="staffId" id="staffIdField" class="form-control"
+                                    placeholder="Generating..." readonly />
+                            </div>
+
+                            <!-- Position Selection -->
+                            <div class="mb-3">
                                 <label class="form-label">Position</label>
                                 <select id="positionSelect" class="form-select mb-2"
                                     onchange="togglePositionInput(this)">
@@ -475,7 +673,186 @@
                     <div class="modal-body text-center">
                         <img id="proofImage" src="" class="img-fluid rounded shadow-sm" alt="Proof Image" />
                         <p id="proofDesc" class="mt-3 text-muted"></p>
+                                    <option value="MAINTENANCE TEAM">Maintenance Team</option>
+                                    <option value="OTHER">Other (Specify)</option>
+                                </select>
+                                <input type="text" id="positionInput" name="position" class="form-control"
+                                    value="MANAGER" placeholder="Enter custom position" style="display: none;"
+                                    required />
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Assign Branch (Optional)</label>
+                                <select name="branchId" class="form-select">
+                                    <option value="">-- Unassigned --</option>
+                                    <option th:each="branch : ${branches}" th:value="${branch.branchId}"
+                                        th:text="${branch.name}">Branch</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Phone Number</label>
+                                <input type="text" name="phoneNumber" class="form-control" pattern="[0-9]+"
+                                    inputmode="numeric" title="Please enter only digits" />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Profile Photo</label>
+                                <input type="file" name="imageFile" class="form-control" accept="image/*" />
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-success">Hire Staff</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Manager MODAL -->
+        <div class="modal fade" id="addManagerModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-dark text-white">
+                        <h5 class="modal-title"><i class="fas fa-user-shield me-2"></i>Add New Manager</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
+                    <form action="/manager/add-manager" method="POST" enctype="multipart/form-data">
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label">Username</label>
+                                <input type="text" name="username" class="form-control" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" name="email" id="managerEmail" class="form-control" required />
+                                <div id="managerEmailError" class="text-danger small" style="display:none;"></div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Password</label>
+                                <input type="password" name="password" class="form-control" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Position</label>
+                                <input type="text" class="form-control" value="MANAGER" disabled />
+                                <input type="hidden" name="position" value="MANAGER" />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Age</label>
+                                <input type="number" name="age" class="form-control" />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Phone Number</label>
+                                <input type="text" name="phoneNumber" class="form-control" pattern="[0-9]+"
+                                    inputmode="numeric" title="Please enter only digits" />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Profile Photo</label>
+                                <input type="file" name="imageFile" class="form-control" accept="image/*" />
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-dark">Add Manager</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- EDIT STAFF MODAL -->
+        <div class="modal fade" id="editStaffModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title">Edit Staff Information</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form action="/manager/update-staff" method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="userId" id="editUserId">
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label">Username</label>
+                                <input type="text" name="username" id="editUsername" class="form-control" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" name="email" id="editEmail" class="form-control" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Staff ID</label>
+                                <input type="text" name="staffId" id="editStaffId" class="form-control" />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Position</label>
+                                <input type="text" name="position" id="editPosition" class="form-control" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Age</label>
+                                <input type="number" name="age" id="editAge" class="form-control" />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Phone Number</label>
+                                <input type="text" name="phoneNumber" id="editPhone" class="form-control"
+                                    pattern="[0-9]+" inputmode="numeric" title="Please enter only digits" />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Assign Branch</label>
+                                <select name="branchId" id="editBranch" class="form-select">
+                                    <option value="">-- Unassigned --</option>
+                                    <option th:each="branch : ${branches}" th:value="${branch.branchId}"
+                                        th:text="${branch.name}">Branch</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Profile Photo (Optional)</label>
+                                <input type="file" name="imageFile" class="form-control" accept="image/*" />
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- ASSIGN TASK MODAL -->
+        <div class="modal fade" id="assignTaskModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title">Assign New Task</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form action="/manager/assign-task" method="POST" enctype="multipart/form-data">
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label">Select Staff</label>
+                                <select name="staffId" id="assignStaffSelect" class="form-select" required>
+                                    <option th:each="s : ${staffList}" th:value="${s.userId}" th:text="${s.username}">
+                                        Staff</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Task Description</label>
+                                <textarea name="description" class="form-control" rows="3" required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Due Date & Time</label>
+                                <input type="datetime-local" name="dueDate" class="form-control" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Reference Image (Optional)</label>
+                                <input type="file" name="taskImage" class="form-control" accept="image/*" />
+                                <small class="text-muted">Upload a photo to show what needs to be done.</small>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Assign Task</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

@@ -869,7 +869,7 @@
                         <div th:id="'carousel' + ${field.fieldId}" class="carousel slide h-100" data-bs-ride="carousel">
                             <div class="carousel-inner h-100">
                                 <div class="carousel-item active h-100">
-                                    <img th:src="${field.imageUrl != null ? field.imageUrl : 'https://images.unsplash.com/photo-1556056504-5c7696c4c28d'}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1556056504-5c7696c4c28d';" class="card-img-top" style="height:220px;object-fit:cover;width:100%;" alt="Field">
+                                    <img th:src="${field.imageUrl != null and field.imageUrl != '' ? field.imageUrl : 'https://images.unsplash.com/photo-1556056504-5c7696c4c28d'}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1556056504-5c7696c4c28d';" class="card-img-top" style="height:220px;object-fit:cover;width:100%;" alt="Field">
                                 </div>
                                 <div th:if="${field.imageUrl2 != null}" class="carousel-item h-100">
                                     <img th:src="${field.imageUrl2}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1556056504-5c7696c4c28d';" class="card-img-top" style="height:220px;object-fit:cover;width:100%;" alt="Photo 2">

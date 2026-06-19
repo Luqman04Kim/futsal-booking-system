@@ -552,11 +552,11 @@ public class CustomerController {
             User user = dbUserOpt.get();
             if (!user.getPassword().equals(currentPassword)) {
                 redirectAttributes.addFlashAttribute("error", "Incorrect current password.");
-                return "redirect:/change-password";
+                return "redirect:/profile";
             }
             if (!newPassword.equals(confirmPassword)) {
                 redirectAttributes.addFlashAttribute("error", "New passwords do not match.");
-                return "redirect:/change-password";
+                return "redirect:/profile";
             }
             user.setPassword(newPassword);
             userRepository.save(user);

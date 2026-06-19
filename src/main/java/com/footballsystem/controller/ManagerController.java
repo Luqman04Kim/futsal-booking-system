@@ -1743,8 +1743,11 @@ public class ManagerController {
             weekData.putIfAbsent("week", "Week " + weekNum);
             weekData.put("count", (long) weekData.getOrDefault("count", 0L) + 1);
 
+            weekData.putIfAbsent("bookings", new ArrayList<Booking>());
+            ((List<Booking>) weekData.get("bookings")).add(b);
+
             if ("APPROVED".equalsIgnoreCase(b.getStatus()) || "COMPLETED".equalsIgnoreCase(b.getStatus())) {
-                weekData.put("revenue", (double) weekData.getOrDefault("revenue", 0.0) + b.getPrice());
+                weekData.put("revenue", (double) weekData.getOrDefault("revenue", 0.0) + (b.getPrice() != null ? b.getPrice() : 0.0));
             } else {
                 weekData.putIfAbsent("revenue", 0.0);
             }

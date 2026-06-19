@@ -445,14 +445,13 @@
                                     </td>
                                     <td class="text-end">
                                         <button class="btn btn-sm btn-primary"
-                                            th:onclick="'showWeekDetails(' +
-                                                '\'' + ${week.week} + '\'' + ',' +
-                                                (${week.startDate} ? '\'' + ${#temporals.format(week.startDate,'MMM d, yyyy')} + '\'' : '\'N/A\'') + ',' +
-                                                (${week.endDate}   ? '\'' + ${#temporals.format(week.endDate,  'MMM d, yyyy')} + '\'' : '\'N/A\'') + ',' +
-                                                ${week.count} + ',' +
-                                                ${week.revenue} + ',' +
-                                                '\'' + ${selectedBranchName} + '\''
-                                            + ')'"
+                                            th:data-week="${week.week}"
+                                            th:data-start-date="${week.startDate != null ? #temporals.format(week.startDate, 'MMM d, yyyy') : 'N/A'}"
+                                            th:data-end-date="${week.endDate != null ? #temporals.format(week.endDate, 'MMM d, yyyy') : 'N/A'}"
+                                            th:data-count="${week.count}"
+                                            th:data-revenue="${week.revenue}"
+                                            th:data-branch="${selectedBranchName}"
+                                            onclick="showWeekDetails(this)"
                                             data-bs-toggle="modal" data-bs-target="#weekDetailsModal">
                                             <i class="fas fa-eye me-1"></i>View Details
                                         </button>
@@ -537,36 +536,32 @@
                             </thead>
                             <tbody id="weekDetailRows">
                                 <!-- Rows injected by Thymeleaf per week -->
-                                <tr th:each="week : ${weeklyReport}"
-                                    th:attr="data-week=${week.week}"
-                                    class="week-detail-row d-none">
-                                    <td colspan="7">
-                                        <!-- Nested: for each booking in this week -->
-                                        <table class="table table-sm mb-0">
-                                            <tbody>
-                                                <tr th:each="b : ${week.bookings}" th:if="${week.bookings != null}">
-                                                    <td th:text="${b.bookingId}" class="text-primary fw-bold">1</td>
-                                                    <td th:text="${b.user?.username ?: 'N/A'}">User</td>
-                                                    <td th:text="${b.field?.name ?: 'N/A'}">Field A</td>
-                                                    <td th:text="${b.date}">2025-01-01</td>
-                                                    <td th:text="${b.startTime + ' - ' + b.endTime}">10:00-12:00</td>
-                                                    <td>
-                                                        <span class="badge bg-success" th:if="${b.status == 'APPROVED'}">Approved</span>
-                                                        <span class="badge bg-warning text-dark" th:if="${b.status == 'PENDING'}">Pending</span>
-                                                        <span class="badge bg-danger" th:if="${b.status == 'CANCELLED'}">Cancelled</span>
-                                                        <span class="badge bg-secondary" th:unless="${b.status == 'APPROVED' or b.status == 'PENDING' or b.status == 'CANCELLED'}" th:text="${b.status}">—</span>
-                                                    </td>
-                                                    <td class="text-end fw-bold text-success">RM <span th:text="${b.price}">0</span></td>
-                                                </tr>
-                                                <tr th:if="${week.bookings == null or #lists.isEmpty(week.bookings)}">
-                                                    <td colspan="7" class="text-center text-muted py-3">
-                                                        <i class="fas fa-inbox me-1"></i> No booking records for this week.
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </td>
-                                </tr>
+                                <th:block th:each="week : ${weeklyReport}">
+                                    <tr th:each="b : ${week.bookings}"
+                                        th:if="${week.bookings != null}"
+                                        th:attr="data-week=${week.week}"
+                                        class="week-detail-row d-none">
+                                        <td th:text="${b.bookingId}" class="text-primary fw-bold">1</td>
+                                        <td th:text="${b.user != null ? b.user.username : 'N/A'}">User</td>
+                                        <td th:text="${b.field != null ? b.field.name : 'N/A'}">Field A</td>
+                                        <td th:text="${b.date}">2025-01-01</td>
+                                        <td th:text="${b.startTime + ' - ' + b.endTime}">10:00-12:00</td>
+                                        <td>
+                                            <span class="badge bg-success" th:if="${b.status == 'APPROVED'}">Approved</span>
+                                            <span class="badge bg-warning text-dark" th:if="${b.status == 'PENDING'}">Pending</span>
+                                            <span class="badge bg-danger" th:if="${b.status == 'CANCELLED'}">Cancelled</span>
+                                            <span class="badge bg-secondary" th:unless="${b.status == 'APPROVED' or b.status == 'PENDING' or b.status == 'CANCELLED'}" th:text="${b.status}">—</span>
+                                        </td>
+                                        <td class="text-end fw-bold text-success">RM <span th:text="${b.price != null ? #numbers.formatDecimal(b.price, 1, 'COMMA', 2, 'POINT') : '0.00'}">0.00</span></td>
+                                    </tr>
+                                    <tr th:if="${week.bookings == null or #lists.isEmpty(week.bookings)}"
+                                        th:attr="data-week=${week.week}"
+                                        class="week-detail-row d-none">
+                                        <td colspan="7" class="text-center text-muted py-3">
+                                            <i class="fas fa-inbox me-1"></i> No booking records for this week.
+                                        </td>
+                                    </tr>
+                                </th:block>
                                 <tr id="noWeekData" class="d-none">
                                     <td colspan="7" class="text-center text-muted py-4">
                                         <i class="fas fa-calendar-times fa-2x mb-2 d-block opacity-50"></i>
@@ -718,7 +713,14 @@
         });
 
         // ===== View Details Modal Logic =====
-        function showWeekDetails(weekLabel, startDate, endDate, count, revenue, branchName) {
+        function showWeekDetails(button) {
+            const weekLabel = button.getAttribute('data-week');
+            const startDate = button.getAttribute('data-start-date');
+            const endDate = button.getAttribute('data-end-date');
+            const count = button.getAttribute('data-count');
+            const revenue = button.getAttribute('data-revenue');
+            const branchName = button.getAttribute('data-branch');
+
             // Update header
             document.getElementById('modalWeekLabel').textContent = weekLabel + ' — Booking History';
             document.getElementById('modalBranchLabel').textContent = branchName;
@@ -726,7 +728,7 @@
             // Update summary cards
             document.getElementById('modalRevenue').textContent = 'RM ' + parseFloat(revenue).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
             document.getElementById('modalCount').textContent = count + ' booking(s)';
-            document.getElementById('modalDateRange').textContent = (startDate !== 'N/A' ? startDate + ' – ' + endDate : 'No date info');
+            document.getElementById('modalDateRange').textContent = (startDate !== 'N/A' && endDate !== 'N/A' ? startDate + ' – ' + endDate : 'No date info');
 
             // Update "View in Bookings" link
             document.getElementById('viewAllLink').href = '/manager/bookings';
