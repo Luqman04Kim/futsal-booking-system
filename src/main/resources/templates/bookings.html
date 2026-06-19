@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
@@ -165,11 +165,33 @@
         }
 
         /* Table Styles */
-        .table-container {
+                .table-container {
             background: white;
             border-radius: 15px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-            overflow: hidden;
+            overflow: hidden; /* keeps border-radius on desktop */
+        }
+
+        /* Mobile horizontal scroll */
+        @media (max-width: 991px) {
+            .table-container {
+                overflow: visible;
+            }
+            .table-scroll-wrapper {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                width: 100%;
+                border-radius: 15px;
+            }
+            .table-scroll-wrapper table {
+                min-width: 750px;
+                font-size: 0.8rem;
+            }
+            .table-scroll-wrapper table th,
+            .table-scroll-wrapper table td {
+                white-space: nowrap;
+                padding: 8px 6px;
+            }
         }
 
         .table {
@@ -340,8 +362,23 @@
         </form>
 
         <!-- Bookings Table -->
+            <!-- #15 Search + #14 Export Toolbar -->
+            <div class="d-flex flex-wrap gap-2 align-items-center mb-3 px-1">
+                <div class="input-group" style="max-width:280px;">
+                    <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted" style="font-size:0.85rem;"></i></span>
+                    <input type="text" class="form-control border-start-0 ps-0" placeholder="Search bookings..."
+                        data-search-table="bookingsTable" id="search-bookingsTable" style="font-size:0.88rem;">
+                </div>
+                <button class="btn btn-sm btn-success" onclick="exportTableCSV('bookingsTable', 'Bookings Report.csv')">
+                    <i class="fas fa-file-csv me-1"></i>Export CSV
+                </button>
+                <button class="btn btn-sm btn-secondary" onclick="printTable('bookingsTable', 'Bookings Report')">
+                    <i class="fas fa-print me-1"></i>Print / PDF
+                </button>
+            </div>
         <div class="table-container">
-            <table class="table table-hover">
+            <div class="table-scroll-wrapper">
+            <table class="table table-hover" id="bookingsTable">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -446,6 +483,7 @@
                     </tr>
                 </tbody>
             </table>
+            </div><!-- end .table-scroll-wrapper -->
         </div>
     </div>
 
@@ -589,6 +627,8 @@
             }
         });
     </script>
+
+    <script src="/js/table-enhancements.js"></script>
 </body>
 
 </html>

@@ -398,7 +398,12 @@
         <div class="hero-content" data-aos="fade-up">
             <h1 class="hero-title">Play Like <span class="legend-word">Legends</span></h1>
             <p class="hero-subtitle">Experience world-class football facilities. Designed for champions.</p>
-            <a href="/register" class="btn btn-cta">Join the Club <i class="fas fa-arrow-right ms-2"></i></a>
+            <div class="d-flex flex-wrap gap-3 justify-content-center">
+                <a href="/login" class="btn btn-cta">Book a Field Now <i class="fas fa-arrow-right ms-2"></i></a>
+                <a href="#quality" class="btn" style="background:rgba(255,255,255,0.12); color:white; border:2px solid rgba(255,255,255,0.4); border-radius:50px; padding:14px 32px; font-weight:700; letter-spacing:1px; backdrop-filter:blur(4px); transition:all 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.25)'" onmouseout="this.style.background='rgba(255,255,255,0.12)'">
+                    <i class="fas fa-play me-2"></i>Explore Facilities
+                </a>
+            </div>
         </div>
     </section>
 
@@ -479,6 +484,8 @@
     </section>
 
     <!-- 4. HISTORY (Horizontal Scroll) -->
+    <section id="history" class="history-section section-padding">
+        <div class="container-fluid">
             <h2 class="section-title">Our Legacy</h2>
             <p class="text-center mb-2" style="color:rgba(255,255,255,0.7); font-size:1.1rem;">
                 From a single field to a nationwide network — swipe to explore our journey.
@@ -489,11 +496,12 @@
 
             <div class="timeline-container">
 
-                <!-- 2015 — The Seed -->
+                <!-- 2015 — The Seed: empty land / bare ground -->
                 <div class="timeline-card">
                     <span class="year-badge">2015</span>
-                    <img src="https://images.unsplash.com/photo-1529900748604-07564a03e7a6?q=80&w=500"
-                        class="timeline-img">
+                    <!-- Empty land / open field — the very beginning -->
+                    <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=500&auto=format&fit=crop"
+                        class="timeline-img" alt="Empty land - the beginning">
                     <div class="d-flex align-items-center gap-2 mb-2">
                         <span class="badge" style="background:#edbb00; color:#000; font-size:0.75rem;">
                             <i class="fas fa-map-marker-alt me-1"></i> 1 Field
@@ -501,14 +509,15 @@
                         <span class="badge bg-secondary" style="font-size:0.75rem;">Kuala Terengganu</span>
                     </div>
                     <h4>The Seed 🌱</h4>
-                    <p class="small text-muted">A single piece of land in Kuala Terengganu. No facilities, no lights — just a dream to build something great for the local community.</p>
+                    <p class="small" style="color:rgba(255,255,255,0.85);">A single piece of land in Kuala Terengganu. No facilities, no lights — just a dream to build something great for the local community.</p>
                 </div>
 
-                <!-- 2017 — First Field Built -->
+                <!-- 2017 — First Field: one indoor futsal court lit up at night -->
                 <div class="timeline-card">
                     <span class="year-badge">2017</span>
-                    <img src="https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?q=80&w=500"
-                        class="timeline-img">
+                    <!-- Single lit futsal/football court at night -->
+                    <img src="https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?q=80&w=500&auto=format&fit=crop"
+                        class="timeline-img" alt="Single futsal field opens">
                     <div class="d-flex align-items-center gap-2 mb-2">
                         <span class="badge" style="background:#edbb00; color:#000; font-size:0.75rem;">
                             <i class="fas fa-futbol me-1"></i> 1 Branch
@@ -516,14 +525,15 @@
                         <span class="badge bg-secondary" style="font-size:0.75rem;">Terengganu</span>
                     </div>
                     <h4>First Field Opens ⚽</h4>
-                    <p class="small text-muted">FOOTBALLHUB Branch 1 officially opens in Kuala Terengganu. Our very first futsal field welcomes its first players — the community responds with sold-out bookings every weekend.</p>
+                    <p class="small" style="color:rgba(255,255,255,0.85);">FOOTBALLHUB Branch 1 officially opens in Kuala Terengganu. Our very first futsal field welcomes its first players — sold-out every weekend.</p>
                 </div>
 
-                <!-- 2019 — 2nd Branch -->
+                <!-- 2019 — 2nd Branch: a proper outdoor field, one football pitch -->
                 <div class="timeline-card">
                     <span class="year-badge">2019</span>
-                    <img src="https://images.unsplash.com/photo-1575361204480-aadea25e6e68?q=80&w=500"
-                        class="timeline-img">
+                    <!-- Single outdoor grass football pitch, clear view -->
+                    <img src="https://images.unsplash.com/photo-1521537634581-0dced2fee2ef?q=80&w=500&auto=format&fit=crop"
+                        class="timeline-img" alt="Second branch expands east coast">
                     <div class="d-flex align-items-center gap-2 mb-2">
                         <span class="badge" style="background:#edbb00; color:#000; font-size:0.75rem;">
                             <i class="fas fa-code-branch me-1"></i> 2 Branches
@@ -531,14 +541,15 @@
                         <span class="badge bg-secondary" style="font-size:0.75rem;">+ Kuantan</span>
                     </div>
                     <h4>Expanding East Coast 🗺️</h4>
-                    <p class="small text-muted">Demand explodes. A second branch opens in Kuantan, Pahang — proving that the FOOTBALLHUB model works beyond our home state. Two cities. One mission.</p>
+                    <p class="small" style="color:rgba(255,255,255,0.85);">Demand explodes. A second branch opens in Kuantan, Pahang — proving that the FOOTBALLHUB model works beyond our home state. Two cities. One mission.</p>
                 </div>
 
-                <!-- 2021 — Multiple Fields per Branch -->
+                <!-- 2021 — 4 Branches: side-by-side futsal courts, multiple fields -->
                 <div class="timeline-card">
                     <span class="year-badge">2021</span>
-                    <img src="https://images.unsplash.com/photo-1518091043644-c1d4457512c6?q=80&w=500"
-                        class="timeline-img">
+                    <!-- Multiple side-by-side futsal / sports courts -->
+                    <img src="https://images.unsplash.com/photo-1624880357913-a8539238245b?q=80&w=500&auto=format&fit=crop"
+                        class="timeline-img" alt="Multiple fields at 4 branches nationwide">
                     <div class="d-flex align-items-center gap-2 mb-2">
                         <span class="badge" style="background:#edbb00; color:#000; font-size:0.75rem;">
                             <i class="fas fa-layer-group me-1"></i> 4 Branches
@@ -546,14 +557,15 @@
                         <span class="badge bg-secondary" style="font-size:0.75rem;">+ KL &amp; Johor</span>
                     </div>
                     <h4>Going National 🇲🇾</h4>
-                    <p class="small text-muted">FOOTBALLHUB crosses state lines into Kuala Lumpur and Johor Bahru. Each branch now features multiple fields — both grass and turf — with professional stadium lighting.</p>
+                    <p class="small" style="color:rgba(255,255,255,0.85);">FOOTBALLHUB crosses state lines into Kuala Lumpur and Johor Bahru. Each branch now features multiple fields — grass and turf — with professional stadium lighting.</p>
                 </div>
 
-                <!-- 2023 — Smart Booking System -->
+                <!-- 2023 — 6 Branches: busy floodlit multi-court complex -->
                 <div class="timeline-card">
                     <span class="year-badge">2023</span>
-                    <img src="https://images.unsplash.com/photo-1556056504-5c7696c4c28d?q=80&w=500"
-                        class="timeline-img">
+                    <!-- Floodlit multi-court busy complex at night -->
+                    <img src="https://images.unsplash.com/photo-1556056504-5c7696c4c28d?q=80&w=500&auto=format&fit=crop"
+                        class="timeline-img" alt="Smart booking launches across 6 branches">
                     <div class="d-flex align-items-center gap-2 mb-2">
                         <span class="badge" style="background:#edbb00; color:#000; font-size:0.75rem;">
                             <i class="fas fa-wifi me-1"></i> 6 Branches
@@ -561,14 +573,15 @@
                         <span class="badge bg-secondary" style="font-size:0.75rem;">+ Penang &amp; Selangor</span>
                     </div>
                     <h4>Smart Booking Launches 📱</h4>
-                    <p class="small text-muted">Our digital portal goes live. Players across all 6 branches can now book fields, pay online, and receive QR-coded receipts — zero phone calls needed.</p>
+                    <p class="small" style="color:rgba(255,255,255,0.85);">Our digital portal goes live. Players across all 6 branches can now book fields, pay online, and receive QR receipts — zero phone calls needed.</p>
                 </div>
 
-                <!-- 2025 — Nationwide Network -->
+                <!-- 2025 — 10+ Branches: aerial/overhead view of huge sports complex -->
                 <div class="timeline-card" style="border-color: var(--barca-red);">
                     <span class="year-badge">2025</span>
-                    <img src="https://images.unsplash.com/photo-1518609878373-06d740f60d8b?q=80&w=500"
-                        class="timeline-img">
+                    <!-- Aerial/drone view of large multi-field sports complex -->
+                    <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=500&auto=format&fit=crop"
+                        class="timeline-img" alt="Nationwide network - 10+ branches across Malaysia">
                     <div class="d-flex align-items-center gap-2 mb-2">
                         <span class="badge bg-danger" style="font-size:0.75rem;">
                             <i class="fas fa-globe-asia me-1"></i> 10+ Branches
@@ -576,7 +589,7 @@
                         <span class="badge bg-secondary" style="font-size:0.75rem;">Nationwide 🇲🇾</span>
                     </div>
                     <h4>Nationwide Network 🏆</h4>
-                    <p class="small text-muted">FOOTBALLHUB now operates 10+ branches across Malaysia — from Perlis to Johor. Thousands of bookings processed monthly. One field became a movement.</p>
+                    <p class="small" style="color:rgba(255,255,255,0.85);">FOOTBALLHUB now operates 10+ branches across Malaysia — from Perlis to Johor. Thousands of bookings processed monthly. One field became a movement.</p>
                 </div>
 
                 <!-- Future -->
@@ -591,7 +604,7 @@
                         </span>
                     </div>
                     <h4>What's Next? 🚀</h4>
-                    <p class="small text-muted">Indoor arenas, international partnerships, and AI-powered match analytics. The FOOTBALLHUB story is far from over.</p>
+                    <p class="small" style="color:rgba(255,255,255,0.85);">Indoor arenas, international partnerships, and AI-powered match analytics. The FOOTBALLHUB story is far from over.</p>
                 </div>
 
             </div>
@@ -627,8 +640,8 @@
             </div>
 
         </div>
-    </section>
 
+    </section>
 
     <footer>
         <div class="container">
@@ -778,9 +791,22 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        AOS.init({
-            duration: 1000,
-            once: true
+        AOS.init({ duration: 1000, once: true });
+    </script>
+
+    <!-- #7 Back to Top Button -->
+    <button id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top"
+        style="position:fixed;bottom:30px;right:30px;width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#a50044,#004d98);color:white;border:none;font-size:1.2rem;cursor:pointer;z-index:9999;box-shadow:0 4px 15px rgba(0,0,0,0.3);opacity:0;transform:translateY(20px);transition:all 0.3s ease;display:flex;align-items:center;justify-content:center;">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+    <script>
+        const btn = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                btn.style.opacity = '1'; btn.style.transform = 'translateY(0)';
+            } else {
+                btn.style.opacity = '0'; btn.style.transform = 'translateY(20px)';
+            }
         });
     </script>
 </body>

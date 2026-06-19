@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
@@ -178,6 +178,19 @@
         /* Utility */
         .text-success-dark {
             color: #059669;
+        }
+
+        /* Mobile responsive for performance table */
+        @media (max-width: 768px) {
+            .table-responsive table {
+                min-width: 600px;
+                font-size: 0.8rem;
+            }
+            .table-responsive table th,
+            .table-responsive table td {
+                white-space: nowrap;
+                padding: 8px 10px;
+            }
         }
     </style>
 </head>
@@ -431,8 +444,18 @@
                                             th:text="${#numbers.formatDecimal(week.revenue, 1, 'COMMA', 2, 'POINT')}">0.00</span>
                                     </td>
                                     <td class="text-end">
-                                        <!-- Could link to bookings filtered by date range if implemented -->
-                                        <button class="btn btn-sm btn-outline-secondary" disabled>View Details</button>
+                                        <button class="btn btn-sm btn-primary"
+                                            th:onclick="'showWeekDetails(' +
+                                                '\'' + ${week.week} + '\'' + ',' +
+                                                (${week.startDate} ? '\'' + ${#temporals.format(week.startDate,'MMM d, yyyy')} + '\'' : '\'N/A\'') + ',' +
+                                                (${week.endDate}   ? '\'' + ${#temporals.format(week.endDate,  'MMM d, yyyy')} + '\'' : '\'N/A\'') + ',' +
+                                                ${week.count} + ',' +
+                                                ${week.revenue} + ',' +
+                                                '\'' + ${selectedBranchName} + '\''
+                                            + ')'"
+                                            data-bs-toggle="modal" data-bs-target="#weekDetailsModal">
+                                            <i class="fas fa-eye me-1"></i>View Details
+                                        </button>
                                     </td>
                                 </tr>
                                 <tr th:if="${#lists.isEmpty(weeklyReport)}">
@@ -444,6 +467,119 @@
                             </tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== WEEK DETAILS MODAL ===== -->
+    <div class="modal fade" id="weekDetailsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header text-white" style="background: linear-gradient(135deg, #0f172a, #3b82f6);">
+                    <div>
+                        <h5 class="modal-title fw-bold mb-0">
+                            <i class="fas fa-chart-bar me-2"></i>
+                            <span id="modalWeekLabel">Week Details</span>
+                        </h5>
+                        <small id="modalBranchLabel" class="opacity-75"></small>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+
+                    <!-- Summary Cards -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-6">
+                            <div class="p-3 rounded-3" style="background:#f0fdf4; border-left:4px solid #10b981;">
+                                <div class="small text-muted fw-semibold text-uppercase mb-1">Revenue</div>
+                                <div class="fw-bold fs-5 text-success" id="modalRevenue">RM 0.00</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 rounded-3" style="background:#eff6ff; border-left:4px solid #3b82f6;">
+                                <div class="small text-muted fw-semibold text-uppercase mb-1">Bookings</div>
+                                <div class="fw-bold fs-5 text-primary" id="modalCount">0</div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="p-3 rounded-3" style="background:#fafafa; border:1px solid #e2e8f0;">
+                                <i class="far fa-calendar me-2 text-muted"></i>
+                                <span class="small text-muted">Period: </span>
+                                <span class="fw-semibold" id="modalDateRange">—</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-3">
+
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="fw-bold mb-0"><i class="fas fa-list me-2 text-secondary"></i>Full Booking History</h6>
+                        <a id="viewAllLink" href="#" class="btn btn-sm btn-outline-primary" target="_blank">
+                            <i class="fas fa-external-link-alt me-1"></i>View in Bookings
+                        </a>
+                    </div>
+
+                    <!-- Booking records table — populated from weeklyReport via Thymeleaf fragments -->
+                    <!-- We embed ALL weeks' booking rows and show/hide based on selection -->
+                    <div class="table-responsive" style="max-height: 380px; overflow-y: auto;">
+                        <table class="table table-sm table-hover">
+                            <thead class="table-dark sticky-top">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Customer</th>
+                                    <th>Field</th>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody id="weekDetailRows">
+                                <!-- Rows injected by Thymeleaf per week -->
+                                <tr th:each="week : ${weeklyReport}"
+                                    th:attr="data-week=${week.week}"
+                                    class="week-detail-row d-none">
+                                    <td colspan="7">
+                                        <!-- Nested: for each booking in this week -->
+                                        <table class="table table-sm mb-0">
+                                            <tbody>
+                                                <tr th:each="b : ${week.bookings}" th:if="${week.bookings != null}">
+                                                    <td th:text="${b.bookingId}" class="text-primary fw-bold">1</td>
+                                                    <td th:text="${b.user?.username ?: 'N/A'}">User</td>
+                                                    <td th:text="${b.field?.name ?: 'N/A'}">Field A</td>
+                                                    <td th:text="${b.date}">2025-01-01</td>
+                                                    <td th:text="${b.startTime + ' - ' + b.endTime}">10:00-12:00</td>
+                                                    <td>
+                                                        <span class="badge bg-success" th:if="${b.status == 'APPROVED'}">Approved</span>
+                                                        <span class="badge bg-warning text-dark" th:if="${b.status == 'PENDING'}">Pending</span>
+                                                        <span class="badge bg-danger" th:if="${b.status == 'CANCELLED'}">Cancelled</span>
+                                                        <span class="badge bg-secondary" th:unless="${b.status == 'APPROVED' or b.status == 'PENDING' or b.status == 'CANCELLED'}" th:text="${b.status}">—</span>
+                                                    </td>
+                                                    <td class="text-end fw-bold text-success">RM <span th:text="${b.price}">0</span></td>
+                                                </tr>
+                                                <tr th:if="${week.bookings == null or #lists.isEmpty(week.bookings)}">
+                                                    <td colspan="7" class="text-center text-muted py-3">
+                                                        <i class="fas fa-inbox me-1"></i> No booking records for this week.
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr id="noWeekData" class="d-none">
+                                    <td colspan="7" class="text-center text-muted py-4">
+                                        <i class="fas fa-calendar-times fa-2x mb-2 d-block opacity-50"></i>
+                                        No detailed booking data available for this period.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+                <div class="modal-footer border-0">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -580,6 +716,38 @@
                 if (overlay) overlay.classList.remove('show');
             }
         });
+
+        // ===== View Details Modal Logic =====
+        function showWeekDetails(weekLabel, startDate, endDate, count, revenue, branchName) {
+            // Update header
+            document.getElementById('modalWeekLabel').textContent = weekLabel + ' — Booking History';
+            document.getElementById('modalBranchLabel').textContent = branchName;
+
+            // Update summary cards
+            document.getElementById('modalRevenue').textContent = 'RM ' + parseFloat(revenue).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            document.getElementById('modalCount').textContent = count + ' booking(s)';
+            document.getElementById('modalDateRange').textContent = (startDate !== 'N/A' ? startDate + ' – ' + endDate : 'No date info');
+
+            // Update "View in Bookings" link
+            document.getElementById('viewAllLink').href = '/manager/bookings';
+
+            // Show the matching week detail rows, hide all others
+            const allRows = document.querySelectorAll('.week-detail-row');
+            let found = false;
+            allRows.forEach(row => {
+                if (row.getAttribute('data-week') === weekLabel) {
+                    row.classList.remove('d-none');
+                    found = true;
+                } else {
+                    row.classList.add('d-none');
+                }
+            });
+
+            // Show/hide the "no data" fallback row
+            const noDataRow = document.getElementById('noWeekData');
+            if (noDataRow) noDataRow.classList.toggle('d-none', found);
+        }
+
     </script>
 </body>
 

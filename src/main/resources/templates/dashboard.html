@@ -470,21 +470,25 @@
         <div class="row g-3 mb-4 row-cols-1 row-cols-md-2 row-cols-xl-5">
             <!-- Total Bookings -->
             <div class="col">
-                <div class="stat-card">
+                <a href="/manager/bookings" style="text-decoration:none;">
+                <div class="stat-card" style="cursor:pointer;">
                     <div class="stat-label">Total Bookings</div>
                     <div class="stat-value" th:text="${totalBookings}">0</div>
                     <div class="stat-desc"><i class="fas fa-arrow-up"></i> All time record</div>
                     <i class="fas fa-calendar-check stat-icon-bg text-primary"></i>
                 </div>
+                </a>
             </div>
             <!-- Total Users -->
             <div class="col">
-                <div class="stat-card">
+                <a href="/manager/users" style="text-decoration:none;">
+                <div class="stat-card" style="cursor:pointer;">
                     <div class="stat-label">Registered Users</div>
                     <div class="stat-value" th:text="${totalUsers}">0</div>
                     <div class="stat-desc text-primary"><i class="fas fa-user-plus"></i> Active accounts</div>
                     <i class="fas fa-users stat-icon-bg text-success"></i>
                 </div>
+                </a>
             </div>
             <!-- Visits -->
             <div class="col">
@@ -497,22 +501,26 @@
             </div>
             <!-- Fields -->
             <div class="col">
-                <div class="stat-card">
+                <a href="/manager/fields" style="text-decoration:none;">
+                <div class="stat-card" style="cursor:pointer;">
                     <div class="stat-label">Active Fields</div>
                     <div class="stat-value" th:text="${totalFields}">0</div>
                     <div class="stat-desc text-warning"><i class="fas fa-map-marker-alt"></i> Across branches</div>
                     <img src="/favicon.png" style="height:32px;width:32px;object-fit:contain;margin-right:8px;border-radius:4px;vertical-align:middle;">
                 </div>
+                </a>
             </div>
             <!-- Total Revenue -->
             <div class="col">
-                <div class="stat-card">
+                <a href="/manager/payment-field" style="text-decoration:none;">
+                <div class="stat-card" style="cursor:pointer;">
                     <div class="stat-label">Total Revenue</div>
                     <div class="stat-value"
                         th:text="'RM ' + ${#numbers.formatDecimal(totalRevenue, 0, 'COMMA', 2, 'POINT')}">RM 0.00</div>
                     <div class="stat-desc text-success"><i class="fas fa-chart-line"></i> All time</div>
                     <i class="fas fa-money-bill-wave stat-icon-bg text-success"></i>
                 </div>
+                </a>
             </div>
         </div>
 
@@ -1359,6 +1367,7 @@
                 }
             });
         </script>
+    <script src="/js/table-enhancements.js"></script>
 </body>
 
 </html>

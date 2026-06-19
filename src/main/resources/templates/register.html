@@ -227,39 +227,47 @@
 
         <form action="/register" method="POST">
 
-            <div class="input-group mb-3">
+            <div class="input-group mb-1">
                 <span class="input-group-text border-0 rounded-start-1" style="background: #e9ecef;"><i
                         class="fas fa-id-card text-secondary"></i></span>
-                <input type="text" class="form-control m-0" name="username" placeholder="Team / Organization Name"
+                <input type="text" class="form-control m-0" id="usernameInput" name="username" placeholder="Team / Organization Name"
                     required>
             </div>
+            <div class="match-msg" id="usernameFeedback"></div>
 
-            <div class="input-group mb-3">
+            <div class="input-group mb-1">
                 <span class="input-group-text border-0 rounded-start-1" style="background: #e9ecef;"><i
                         class="fas fa-envelope text-secondary"></i></span>
-                <input type="email" class="form-control m-0" name="email" placeholder="Contact Email" required>
+                <input type="email" class="form-control m-0" id="emailInput" name="email" placeholder="Contact Email" required>
             </div>
+            <div class="match-msg" id="emailFeedback"></div>
 
-            <div class="input-group mb-3">
+            <div class="input-group mb-1">
                 <span class="input-group-text border-0 rounded-start-1" style="background: #e9ecef;"><i
                         class="fas fa-phone text-secondary"></i></span>
-                <input type="tel" class="form-control m-0" name="phoneNumber" placeholder="Phone Number"
+                <input type="tel" class="form-control m-0" id="phoneInput" name="phoneNumber" placeholder="Phone Number"
                     pattern="[0-9]+" inputmode="numeric" title="Please enter only digits" required>
             </div>
+            <div class="match-msg" id="phoneFeedback"></div>
 
             <!-- Create Password -->
-            <div class="input-group mb-2">
+            <div class="input-group mb-1">
                 <span class="input-group-text border-0 rounded-start-1" style="background: #e9ecef;"><i
                         class="fas fa-lock text-secondary"></i></span>
                 <div class="password-group flex-grow-1">
                     <input type="password" class="form-control m-0" id="passwordInput" name="password"
-                        placeholder="Create Password" required oninput="checkMatch()">
+                        placeholder="Create Password" required>
                     <button type="button" class="eye-btn" onclick="toggleEye('passwordInput', 'eyeIcon1')"
                         tabindex="-1" aria-label="Toggle password visibility">
                         <i class="fas fa-eye" id="eyeIcon1"></i>
                     </button>
                 </div>
             </div>
+            <!-- Password strength bar -->
+            <div style="height:4px;background:#e5e7eb;border-radius:2px;margin-bottom:4px;overflow:hidden;">
+                <div id="strengthBar" style="height:100%;width:0;transition:width 0.3s,background 0.3s;border-radius:2px;"></div>
+            </div>
+            <div class="match-msg" id="strengthLabel" style="font-weight:600;"></div>
 
             <!-- Confirm Password -->
             <div class="input-group mb-1">
@@ -267,7 +275,7 @@
                         class="fas fa-lock-open text-secondary"></i></span>
                 <div class="password-group flex-grow-1">
                     <input type="password" class="form-control m-0" id="confirmInput" name="confirmPassword"
-                        placeholder="Confirm Password" required oninput="checkMatch()">
+                        placeholder="Confirm Password" required>
                     <button type="button" class="eye-btn" onclick="toggleEye('confirmInput', 'eyeIcon2')"
                         tabindex="-1" aria-label="Toggle confirm password visibility">
                         <i class="fas fa-eye" id="eyeIcon2"></i>
@@ -281,6 +289,7 @@
 
             <button type="submit" class="btn btn-access">REGISTER TEAM</button>
 
+
             <div class="links-area">
                 Already have an account? <a href="/login">Login here</a>
             </div>
@@ -291,11 +300,9 @@
             <span class="text-white-50">Official Partner of Football Hub</span>
         </div>
 
-    </div>
-
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // ===== Eye toggle =====
         function toggleEye(inputId, iconId) {
             const input = document.getElementById(inputId);
             const icon  = document.getElementById(iconId);
@@ -308,27 +315,114 @@
             }
         }
 
-        function checkMatch() {
-            const pw      = document.getElementById('passwordInput').value;
-            const confirm = document.getElementById('confirmInput').value;
-            const msg     = document.getElementById('matchMsg');
-            const btn     = document.querySelector('.btn-access');
-            if (confirm.length === 0) { msg.textContent = ''; btn.disabled = false; return; }
-            if (pw === confirm) {
-                msg.className = 'match-msg match-ok';
-                msg.innerHTML = '<i class="fas fa-check-circle me-1"></i>Passwords match';
-                btn.disabled = false;
-            } else {
-                msg.className = 'match-msg match-fail';
-                msg.innerHTML = '<i class="fas fa-times-circle me-1"></i>Passwords do not match';
-                btn.disabled = true;
-            }
+        // ===== #18 Real-time field validation helpers =====
+        function setFieldState(input, isValid, msg) {
+            const existingFeedback = input.parentElement.querySelector('.fh-feedback')
+                || input.closest('.input-group')?.nextElementSibling;
+            input.style.borderBottom = isValid ? '2px solid #6ee7b7' : (msg ? '2px solid #fca5a5' : '');
         }
 
+        function showFeedback(containerId, msg, type) {
+            let el = document.getElementById(containerId);
+            if (!el) return;
+            el.innerHTML = msg ? `<i class="fas fa-${type === 'ok' ? 'check-circle' : 'times-circle'} me-1"></i>${msg}` : '';
+            el.className = 'match-msg ' + (type === 'ok' ? 'match-ok' : type === 'err' ? 'match-fail' : '');
+        }
+
+        // ===== Password Strength =====
+        function getStrength(pw) {
+            let score = 0;
+            if (pw.length >= 8) score++;
+            if (/[A-Z]/.test(pw)) score++;
+            if (/[0-9]/.test(pw)) score++;
+            if (/[^A-Za-z0-9]/.test(pw)) score++;
+            return score;
+        }
+        function updateStrengthBar(pw) {
+            const bar = document.getElementById('strengthBar');
+            const label = document.getElementById('strengthLabel');
+            if (!bar || !label) return;
+            const score = getStrength(pw);
+            const colors = ['#ef4444','#f59e0b','#3b82f6','#10b981'];
+            const labels = ['Weak','Fair','Good','Strong'];
+            const widths = ['25%','50%','75%','100%'];
+            bar.style.width = pw.length ? widths[score - 1] || '10%' : '0%';
+            bar.style.background = pw.length ? colors[score - 1] || '#ef4444' : 'transparent';
+            label.textContent = pw.length ? labels[score - 1] || 'Weak' : '';
+            label.style.color = pw.length ? colors[score - 1] || '#ef4444' : '';
+        }
+
+        // ===== Validate all fields live =====
+        function validateAll() {
+            const username = document.getElementById('usernameInput');
+            const email    = document.getElementById('emailInput');
+            const phone    = document.getElementById('phoneInput');
+            const pw       = document.getElementById('passwordInput');
+            const confirm  = document.getElementById('confirmInput');
+            const btn      = document.querySelector('.btn-access');
+
+            let allOk = true;
+
+            // Username
+            if (username) {
+                const ok = username.value.trim().length >= 3;
+                showFeedback('usernameFeedback', ok ? '' : 'Name must be at least 3 characters', ok ? 'ok' : 'err');
+                if (!ok && username.value.length > 0) allOk = false;
+            }
+
+            // Email
+            if (email) {
+                const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value);
+                showFeedback('emailFeedback', email.value && !ok ? 'Please enter a valid email address' : '', ok ? 'ok' : 'err');
+                if (email.value && !ok) allOk = false;
+            }
+
+            // Phone
+            if (phone) {
+                const ok = /^[0-9]{7,15}$/.test(phone.value);
+                showFeedback('phoneFeedback', phone.value && !ok ? 'Phone must be 7–15 digits only' : '', ok ? 'ok' : 'err');
+                if (phone.value && !ok) allOk = false;
+            }
+
+            // Password
+            if (pw) {
+                updateStrengthBar(pw.value);
+                const ok = pw.value.length >= 6;
+                if (pw.value && !ok) allOk = false;
+            }
+
+            // Confirm
+            if (pw && confirm) {
+                if (confirm.value.length === 0) {
+                    showFeedback('matchMsg', '', '');
+                } else if (pw.value === confirm.value) {
+                    showFeedback('matchMsg', 'Passwords match', 'ok');
+                } else {
+                    showFeedback('matchMsg', 'Passwords do not match', 'err');
+                    allOk = false;
+                }
+            }
+
+            if (btn) btn.disabled = !allOk;
+        }
+
+        // Attach listeners after DOM ready
+        document.addEventListener('DOMContentLoaded', () => {
+            ['usernameInput','emailInput','phoneInput','passwordInput','confirmInput'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.addEventListener('input', validateAll);
+            });
+        });
+
+        // Final submit guard
         document.querySelector('form').addEventListener('submit', function(e) {
             const pw      = document.getElementById('passwordInput').value;
             const confirm = document.getElementById('confirmInput').value;
-            if (pw !== confirm) { e.preventDefault(); checkMatch(); document.getElementById('confirmInput').focus(); }
+            if (pw !== confirm) {
+                e.preventDefault();
+                validateAll();
+                document.getElementById('confirmInput').focus();
+            }
         });
     </script>
 </body>
