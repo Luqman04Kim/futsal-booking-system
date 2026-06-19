@@ -1129,6 +1129,327 @@
                             </ul>
                         </div>
                         <div class="text-end mt-2">
+                            <small class="text-muted">Powered by Calendarific API</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <style>
+            .calendar-grid {
+                display: grid;
+                grid-template-columns: repeat(7, 1fr);
+                gap: 6px;
+            }
+
+            .calendar-day-header {
+                text-align: center;
+                font-weight: 700;
+                padding: 8px 0;
+                color: #475569;
+                text-transform: uppercase;
+                font-size: 0.8rem;
+                letter-spacing: 0.05em;
+                border-bottom: 2px solid #e2e8f0;
+                margin-bottom: 4px;
+            }
+
+            .calendar-day {
+                min-height: 90px;
+                border: 1px solid #e2e8f0;
+                border-radius: 10px;
+                padding: 6px;
+                position: relative;
+                background: #fff;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                transition: all 0.2s ease-in-out;
+                box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+            }
+
+            .calendar-day:hover {
+                background-color: #f8fafc;
+                border-color: #cbd5e1;
+                transform: translateY(-1px);
+                box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+            }
+
+            .calendar-day .day-number {
+                font-weight: 600;
+                color: #334155;
+                font-size: 0.9rem;
+                width: 24px;
+                height: 24px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 50%;
+            }
+
+            .calendar-day.today {
+                background-color: #eff6ff;
+                border-color: #bfdbfe;
+            }
+
+            .calendar-day.today .day-number {
+                background: #2563eb;
+                color: white;
+            }
+
+            .calendar-day.other-month {
+                opacity: 0.45;
+                background-color: #f8fafc;
+                border-color: #f1f5f9;
+            }
+            
+            .calendar-day.other-month:hover {
+                transform: none;
+                box-shadow: none;
+                border-color: #f1f5f9;
+            }
+
+            .holiday-wrapper {
+                display: flex;
+                flex-direction: column;
+                gap: 3px;
+                margin-top: auto;
+                width: 100%;
+            }
+
+            .holiday-badge {
+                font-size: 0.68rem;
+                font-weight: 500;
+                display: block;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                cursor: pointer;
+                padding: 3px 6px;
+                border-radius: 6px;
+                background-color: rgba(239, 68, 68, 0.08) !important;
+                color: #ef4444 !important;
+                border: 1px solid rgba(239, 68, 68, 0.15);
+                text-align: left;
+                margin-top: 2px;
+            }
+            
+            .holiday-badge:hover {
+                background-color: rgba(239, 68, 68, 0.15) !important;
+            }
+
+            /* Holiday Indicator Dot for Mobile */
+            .holiday-dot {
+                display: none;
+                width: 6px;
+                height: 6px;
+                background-color: #ef4444;
+                border-radius: 50%;
+                margin: 4px auto 0 auto;
+            }
+
+            /* Responsive Styles */
+            @media (max-width: 768px) {
+                .calendar-day {
+                    min-height: 52px;
+                    padding: 4px;
+                    align-items: center;
+                    justify-content: center;
+                }
+                
+                .calendar-day .day-number {
+                    font-size: 0.8rem;
+                    width: 22px;
+                    height: 22px;
+                }
+                
+                .calendar-day-header {
+                    padding: 6px 0;
+                    font-size: 0.75rem;
+                    font-weight: 600;
+                }
+
+                .holiday-wrapper {
+                    display: none; /* Hide the full holiday badge container */
+                }
+
+                /* Show red dot indicator for days with holiday */
+                .calendar-day.has-holiday .holiday-dot {
+                    display: block;
+                }
+                
+                .modal-body {
+                    padding: 1.25rem !important;
+                }
+                
+                #calendarMonthYear {
+                    font-size: 1.25rem;
+                }
+            }
+        </style>
+
+        <script>
+            // Calendar Logic (Robust)
+            let currentCalendarDate = new Date();
+            const CALENDAR_API_KEY = 'VcJpWp7BC4qUFhUXrM2jIBVwMeqiOLxB';
+            let holidaysCache = {};
+
+            function openCalendarModal() {
+                var myModal = new bootstrap.Modal(document.getElementById('calendarModal'));
+                myModal.show();
+                fetchHolidays(currentCalendarDate.getFullYear());
+                renderCalendar();
+            }
+
+            function changeMonth(delta) {
+                currentCalendarDate.setMonth(currentCalendarDate.getMonth() + delta);
+                renderCalendar();
+                fetchHolidays(currentCalendarDate.getFullYear());
+            }
+
+            async function fetchHolidays(year) {
+                // If we have cached holidays (and it's a valid array), use them
+                if (holidaysCache[year] && Array.isArray(holidaysCache[year]) && holidaysCache[year].length > 0) {
+                    return;
+                }
+
+                const holidayList = document.getElementById('holidayList');
+                holidayList.innerHTML = '<li class="list-group-item text-center text-muted py-2"><i class="fas fa-spinner fa-spin me-2"></i>Loading holidays...</li>';
+
+                try {
+                    // Using Malaysia (MY)
+                    console.log(`Fetching holidays for MY/${year}...`);
+                    const response = await fetch(`https://calendarific.com/api/v2/holidays?api_key=${CALENDAR_API_KEY}&country=MY&year=${year}`);
+                    const data = await response.json();
+
+                    if (data.meta && data.meta.code !== 200) {
+                        console.error('API Error:', data.meta);
+                        holidayList.innerHTML = `<li class="list-group-item text-danger">Error: ${data.meta.error_detail || 'Could not fetch holidays'}</li>`;
+                        return;
+                    }
+
+                    if (data.response && data.response.holidays) {
+                        holidaysCache[year] = data.response.holidays;
+                        console.log('Holidays fetched:', data.response.holidays.length);
+                        renderCalendar();
+                    } else {
+                        holidayList.innerHTML = '<li class="list-group-item text-muted">No holiday data received.</li>';
+                    }
+                } catch (error) {
+                    console.error('Error fetching holidays:', error);
+                    holidayList.innerHTML = '<li class="list-group-item text-danger">Failed to connect to holiday service.</li>';
+                }
+            }
+
+            function renderCalendar() {
+                const year = currentCalendarDate.getFullYear();
+                const month = currentCalendarDate.getMonth(); // 0-indexed (0=Jan)
+
+                document.getElementById('calendarMonthYear').textContent = new Date(year, month).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+                const firstDay = new Date(year, month, 1);
+                const lastDay = new Date(year, month + 1, 0);
+                const daysInMonth = lastDay.getDate();
+                const startingDay = firstDay.getDay(); // 0 = Sunday
+
+                const grid = document.getElementById('calendarGrid');
+                grid.innerHTML = `
+                <div class="calendar-day-header text-danger"><span class="d-none d-sm-inline">Sun</span><span class="d-inline d-sm-none">S</span></div>
+                <div class="calendar-day-header"><span class="d-none d-sm-inline">Mon</span><span class="d-inline d-sm-none">M</span></div>
+                <div class="calendar-day-header"><span class="d-none d-sm-inline">Tue</span><span class="d-inline d-sm-none">T</span></div>
+                <div class="calendar-day-header"><span class="d-none d-sm-inline">Wed</span><span class="d-inline d-sm-none">W</span></div>
+                <div class="calendar-day-header"><span class="d-none d-sm-inline">Thu</span><span class="d-inline d-sm-none">T</span></div>
+                <div class="calendar-day-header text-success"><span class="d-none d-sm-inline">Fri</span><span class="d-inline d-sm-none">F</span></div>
+                <div class="calendar-day-header"><span class="d-none d-sm-inline">Sat</span><span class="d-inline d-sm-none">S</span></div>
+            `;
+
+                // Previous month filler
+                const prevMonthLastDay = new Date(year, month, 0).getDate();
+                for (let i = 0; i < startingDay; i++) {
+                    grid.innerHTML += `
+                        <div class="calendar-day other-month">
+                            <div class="day-number">${prevMonthLastDay - startingDay + 1 + i}</div>
+                        </div>
+                    `;
+                }
+
+                // Current month days
+                const today = new Date();
+                const holidayList = document.getElementById('holidayList');
+                holidayList.innerHTML = '';
+                let hasHolidays = false;
+
+                const yearHolidays = holidaysCache[year] || [];
+
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const isToday = day === today.getDate() && month === today.getMonth() && year === today.getFullYear();
+
+                    // Check for holiday using robust datetime properties (1-indexed month)
+                    const currentMonthNum = month + 1;
+
+                    const dayHolidays = yearHolidays.filter(h => {
+                        // Ensure datetime property exists
+                        if (h.date && h.date.datetime) {
+                            return h.date.datetime.year === year &&
+                                h.date.datetime.month === currentMonthNum &&
+                                h.date.datetime.day === day;
+                        }
+                        return false;
+                    });
+
+                    let holidayHtml = '';
+                    dayHolidays.forEach(h => {
+                        holidayHtml += `<span class="badge bg-danger holiday-badge" title="${h.name}"><span class="holiday-text">${h.name}</span></span>`;
+
+                        const li = document.createElement('li');
+                        li.className = 'list-group-item d-flex justify-content-between align-items-center';
+                        li.innerHTML = `<span><strong class="text-primary">${day} ${new Date(year, month).toLocaleString('default', { month: 'short' })}:</strong> ${h.name}</span> <span class="badge bg-light text-dark border">${h.type[0] || 'Holiday'}</span>`;
+                        holidayList.appendChild(li);
+                        hasHolidays = true;
+                    });
+
+                    grid.innerHTML += `
+                    <div class="calendar-day ${isToday ? 'today' : ''} ${dayHolidays.length > 0 ? 'has-holiday' : ''}">
+                        <div class="day-number">${day}</div>
+                        <div class="holiday-wrapper">${holidayHtml}</div>
+                        <div class="holiday-dot"></div>
+                    </div>
+                `;
+                }
+
+                if (!hasHolidays) {
+                    if (!holidaysCache[year]) {
+                        holidayList.innerHTML = '<li class="list-group-item text-muted">Fetching data...</li>';
+                    } else {
+                        holidayList.innerHTML = '<li class="list-group-item text-center text-muted py-3">No holidays found for this month ??</li>';
+                    }
+                }
+
+
+                // Next month filler
+                const totalCells = startingDay + daysInMonth;
+                let nextMonthDays = 0;
+                if (totalCells <= 35) {
+                    nextMonthDays = 35 - totalCells;
+                } else {
+                    nextMonthDays = 42 - totalCells;
+                }
+
+                for (let i = 1; i <= nextMonthDays; i++) {
+                    grid.innerHTML += `
+                        <div class="calendar-day other-month">
+                            <div class="day-number">${i}</div>
+                        </div>
+                    `;
+                }
+            }
+        </script>
+        <!-- Bootstrap JS (Required for Modals) -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+        <!-- Mobile Sidebar Toggle -->
+        <script>
             function toggleSidebar() {
                 const sidebar = document.querySelector('.sidebar');
                 const overlay = document.getElementById('sidebarOverlay');

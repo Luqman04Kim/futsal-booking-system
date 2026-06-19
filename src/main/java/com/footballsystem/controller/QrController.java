@@ -151,7 +151,10 @@ public class QrController {
             if (booking.getDate().isBefore(today) ||
                     (booking.getDate().isEqual(today) && booking.getEndTime().isBefore(now))) {
                 response.put("success", false);
-                response.put("message", "QR Code was expired");
+                java.time.format.DateTimeFormatter dateFormatter = java.time.format.DateTimeFormatter.ofPattern("dd MMM yyyy");
+                java.time.format.DateTimeFormatter timeFormatter = java.time.format.DateTimeFormatter.ofPattern("hh:mm a");
+                String formattedSessionEnd = booking.getDate().format(dateFormatter) + " at " + booking.getEndTime().format(timeFormatter);
+                response.put("message", "QR Code was expired. Session ended on " + formattedSessionEnd);
                 return response;
             }
         }
