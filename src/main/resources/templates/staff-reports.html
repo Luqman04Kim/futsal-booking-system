@@ -205,6 +205,32 @@
             border-color: #3b82f6;
         }
 
+        /* Image Lightbox */
+        .lightbox-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .lightbox-overlay.show {
+            display: flex;
+        }
+
+        .lightbox-overlay img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
         /* Photo Upload */
         .photo-upload-area {
             border: 2px dashed #cbd5e1;
@@ -375,15 +401,16 @@
                         <td>
                             <div class="d-flex flex-wrap gap-1">
                                 <img th:if="${report.imageUrl != null and !report.imageUrl.isEmpty()}"
-                                    th:src="${report.imageUrl}" class="report-img" alt="1">
+                                    th:src="${report.imageUrl}" class="report-img" alt="1"
+                                    onclick="openLightbox(this.src)">
                                 <img th:if="${report.imageUrl2 != null}" th:src="${report.imageUrl2}" class="report-img"
-                                    alt="2">
+                                    alt="2" onclick="openLightbox(this.src)">
                                 <img th:if="${report.imageUrl3 != null}" th:src="${report.imageUrl3}" class="report-img"
-                                    alt="3">
+                                    alt="3" onclick="openLightbox(this.src)">
                                 <img th:if="${report.imageUrl4 != null}" th:src="${report.imageUrl4}" class="report-img"
-                                    alt="4">
+                                    alt="4" onclick="openLightbox(this.src)">
                                 <img th:if="${report.imageUrl5 != null}" th:src="${report.imageUrl5}" class="report-img"
-                                    alt="5">
+                                    alt="5" onclick="openLightbox(this.src)">
                                 <span th:if="${report.imageUrl == null or report.imageUrl.isEmpty()}"
                                     class="text-muted small">No photo</span>
                             </div>
@@ -518,7 +545,24 @@
             document.getElementById('submitReportForm').reset();
         });
     </script>
+    <!-- Image Lightbox Overlay -->
+    <div class="lightbox-overlay" id="lightbox" onclick="closeLightbox()">
+        <img id="lightboxImg" src="" alt="Full size image">
+    </div>
+
     <script>
+        /* ---- Image Lightbox ---- */
+        function openLightbox(src) {
+            document.getElementById('lightboxImg').src = src;
+            document.getElementById('lightbox').classList.add('show');
+        }
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.remove('show');
+        }
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeLightbox();
+        });
+
         // Mobile sidebar toggle
         function toggleSidebar() {
             var sidebar = document.querySelector('.sidebar');
