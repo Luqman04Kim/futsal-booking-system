@@ -769,8 +769,9 @@
                 <button class="send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
             </div>
         </div>
+    </div> <!-- /content -->
 
-        <!-- Scripts -->
+    <!-- Scripts -->
         <script th:inline="javascript">
             // --- Data ---
             const dailyRevenue = /*[[${dailyRevenue}]]*/ {};
@@ -1296,10 +1297,13 @@
             let currentCalendarDate = new Date();
             const CALENDAR_API_KEY = 'VcJpWp7BC4qUFhUXrM2jIBVwMeqiOLxB';
             let holidaysCache = {};
+            let calendarModalInstance = null;
 
             function openCalendarModal() {
-                var myModal = new bootstrap.Modal(document.getElementById('calendarModal'));
-                myModal.show();
+                if (!calendarModalInstance) {
+                    calendarModalInstance = new bootstrap.Modal(document.getElementById('calendarModal'));
+                }
+                calendarModalInstance.show();
                 fetchHolidays(currentCalendarDate.getFullYear());
                 renderCalendar();
             }

@@ -742,6 +742,11 @@
     </div>
 
     <!-- Task Image Modal (Shared) -->
+    <div class="modal fade" id="viewTaskImageModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-image me-2"></i>Task Proof Image</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body text-center">
@@ -983,202 +988,7 @@
             chatBody.appendChild(div);
             chatBody.scrollTop = chatBody.scrollHeight;
         }
-    </script>
-    <!-- Calendar Modal -->
-    <div class="modal fade" id="calendarModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
-            <div class="modal-content border-0 shadow">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title"><i class="fas fa-calendar-alt me-2"></i>Holiday Calendar (Malaysia)</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
-                </div>
-                <div class="modal-body p-4">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <button class="btn btn-outline-primary btn-sm" onclick="changeMonth(-1)"><i
-                                class="fas fa-chevron-left"></i></button>
-                        <h4 class="mb-0 fw-bold" id="calendarMonthYear">Month Year</h4>
-                        <button class="btn btn-outline-primary btn-sm" onclick="changeMonth(1)"><i
-                                class="fas fa-chevron-right"></i></button>
-                    </div>
-
-                    <div class="calendar-grid" id="calendarGrid">
-                        <!-- Calendar Days Generated Here -->
-                    </div>
-
-                    <div class="mt-4">
-                        <h6 class="fw-bold border-bottom pb-2">Holidays this Month:</h6>
-                        <ul class="list-group list-group-flush" id="holidayList"
-                            style="max-height: 200px; overflow-y: scroll;">
-                            <li class="list-group-item text-muted">No holidays found.</li>
-                        </ul>
-                    </div>
-                    <div class="text-end mt-2">
-                        <small class="text-muted">Powered by Calendarific API</small>
-                    </div>
-                    bgUrl = 'https://images.unsplash.com/photo-1534088568595-a066f410bcda?q=80&w=2051'; // Clouds
-                } else if (condition.includes('sun') || condition.includes('clear')) {
-                    bgUrl = 'https://images.unsplash.com/photo-1601297183305-6df142704ea2?q=80&w=1974'; // Sunny
-                } else {
-                    bgUrl = 'https://images.unsplash.com/photo-1513002749550-c59d786b8e6c?q=80&w=1974'; // Default Sky
-                }
-                document.getElementById('weatherBg').style.backgroundImage = `url('${bgUrl}')`;
-
-                // Update Hourly Forecast (every 2 hours)
-                const hourlyDiv = document.getElementById('hourlyForecast');
-                hourlyDiv.innerHTML = '';
-
-                const todayForecast = data.forecast.forecastday[0];
-                const currentHour = new Date().getHours();
-
-                // Get hours at 2-hour intervals (0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22)
-                const hourlyData = todayForecast.hour.filter((h, index) => index % 2 === 0);
-
-                hourlyData.forEach(hour => {
-                    const hourTime = new Date(hour.time);
-                    const hourNum = hourTime.getHours();
-                    const timeStr = hourNum.toString().padStart(2, '0') + ':00';
-                    const icon = `https:${hour.condition.icon}`;
-                    const temp = Math.round(hour.temp_c);
-                    const isPast = hourNum < currentHour;
-
-                    hourlyDiv.innerHTML += `
-                        <div class="text-center flex-shrink-0 ${isPast ? 'opacity-50' : ''}" style="min-width: 60px; background: rgba(255,255,255,0.1); border-radius: 10px; padding: 8px;">
-                            <p class="mb-1 small fw-bold ${hourNum === currentHour || hourNum === currentHour + 1 ? 'text-warning' : ''}">${timeStr}</p>
-                            <img src="${icon}" alt="icon" style="width: 28px; height: 28px;">
-                            <p class="mb-0 small fw-bold">${temp}°C</p>
-                        </div>
-                    `;
-                });
-
-                // Update 3-Day Forecast
-                const forecastDiv = document.getElementById('weatherForecast');
-                forecastDiv.innerHTML = '';
-                data.forecast.forecastday.forEach(day => {
-                    const date = new Date(day.date);
-                    const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
-                    const icon = `https:${day.day.condition.icon}`;
-                    const temp = Math.round(day.day.avgtemp_c);
-
-                    forecastDiv.innerHTML += `
-                        <div class="col-4">
-                            <p class="mb-1 small fw-bold">${dayName}</p>
-                            <img src="${icon}" alt="icon" style="width: 32px; height: 32px;">
-                            <p class="mb-0 small">${temp}°C</p>
-                        </div>
-                    `;
-                });
-
-            } catch (error) {
-                console.error('Failed to fetch weather:', error);
-                document.getElementById('weatherCondition').textContent = 'Unavailable';
-            }
-        }
-
-        function searchWeather() {
-            const input = document.getElementById('weatherSearchInput');
-            const location = input.value.trim();
-            if (location) {
-                fetchWeather(location);
-            }
-        }
-
-        function handleWeatherEnter(e) {
-            if (e.key === 'Enter') searchWeather();
-        }
-
-        // Fetch default weather on load
-        const savedLocation = localStorage.getItem('staffWeatherLocation');
-        if (savedLocation) {
-            weatherLocation = savedLocation;
-        }
-        fetchWeather(weatherLocation);
-
-        // --- Task Modals ---
-        function setTaskModal(button) {
-            var taskId = button.getAttribute('data-task-id');
-            var taskDesc = button.getAttribute('data-task-desc');
-            document.getElementById('modalTaskDesc').innerText = taskDesc;
-            // Update form action with taskId
-            document.getElementById('completeTaskForm').action = "/staff/task/complete/" + taskId;
-        }
-
-        function setTaskImageModal(button) {
-            var imgUrl = button.getAttribute('data-img-url');
-            var taskDesc = button.getAttribute('data-task-desc');
-            document.getElementById('modalTaskImage').src = imgUrl;
-            document.getElementById('modalTaskImageDesc').innerText = taskDesc;
-        }
-
-        function setDeleteTaskModal(button) {
-            var taskId = button.getAttribute('data-task-id');
-            var taskDesc = button.getAttribute('data-task-desc');
-            document.getElementById('deleteModalTaskDesc').innerText = taskDesc;
-            document.getElementById('deleteTaskForm').action = "/staff/task/delete/" + taskId;
-        }
-
-        // --- Chatbot Logic ---
-        function toggleChat() {
-            const chatWindow = document.getElementById('chatWindow');
-            if (chatWindow.style.display === 'none' || chatWindow.style.display === '') {
-                chatWindow.style.display = 'flex';
-            } else {
-                chatWindow.style.display = 'none';
-            }
-        }
-
-        function handleEnter(e) {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
-        }
-
-        async function sendMessage() {
-            const input = document.getElementById('chatInput');
-            const message = input.value.trim();
-            if (message === '') return;
-
-            // Add User Message
-            appendMessage(message, 'user-message');
-            input.value = '';
-
-            // Show Loading
-            const loadingId = 'loading-' + Date.now();
-            appendMessage('Thinking...', 'bot-message', loadingId);
-
-            try {
-                const response = await fetch('/api/chat/ask', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ question: message })
-                });
-                const data = await response.json();
-
-                // Remove Loading
-                const loadingElement = document.getElementById(loadingId);
-                if (loadingElement) loadingElement.remove();
-
-                // Add Bot Response
-                appendMessage(data.answer, 'bot-message');
-
-            } catch (error) {
-                console.error('Error:', error);
-                const loadingElement = document.getElementById(loadingId);
-                if (loadingElement) loadingElement.remove();
-                appendMessage('Sorry, I am having trouble connecting right now.', 'bot-message');
-            }
-        }
-
-        function appendMessage(text, className, id = null) {
-            const chatBody = document.getElementById('chatBody');
-            const div = document.createElement('div');
-            div.className = `chat-message ${className}`;
-            div.textContent = text;
-            if (id) div.id = id;
-            chatBody.appendChild(div);
-            chatBody.scrollTop = chatBody.scrollHeight;
-        }
-    </script>
+        </script>
     <!-- Calendar Modal -->
     <div class="modal fade" id="calendarModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
@@ -1378,11 +1188,12 @@
         // Calendar Logic (Robust)
         let currentCalendarDate = new Date();
         const CALENDAR_API_KEY = 'VcJpWp7BC4qUFhUXrM2jIBVwMeqiOLxB';
-        let holidaysCache = {};
-
+        let calendarModalInstance = null;
         function openCalendarModal() {
-            var myModal = new bootstrap.Modal(document.getElementById('calendarModal'));
-            myModal.show();
+            if (!calendarModalInstance) {
+                calendarModalInstance = new bootstrap.Modal(document.getElementById('calendarModal'));
+            }
+            calendarModalInstance.show();
             fetchHolidays(currentCalendarDate.getFullYear());
             renderCalendar();
         }
