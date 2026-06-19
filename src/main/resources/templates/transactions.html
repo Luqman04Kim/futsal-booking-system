@@ -277,9 +277,7 @@
     <div class="content">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="fw-bold text-primary">Transaction History</h2>
-            <button class="btn btn-success" onclick="downloadPDF()">
-                <i class="fas fa-file-pdf me-2"></i>Download PDF
-            </button>
+
         </div>
 
         <!-- Search and Filter -->
@@ -411,8 +409,6 @@
         </div>
     </div>
 
-    <!-- jsPDF for PDF generation -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
@@ -426,136 +422,6 @@
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('deleted') === 'true') {
             // Optional: You could add a toast here if you have a toast container
-        }
-
-        function downloadPDF() {
-            try {
-                if (typeof window.jspdf === 'undefined') {
-                    alert('PDF library is still loading. Please wait a moment and try again.');
-                    return;
-                }
-
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF();
-
-                // Title
-                doc.setFontSize(20);
-                doc.setTextColor(0, 77, 152);
-                doc.text('FOOTBALLHUB', 14, 20);
-
-                doc.setFontSize(14);
-                doc.setTextColor(60, 60, 60);
-                doc.text('Transaction History Report', 14, 30);
-
-                // Date
-                doc.setFontSize(10);
-                doc.setTextColor(100);
-                doc.text('Generated: ' + new Date().toLocaleString('en-MY'), 14, 38);
-
-                // Line separator
-                doc.setDrawColor(0, 77, 152);
-                doc.setLineWidth(0.5);
-                doc.line(14, 42, 196, 42);
-
-                // Get table data
-                const table = document.getElementById('transactionsTable');
-                const tbody = table.querySelector('tbody');
-                const trs = tbody.querySelectorAll('tr');
-
-                // Table headers
-                const headers = ['ID', 'Customer', 'Phone', 'Amount', 'Type', 'Date'];
-                const colWidths = [20, 40, 35, 30, 35, 30];
-                let startX = 14;
-                let startY = 50;
-                const rowHeight = 8;
-
-                // Draw header background
-                doc.setFillColor(15, 23, 42);
-                doc.rect(startX, startY - 5, 182, rowHeight, 'F');
-
-                // Draw headers
-                doc.setFontSize(9);
-                doc.setTextColor(255, 255, 255);
-                let xPos = startX + 2;
-                headers.forEach((header, i) => {
-                    doc.text(header, xPos, startY);
-                    xPos += colWidths[i];
-                });
-
-                startY += rowHeight;
-                let rowCount = 0;
-
-                // Draw data rows
-                trs.forEach(tr => {
-                    if (tr.querySelector('td[colspan]')) return;
-
-                    const cells = tr.querySelectorAll('td');
-                    if (cells.length >= 7) {
-                        // Check if we need a new page
-                        if (startY > 270) {
-                            doc.addPage();
-                            startY = 20;
-                        }
-
-                        // Alternate row colors
-                        if (rowCount % 2 === 0) {
-                            doc.setFillColor(248, 250, 252);
-                            doc.rect(startX, startY - 5, 182, rowHeight, 'F');
-                        }
-
-                        doc.setTextColor(30, 30, 30);
-                        doc.setFontSize(8);
-                        xPos = startX + 2;
-
-                        // ID
-                        doc.text(cells[0].textContent.trim(), xPos, startY);
-                        xPos += colWidths[0];
-
-                        // Customer (truncate if too long)
-                        let customer = cells[1].textContent.trim();
-                        if (customer.length > 20) customer = customer.substring(0, 18) + '...';
-                        doc.text(customer, xPos, startY);
-                        xPos += colWidths[1];
-
-                        // Phone
-                        doc.text(cells[2].textContent.trim(), xPos, startY);
-                        xPos += colWidths[2];
-
-                        // Amount
-                        doc.setTextColor(16, 185, 129);
-                        doc.text('RM ' + cells[3].textContent.replace('RM', '').trim(), xPos, startY);
-                        xPos += colWidths[3];
-
-                        // Type (Booking/VIP)
-                        doc.setTextColor(30, 30, 30);
-                        doc.text(cells[4].textContent.trim(), xPos, startY);
-                        xPos += colWidths[4];
-
-                        // Date
-                        doc.text(cells[6].textContent.trim().split('\n')[0], xPos, startY);
-
-                        startY += rowHeight;
-                        rowCount++;
-                    }
-                });
-
-                // Footer
-                const pageCount = doc.internal.getNumberOfPages();
-                for (let i = 1; i <= pageCount; i++) {
-                    doc.setPage(i);
-                    doc.setFontSize(8);
-                    doc.setTextColor(150);
-                    doc.text('Page ' + i + ' of ' + pageCount, 105, 290, { align: 'center' });
-                    doc.text('FOOTBALLHUB - Football Field Management System', 105, 295, { align: 'center' });
-                }
-
-                // Download
-                doc.save('FOOTBALLHUB_Transactions_' + new Date().toISOString().split('T')[0] + '.pdf');
-
-            } catch (error) {
-                console.error('PDF Generation Error:', error);
-                alert('Error generating PDF: ' + error.message);
-            }
         }
     </script>
     <script>
