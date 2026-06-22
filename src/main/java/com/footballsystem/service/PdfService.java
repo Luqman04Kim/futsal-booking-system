@@ -56,7 +56,16 @@ public class PdfService {
 
             // LOGO
             try {
-                Image logo = Image.getInstance("LOGO WEB.png");
+                Image logo = null;
+                try (java.io.InputStream is = getClass().getResourceAsStream("/static/LOGO WEB.png")) {
+                    if (is != null) {
+                        byte[] bytes = is.readAllBytes();
+                        logo = Image.getInstance(bytes);
+                    }
+                }
+                if (logo == null) {
+                    logo = Image.getInstance("LOGO WEB.png");
+                }
                 logo.setAlignment(Element.ALIGN_CENTER);
                 float width = logo.getWidth();
                 float height = logo.getHeight();

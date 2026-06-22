@@ -399,7 +399,8 @@ public class PaymentController {
                                 user = userRepository.findById(user.getUserId()).orElse(user);
                                 user.setMembershipPlan(plan);
                                 user.setVipStartDate(java.time.LocalDateTime.now());
-                                user.setVipExpiryDate(java.time.LocalDateTime.now().plusYears(1));
+                                int years = plan.getPeriodYears() != null ? plan.getPeriodYears() : 1;
+                                user.setVipExpiryDate(java.time.LocalDateTime.now().plusYears(years));
                                 user.setVip(true); // Enable VIP legacy flag as well
                                 userRepository.save(user);
                                 System.out.println("User " + user.getUsername() + " successfully subscribed to plan: " + plan.getName());

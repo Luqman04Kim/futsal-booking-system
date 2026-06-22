@@ -183,7 +183,7 @@
                 <span class="fw-bold fs-4 text-warning">RM <span th:text="${plan.price != null ? #numbers.formatDecimal(plan.price, 1, 2) : '0.00'}">1000.00</span></span>
             </div>
 
-            <p class="text-center text-muted small mt-2">Valid for 365 days from today.</p>
+            <p class="text-center text-muted small mt-2">Valid for <span th:text="${plan.periodYears != null ? plan.periodYears + ' year(s)' : '1 year'}">1 year</span> from today.</p>
         </div>
 
         <!-- Payment Form -->

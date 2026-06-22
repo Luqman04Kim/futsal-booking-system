@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
@@ -324,7 +324,7 @@
         <div class="mt-3">
             <a href="/manager/dashboard"><i class="fas fa-th-large"></i> Dashboard</a>
             <a href="/manager/bookings"><i class="fas fa-calendar-check"></i> Bookings</a>
-            <a href="/manager/payment-field"><i class="fas fa-credit-card"></i> Payments</a>
+            <a href="/manager/deposit-settings"><i class="fas fa-credit-card"></i> Deposit</a>
             <a href="/manager/transactions"><i class="fas fa-exchange-alt"></i> Transactions</a>
             <a href="/manager/performance"><i class="fas fa-chart-line"></i> Performance</a>
             <a href="#branchMenu" data-bs-toggle="collapse" role="button" aria-expanded="false" class="sidebar-parent d-flex justify-content-between align-items-center">
@@ -359,7 +359,7 @@
                     <a href="/manager/reports" class="active"><i class="fas fa-chart-bar"></i> Reports</a>
                 </div>
             </div>
-            <a href="/manager/deposit-settings"><i class="fas fa-cogs"></i> Deposit Settings</a>
+
         </div>
         <div style="margin-top: auto; padding-bottom: 20px;">
             <a href="/logout" class="text-danger"><i class="fas fa-sign-out-alt"></i> Logout</a>
@@ -734,7 +734,7 @@
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header bg-dark text-white">
-                        <h5 class="modal-title"><i class="fas fa-info-circle me-2"></i>Report Details â€” <span th:text="${report.formattedReportId}">R1</span></h5>
+                        <h5 class="modal-title"><i class="fas fa-info-circle me-2"></i>Report Details — <span th:text="${report.formattedReportId}">R1</span></h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
@@ -743,7 +743,7 @@
                             <div class="col-md-6">
                                 <p><strong>Location:</strong>
                                     <span th:if="${report.branch != null}" th:text="${report.branch.name}">Branch</span>
-                                    <span th:if="${report.field != null}"> â€” <span th:text="${report.field.name}">Field</span></span>
+                                    <span th:if="${report.field != null}"> — <span th:text="${report.field.name}">Field</span></span>
                                 </p>
                                 <p><strong>Reporter:</strong>
                                     <span th:if="${report.reporter != null}" th:text="${report.reporter.username}">Staff</span>
@@ -959,9 +959,9 @@
             row.classList.toggle('table-success', cb.checked);
         }
 
-        // Confirm Selection: copy popup checks â†’ hidden form inputs, update badges, close popup
+        // Confirm Selection: copy popup checks → hidden form inputs, update badges, close popup
         function confirmStaffSelection(reportId) {
-            // Sync popup â†’ hidden inputs
+            // Sync popup → hidden inputs
             const popupCheckboxes = document.querySelectorAll(
                 '#viewStaffModal' + reportId + ' input[type="checkbox"][data-report-id]'
             );

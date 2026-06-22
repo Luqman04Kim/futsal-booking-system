@@ -907,6 +907,7 @@ public class ManagerController {
     @PostMapping("/memberships/plans/add")
     public String addMembershipPlan(@RequestParam String name, @RequestParam(required = false) String description,
                                     @RequestParam Double price, @RequestParam int discountPercentage,
+                                    @RequestParam(defaultValue = "1") Integer periodYears,
                                     @RequestParam(defaultValue = "false") boolean freeAddonsIncluded,
                                     @RequestParam(defaultValue = "false") boolean priorityBooking,
                                     @RequestParam(required = false) String perks,
@@ -922,6 +923,7 @@ public class ManagerController {
         plan.setActive(active);
         plan.setCardColor(cardColor);
         plan.setPerks(perks);
+        plan.setPeriodYears(periodYears);
 
         if (freeServiceIds != null) {
             java.util.List<com.footballsystem.model.InventoryItem> items = new java.util.ArrayList<>();
@@ -938,6 +940,7 @@ public class ManagerController {
     @PostMapping("/memberships/plans/edit")
     public String editMembershipPlan(@RequestParam Long id, @RequestParam String name, @RequestParam(required = false) String description,
                                      @RequestParam Double price, @RequestParam int discountPercentage,
+                                     @RequestParam(defaultValue = "1") Integer periodYears,
                                      @RequestParam(defaultValue = "false") boolean freeAddonsIncluded,
                                      @RequestParam(defaultValue = "false") boolean priorityBooking,
                                      @RequestParam(required = false) String perks,
@@ -953,6 +956,7 @@ public class ManagerController {
             plan.setDescription(description);
             plan.setPrice(price);
             plan.setDiscountPercentage(discountPercentage);
+            plan.setPeriodYears(periodYears);
             plan.setFreeAddonsIncluded(freeAddonsIncluded);
             plan.setPriorityBooking(priorityBooking);
             plan.setPerks(perks);
@@ -1001,16 +1005,22 @@ public class ManagerController {
         Optional<User> userOpt = userRepository.findById(userId);
         if (userOpt.isPresent()) {
             User user = userOpt.get();
+            int years = 1;
             if (planId != null) {
-                membershipPlanRepository.findById(planId).ifPresent(plan -> {
+                com.footballsystem.model.MembershipPlan plan = membershipPlanRepository.findById(planId).orElse(null);
+                if (plan != null) {
                     user.setMembershipPlan(plan);
-                });
+                    user.setVip(true);
+                    if (plan.getPeriodYears() != null) {
+                        years = plan.getPeriodYears();
+                    }
+                }
             } else {
                 // Fallback to legacy
                 user.setVip(true);
             }
             user.setVipStartDate(java.time.LocalDateTime.now());
-            user.setVipExpiryDate(java.time.LocalDateTime.now().plusYears(1));
+            user.setVipExpiryDate(java.time.LocalDateTime.now().plusYears(years));
             userRepository.save(user);
         }
         return "redirect:/manager/memberships";
@@ -1115,31 +1125,8 @@ public class ManagerController {
     // PAYMENT MANAGEMENT
     // =========================
     @GetMapping("/payment-field")
-    public String showPaymentFieldPage(@RequestParam(required = false) String search,
-            @RequestParam(required = false) Long branchId,
-            HttpSession session, Model model) {
-        if (!isManager(session))
-            return "redirect:/login";
-
-        List<Booking> allBookings = bookingRepository.findAll();
-        Stream<Booking> stream = allBookings.stream()
-                .filter(b -> b.getField() != null);
-
-        if (search != null && !search.isEmpty()) {
-            stream = stream.filter(b -> String.valueOf(b.getBookingId()).contains(search));
-        }
-
-        if (branchId != null) {
-            stream = stream.filter(b -> b.getField().getBranch() != null &&
-                    b.getField().getBranch().getBranchId().equals(branchId));
-        }
-
-        List<Booking> fieldBookings = stream.collect(Collectors.toList());
-
-        model.addAttribute("bookings", fieldBookings);
-        model.addAttribute("branches", branchRepository.findAll());
-        model.addAttribute("selectedBranchId", branchId);
-        return "paymentfield";
+    public String showPaymentFieldPage() {
+        return "redirect:/manager/deposit-settings";
     }
 
     @PostMapping("/payment/update")
@@ -1151,7 +1138,7 @@ public class ManagerController {
             booking.setPaymentStatus("Full Payment");
             bookingRepository.save(booking);
         }
-        return "redirect:/manager/payment-field";
+        return "redirect:/manager/deposit-settings";
     }
 
     @GetMapping("/payment/delete/{id}")
@@ -1159,7 +1146,7 @@ public class ManagerController {
         if (!isManager(session))
             return "redirect:/login";
         bookingRepository.deleteById(id);
-        return "redirect:/manager/payment-field?deleted=true";
+        return "redirect:/manager/deposit-settings?deleted=true";
     }
 
     // =========================
@@ -1821,7 +1808,9 @@ public class ManagerController {
     }
 
     @GetMapping("/deposit-settings")
-    public String showDepositSettings(HttpSession session, Model model) {
+    public String showDepositSettings(@RequestParam(required = false) String search,
+                                      @RequestParam(required = false) Long branchId,
+                                      HttpSession session, Model model) {
         if (!isManager(session))
             return "redirect:/login";
 
@@ -1832,6 +1821,25 @@ public class ManagerController {
 
         model.addAttribute("depositAmount", depositAmount);
         model.addAttribute("halfPriceEnabled", halfPriceEnabled);
+
+        List<Booking> allBookings = bookingRepository.findAll();
+        java.util.stream.Stream<Booking> stream = allBookings.stream()
+                .filter(b -> b.getField() != null);
+
+        if (search != null && !search.isEmpty()) {
+            stream = stream.filter(b -> String.valueOf(b.getBookingId()).contains(search));
+        }
+
+        if (branchId != null) {
+            stream = stream.filter(b -> b.getField().getBranch() != null &&
+                    b.getField().getBranch().getBranchId().equals(branchId));
+        }
+
+        List<Booking> fieldBookings = stream.collect(Collectors.toList());
+
+        model.addAttribute("bookings", fieldBookings);
+        model.addAttribute("branches", branchRepository.findAll());
+        model.addAttribute("selectedBranchId", branchId);
         return "manager-deposit-settings";
     }
 

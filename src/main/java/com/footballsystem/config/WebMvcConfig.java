@@ -24,10 +24,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 Files.createDirectories(uploadPath);
             }
             // Use Path.toUri() to get a properly formatted file URI (works on Windows + Linux)
-            String uploadLocation = uploadPath.toUri().toString();
-            if (!uploadLocation.endsWith("/")) {
-                uploadLocation += "/";
-            }
+            String uploadLocation = "file:" + uploadPath.toAbsolutePath().toString().replace("\\", "/") + "/";
             registry.addResourceHandler("/uploads/**")
                     .addResourceLocations(uploadLocation);
 
@@ -35,10 +32,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
             // This keeps existing DB image URLs (/img/branch_xxx.png) working
             Path staticImgPath = Paths.get("src/main/resources/static/img").toAbsolutePath().normalize();
             if (Files.exists(staticImgPath)) {
-                String staticImgLocation = staticImgPath.toUri().toString();
-                if (!staticImgLocation.endsWith("/")) {
-                    staticImgLocation += "/";
-                }
+                String staticImgLocation = "file:" + staticImgPath.toAbsolutePath().toString().replace("\\", "/") + "/";
                 registry.addResourceHandler("/img/**")
                         .addResourceLocations(staticImgLocation, "classpath:/static/img/");
             }

@@ -329,7 +329,7 @@
                     <a href="/home" class="btn btn-outline-light btn-sm rounded-pill px-3 w-fit-content">
                         <i class="fas fa-home me-1"></i> Home
                     </a>
-                    <a href="/customer/branches" class="btn btn-outline-light btn-sm rounded-pill px-3 w-fit-content active">
+                    <a href="/customer/branches" class="btn btn-outline-light btn-sm rounded-pill px-3 w-fit-content active d-lg-none">
                         <i class="fas fa-map-marker-alt me-1"></i> Branches
                     </a>
 
@@ -382,8 +382,8 @@
             <div th:each="branch : ${branches}" class="col-md-6 col-lg-4">
                 <div class="branch-grid-card">
                     <div class="branch-img-wrapper">
-                        <img th:src="${branch.imageUrl != null and branch.imageUrl != '' ? branch.imageUrl : 'https://images.unsplash.com/photo-1575361204480-aadea25e6e68'}" 
-                             onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1575361204480-aadea25e6e68';" 
+                        <img th:src="${branch.imageUrl != null and branch.imageUrl != '' ? branch.imageUrl : 'https://images.unsplash.com/photo-1522778119026-d647f0565c6a'}" 
+                             onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1522778119026-d647f0565c6a';" 
                              class="branch-img" alt="Branch Cover">
                     </div>
                     <div class="branch-card-body">

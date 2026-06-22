@@ -43,6 +43,9 @@ public class MembershipPlan {
     @Column(name = "card_color")
     private String cardColor = "#fbbf24";
 
+    @Column(name = "period_years")
+    private Integer periodYears = 1;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
@@ -115,5 +118,13 @@ public class MembershipPlan {
             }
         }
         return sb.toString();
+    }
+
+    public Integer getPeriodYears() {
+        return periodYears != null ? periodYears : 1;
+    }
+
+    public void setPeriodYears(Integer periodYears) {
+        this.periodYears = periodYears;
     }
 }

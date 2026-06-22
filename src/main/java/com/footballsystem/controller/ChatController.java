@@ -5,6 +5,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.http.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import jakarta.servlet.http.HttpSession;
 import java.util.Map;
 import java.util.HashMap;
@@ -78,18 +79,29 @@ public class ChatController {
     @Autowired
     private ProblemReportRepository problemReportRepository;
 
-    // API Key
-    private static final String API_KEY = "AIzaSyATamWFVHrr-hWmjrcboPPbLh0Sr7RcUSo";
-
-    // Using 'gemini-1.5-flash' (stable model)
-    private static final String GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key="
-            + API_KEY;
+    @Value("${gemini.api.key:}")
+    private String geminiApiKey;
 
     @PostMapping("/ask")
     @SuppressWarnings("unchecked")
     public Map<String, String> askGemini(@RequestBody Map<String, String> payload, HttpSession session) {
         String userQuestion = payload.get("question");
         String botResponse = "I'm having trouble connecting to the AI service right now.";
+
+        // Resolve Gemini API key dynamically to avoid hardcoded secrets in git history
+        String activeApiKey = systemSettingRepository.findById("gemini_api_key")
+                .map(com.footballsystem.model.SystemSetting::getSettingValue)
+                .orElse(null);
+
+        if (activeApiKey == null || activeApiKey.trim().isEmpty()) {
+            activeApiKey = System.getenv("GEMINI_API_KEY");
+        }
+
+        if (activeApiKey == null || activeApiKey.trim().isEmpty()) {
+            activeApiKey = geminiApiKey;
+        }
+
+        String geminiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + activeApiKey;
 
         System.out.println("Received question: " + userQuestion);
 
@@ -360,7 +372,7 @@ public class ChatController {
 
             System.out.println("Sending request to Gemini");
 
-            ResponseEntity<String> responseEntity = restTemplate.postForEntity(GEMINI_URL, entity, String.class);
+            ResponseEntity<String> responseEntity = restTemplate.postForEntity(geminiUrl, entity, String.class);
             String rawResponse = responseEntity.getBody();
 
             // 8. Parse Response

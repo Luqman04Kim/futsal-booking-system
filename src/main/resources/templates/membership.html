@@ -460,7 +460,7 @@
                     <a href="/home" class="btn btn-outline-light btn-sm rounded-pill px-3 w-fit-content">
                         <i class="fas fa-home me-1"></i> Home
                     </a>
-                    <a href="/customer/branches" class="btn btn-outline-light btn-sm rounded-pill px-3 w-fit-content">
+                    <a href="/customer/branches" class="btn btn-outline-light btn-sm rounded-pill px-3 w-fit-content d-lg-none">
                         <i class="fas fa-map-marker-alt me-1"></i> Branches
                     </a>
 
@@ -603,7 +603,7 @@
                         <h3 class="fw-bold" th:text="${plan.name}">VIP Member</h3>
                         <div class="plan-price">RM <span th:text="${plan.price != null ? #numbers.formatDecimal(plan.price, 1, 0) : '0'}">1000</span></div>
                         <p class="fw-semibold mb-2" style="color: var(--plan-color); font-size: 0.95rem;">
-                            <i class="far fa-clock me-1"></i> Membership for 1 year
+                            <i class="far fa-clock me-1"></i> Membership for <span th:text="${plan.periodYears != null ? plan.periodYears + ' year(s)' : '1 year'}">1 year</span>
                         </p>
                         <p class="mb-0 text-white-50" th:text="${plan.description}">For true legends</p>
                     </div>

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
@@ -304,12 +304,12 @@
 
             if (data.success) {
                 box.classList.add('result-success');
-                icon.textContent = '✅';
+                icon.textContent = '?';
                 title.textContent = 'Check-in Successful!';
                 title.style.color = '#065f46';
             } else {
                 box.classList.add('result-error');
-                icon.textContent = '❌';
+                icon.textContent = '?';
                 title.textContent = data.message || 'QR Code was invalid';
                 title.style.color = '#991b1b';
             }
@@ -319,7 +319,7 @@
                     <div class="mt-2 p-3 rounded" style="background:rgba(255,255,255,0.7);">
                         <div><strong>Booking #</strong>${data.bookingId}</div>
                         <div><strong>Customer</strong>${data.customer || ''}</div>
-                        <div><strong>Field</strong>${data.field || ''} ${data.branch ? '— ' + data.branch : ''}</div>
+                        <div><strong>Field</strong>${data.field || ''} ${data.branch ? '� ' + data.branch : ''}</div>
                         <div><strong>Date</strong>${data.date || ''}</div>
                         <div><strong>Time</strong>${data.time || ''}</div>
                         <div><strong>Status</strong>${data.status || ''}</div>

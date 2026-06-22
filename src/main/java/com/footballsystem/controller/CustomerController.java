@@ -146,6 +146,7 @@ public class CustomerController {
                     .collect(Collectors.toList());
 
             // Update status display
+            java.util.Map<Long, List<Review>> fieldReviews = new java.util.HashMap<>();
             for (Field field : fields) {
                 boolean isBookedNow = bookingRepository.findAll().stream()
                         .anyMatch(b -> b.getField() != null && b.getField().getFieldId().equals(field.getFieldId())
@@ -157,13 +158,21 @@ public class CustomerController {
                 if (isBookedNow && !"Maintenance".equals(field.getStatus())) {
                     field.setStatus("Booked");
                 }
+
+                // Query and sort reviews for this field
+                List<Review> reviews = reviewRepository.findByField(field);
+                reviews.sort((r1, r2) -> Integer.compare(r2.getRating(), r1.getRating()));
+                List<Review> top3Reviews = reviews.stream().limit(3).collect(Collectors.toList());
+                fieldReviews.put(field.getFieldId(), top3Reviews);
             }
 
             model.addAttribute("fields", fields);
+            model.addAttribute("fieldReviews", fieldReviews);
             model.addAttribute("selectedBranchId", branchId);
             branchRepository.findById(branchId).ifPresent(b -> model.addAttribute("branchName", b.getName()));
         } else {
             model.addAttribute("fields", List.of());
+            model.addAttribute("fieldReviews", new java.util.HashMap<>());
         }
         return "home";
     }
