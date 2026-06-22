@@ -54,6 +54,24 @@ public class PdfService {
             Font boldFont = new Font(Font.HELVETICA, 12, Font.BOLD);
             Font smallFont = new Font(Font.HELVETICA, 10, Font.NORMAL, Color.GRAY);
 
+            // LOGO
+            try {
+                Image logo = Image.getInstance("LOGO WEB.png");
+                logo.setAlignment(Element.ALIGN_CENTER);
+                float width = logo.getWidth();
+                float height = logo.getHeight();
+                float targetHeight = 60f;
+                float targetWidth = (width / height) * targetHeight;
+                logo.scaleAbsolute(targetWidth, targetHeight);
+                document.add(logo);
+                
+                Paragraph space = new Paragraph(" ", new Font(Font.HELVETICA, 8));
+                space.setAlignment(Element.ALIGN_CENTER);
+                document.add(space);
+            } catch (Exception logoEx) {
+                System.err.println("Could not load receipt logo: " + logoEx.getMessage());
+            }
+
             // HEADER
             PdfPTable headerTable = new PdfPTable(1);
             headerTable.setWidthPercentage(100);

@@ -242,6 +242,9 @@
                 <a href="/home" class="btn btn-outline-light btn-sm rounded-pill px-3">
                     <i class="fas fa-home me-1"></i> Home
                 </a>
+                <a href="/customer/branches" class="btn btn-outline-light btn-sm rounded-pill px-3">
+                    <i class="fas fa-map-marker-alt me-1"></i> Branches
+                </a>
 
                 <!-- Profile Dropdown -->
                 <div class="dropdown profile-dropdown" th:if="${session.loggedUser != null}">
@@ -251,21 +254,17 @@
                         <span th:text="${session.loggedUser.username}">User</span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="/profile"><i class="fas fa-user-cog me-2"></i> Manage
-                                Profile</a></li>
-                        <li><a class="dropdown-item" href="/my-team"><i class="fas fa-users-cog me-2"></i> My Team
-                                Info</a></li>
-                        <li><a class="dropdown-item" href="/my-bookings"><i class="fas fa-calendar-alt me-2"></i> My
-                                Bookings</a></li>
-                        <li><a class="dropdown-item" href="/membership"><i class="fas fa-crown me-2"></i> Membership</a>
-                        </li>
-                        <li><a class="dropdown-item" href="/contact"><i class="fas fa-envelope me-2"></i> Contact Us</a>
-                        </li>
+                        <li><a class="dropdown-item" href="/home"><i class="fas fa-home me-2"></i> Home</a></li>
+                        <li><a class="dropdown-item" href="/customer/branches"><i class="fas fa-map-marker-alt me-2"></i> Branches</a></li>
+                        <li><a class="dropdown-item" href="/profile"><i class="fas fa-user-cog me-2"></i> Manage Profile</a></li>
+                        <li><a class="dropdown-item" href="/my-team"><i class="fas fa-users-cog me-2"></i> My Team Info</a></li>
+                        <li><a class="dropdown-item" href="/my-bookings"><i class="fas fa-calendar-alt me-2"></i> My Bookings</a></li>
+                        <li><a class="dropdown-item" href="/membership"><i class="fas fa-crown me-2"></i> Membership</a></li>
+                        <li><a class="dropdown-item" href="/contact"><i class="fas fa-envelope me-2"></i> Contact Us</a></li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
-                        <li><a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt me-2"></i> Logout</a>
-                        </li>
+                        <li><a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
                     </ul>
                 </div>
             </div>
@@ -487,7 +486,7 @@
                                             <span class="d-block fw-bold text-dark">Pay Deposit</span>
                                             <small class="text-muted">Secure your slot now, pay balance later</small>
                                         </div>
-                                        <span class="fw-bold text-primary fs-5">RM 200.00</span>
+                                        <span class="fw-bold text-primary fs-5" th:text="'RM ' + ${#numbers.formatDecimal(depositAmount, 1, 2)}">RM 200.00</span>
                                     </div>
                                 </label>
                             </div>
@@ -569,6 +568,7 @@
         /*<![CDATA[*/
         const totalPrice = /*[[${totalPrice}]]*/ 0;
         const remainingBalance = /*[[${remainingBalance}]]*/ 0;
+        const depositAmount = /*[[${depositAmount}]]*/ 200.00;
         const isOverdue = /*[[${isOverduePayment}]]*/ false;
         const displayPrice = isOverdue ? remainingBalance : totalPrice;
         const bookingCreatedAt = /*[[${bookingCreatedAtMillis}]]*/ null;
@@ -591,7 +591,7 @@
             } else {
                 document.getElementById('payDeposit').checked = true;
                 document.getElementById('payDeposit').closest('.payment-option').classList.add('selected');
-                if (amountDisplay) amountDisplay.innerText = '200.00';
+                if (amountDisplay) amountDisplay.innerText = depositAmount.toFixed(2);
             }
         }
 

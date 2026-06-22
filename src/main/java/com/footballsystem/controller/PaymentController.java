@@ -41,6 +41,24 @@ public class PaymentController {
     private UserRepository userRepository;
     @Autowired
     private MembershipPlanRepository membershipPlanRepository;
+    @Autowired
+    private com.footballsystem.repository.SystemSettingRepository systemSettingRepository;
+
+    private double getRequiredDeposit(double totalPrice) {
+        double configDeposit = Double.parseDouble(systemSettingRepository.findById("deposit_amount")
+                .map(com.footballsystem.model.SystemSetting::getSettingValue).orElse("200.0"));
+        boolean halfPriceEnabled = "true".equals(systemSettingRepository.findById("deposit_half_price_enabled")
+                .map(com.footballsystem.model.SystemSetting::getSettingValue).orElse("false"));
+        
+        if (totalPrice < configDeposit) {
+            if (halfPriceEnabled) {
+                return totalPrice / 2.0;
+            } else {
+                return totalPrice;
+            }
+        }
+        return configDeposit;
+    }
 
     private boolean isCustomer(HttpSession session) {
         Object roleObj = session.getAttribute("role");
@@ -169,7 +187,9 @@ public class PaymentController {
                     && "Pay Deposit".equals(booking.getPaymentStatus());
             model.addAttribute("isOverduePayment", isOverduePayment);
 
-            double remainingBalance = isOverduePayment ? Math.max(0, totalPrice - 200.0) : totalPrice;
+            double depositAmount = getRequiredDeposit(totalPrice);
+            double remainingBalance = isOverduePayment ? Math.max(0, totalPrice - depositAmount) : totalPrice;
+            model.addAttribute("depositAmount", depositAmount);
             model.addAttribute("remainingBalance", remainingBalance);
 
             // Pass gateway error message if redirected back after failure
@@ -203,12 +223,13 @@ public class PaymentController {
 
         // Determine the amount to charge
         double totalPrice = booking.getPrice() != null ? booking.getPrice() : 0.0;
+        double depositAmount = getRequiredDeposit(totalPrice);
         double chargeAmount;
         if ("DEPOSIT".equals(paymentType)) {
-            chargeAmount = 200.0;
+            chargeAmount = depositAmount;
         } else if ("BALANCE".equals(paymentType)) {
-            // Paying outstanding balance (totalPrice - already paid RM200)
-            chargeAmount = Math.max(0, totalPrice - 200.0);
+            // Paying outstanding balance (totalPrice - already paid deposit)
+            chargeAmount = Math.max(0, totalPrice - depositAmount);
         } else {
             chargeAmount = totalPrice;
         }

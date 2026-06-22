@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
@@ -259,6 +259,7 @@
                     <a href="/manager/reports"><i class="fas fa-chart-bar"></i> Reports</a>
                 </div>
             </div>
+            <a href="/manager/deposit-settings"><i class="fas fa-cogs"></i> Deposit Settings</a>
         </div>
         <div style="margin-top: auto; padding-bottom: 20px;">
             <a href="/logout" class="text-danger"><i class="fas fa-sign-out-alt"></i> Logout</a>
@@ -301,8 +302,6 @@
                     <!-- Filter Dropdown -->
                     <select name="filter" class="form-select w-auto" onchange="this.form.submit()">
                         <option value="ALL" th:selected="${selectedFilter == 'ALL'}">All Roles</option>
-                        <option value="MANAGER" th:selected="${selectedFilter == 'MANAGER'}">Managers</option>
-                        <option value="MANAGER" th:selected="${selectedFilter == 'MANAGER'}">Managers</option>
                         <option value="MAINTENANCE TEAM" th:selected="${selectedFilter == 'MAINTENANCE TEAM'}">Maintenance Team</option>
                         <option value="OTHER" th:selected="${selectedFilter == 'OTHER'}">Other Staff</option>
                     </select>
@@ -474,12 +473,11 @@
                                 <label class="form-label">Position</label>
                                 <select id="positionSelect" class="form-select mb-2"
                                     onchange="togglePositionInput(this)">
-                                    <option value="MANAGER">Manager</option>
                                     <option value="MAINTENANCE TEAM">Maintenance Team</option>
                                     <option value="OTHER">Other (Specify)</option>
                                 </select>
                                 <input type="text" id="positionInput" name="position" class="form-control"
-                                    value="MANAGER" placeholder="Enter custom position" style="display: none;"
+                                    value="MAINTENANCE TEAM" placeholder="Enter custom position" style="display: none;"
                                     required />
                             </div>
 
@@ -629,39 +627,11 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body text-center">
-                        <img id="proofImage" src="" class="img-fluid rounded shadow-sm" alt="Proof Image" />
                         <p id="proofDesc" class="mt-3 text-muted"></p>
-                                    <option value="MAINTENANCE TEAM">Maintenance Team</option>
-                                    <option value="OTHER">Other (Specify)</option>
-                                </select>
-                                <input type="text" id="positionInput" name="position" class="form-control"
-                                    value="MANAGER" placeholder="Enter custom position" style="display: none;"
-                                    required />
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">Assign Branch (Optional)</label>
-                                <select name="branchId" class="form-select">
-                                    <option value="">-- Unassigned --</option>
-                                    <option th:each="branch : ${branches}" th:value="${branch.branchId}"
-                                        th:text="${branch.name}">Branch</option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Phone Number</label>
-                                <input type="text" name="phoneNumber" class="form-control" pattern="[0-9]+"
-                                    inputmode="numeric" title="Please enter only digits" />
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Profile Photo</label>
-                                <input type="file" name="imageFile" class="form-control" accept="image/*" />
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-success">Hire Staff</button>
-                        </div>
-                    </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
                 </div>
             </div>
         </div>

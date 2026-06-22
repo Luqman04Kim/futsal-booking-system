@@ -42,6 +42,25 @@ public class ChatController {
     private BookingRepository bookingRepository;
 
     @Autowired
+    private com.footballsystem.repository.SystemSettingRepository systemSettingRepository;
+
+    private double getRequiredDeposit(double totalPrice) {
+        double configDeposit = Double.parseDouble(systemSettingRepository.findById("deposit_amount")
+                .map(com.footballsystem.model.SystemSetting::getSettingValue).orElse("200.0"));
+        boolean halfPriceEnabled = "true".equals(systemSettingRepository.findById("deposit_half_price_enabled")
+                .map(com.footballsystem.model.SystemSetting::getSettingValue).orElse("false"));
+        
+        if (totalPrice < configDeposit) {
+            if (halfPriceEnabled) {
+                return totalPrice / 2.0;
+            } else {
+                return totalPrice;
+            }
+        }
+        return configDeposit;
+    }
+
+    @Autowired
     private UserRepository userRepository;
 
     @Autowired
@@ -129,15 +148,16 @@ public class ChatController {
                         if ("Pay Deposit".equals(b.getPaymentStatus()) && "APPROVED".equals(b.getStatus())) {
                             if (b.getDate() != null && b.getEndTime() != null) {
                                 LocalDateTime matchEnd = LocalDateTime.of(b.getDate(), b.getEndTime());
+                                double depositAmount = getRequiredDeposit(price);
                                 if (nowTime.isAfter(matchEnd)) {
                                     hasOverdue = true;
-                                    double outstanding = Math.max(0, price - 200.0);
+                                    double outstanding = Math.max(0, price - depositAmount);
                                     totalDueAmount += outstanding;
                                     dataBuilder.append(String.format("    [OVERDUE PAYMENT] Match ended on %s but remaining balance of RM %.2f is unpaid!\n", matchEnd.toString(), outstanding));
                                 } else {
-                                    double outstanding = Math.max(0, price - 200.0);
+                                    double outstanding = Math.max(0, price - depositAmount);
                                     totalDueAmount += outstanding;
-                                    dataBuilder.append(String.format("    [UPCOMING MATCH BALANCE DUE] Deposit of RM 200.00 paid. Remaining balance of RM %.2f due after match.\n", outstanding));
+                                    dataBuilder.append(String.format("    [UPCOMING MATCH BALANCE DUE] Deposit of RM %.2f paid. Remaining balance of RM %.2f due after match.\n", depositAmount, outstanding));
                                 }
                             }
                         }

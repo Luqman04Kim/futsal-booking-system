@@ -258,7 +258,7 @@ public class Booking {
         if (now.isAfter(endDateTime)) {
             return "Finished";
         } else if (now.isAfter(startDateTime) || now.isEqual(startDateTime)) {
-            return "In Match";
+            return "Playing";
         } else {
             return "Upcoming";
         }

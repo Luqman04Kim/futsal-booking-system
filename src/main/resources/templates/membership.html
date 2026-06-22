@@ -460,6 +460,9 @@
                     <a href="/home" class="btn btn-outline-light btn-sm rounded-pill px-3 w-fit-content">
                         <i class="fas fa-home me-1"></i> Home
                     </a>
+                    <a href="/customer/branches" class="btn btn-outline-light btn-sm rounded-pill px-3 w-fit-content">
+                        <i class="fas fa-map-marker-alt me-1"></i> Branches
+                    </a>
 
                     <!-- VIP STATUS -->
                     <div th:if="${session.loggedUser != null && session.loggedUser.vip}">
@@ -480,6 +483,7 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" href="/home"><i class="fas fa-home me-2"></i> Home</a></li>
+                            <li><a class="dropdown-item" href="/customer/branches"><i class="fas fa-map-marker-alt me-2"></i> Branches</a></li>
                             <li><a class="dropdown-item" href="/profile"><i class="fas fa-user-cog me-2"></i> Manage Profile</a></li>
                             <li><a class="dropdown-item" href="/my-team"><i class="fas fa-users-cog me-2"></i> My Team Info</a></li>
                             <li><a class="dropdown-item" href="/my-bookings"><i class="fas fa-calendar-alt me-2"></i> My Bookings</a></li>
@@ -507,6 +511,50 @@
         <div th:if="${error}" class="alert alert-danger alert-dismissible fade show max-width-container mx-auto mb-4" role="alert" style="max-width: 800px;">
             <i class="fas fa-exclamation-circle me-2"></i> <span th:text="${error}"></span>
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Active Membership Perks Details Card -->
+        <div th:if="${session.loggedUser != null && session.loggedUser.membershipPlan != null}" class="card mb-5 mx-auto custom-plan-card" 
+             style="max-width: 800px; border-radius: 20px;"
+             th:styleappend="'--plan-color: ' + ${session.loggedUser.membershipPlan.cardColor != null ? session.loggedUser.membershipPlan.cardColor : '#fbbf24'} + ';'">
+            <div class="card-body p-4 p-md-5">
+                <div class="row align-items-center">
+                    <div class="col-md-7">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <i class="fas fa-crown fa-2x text-warning" th:style="'color: ' + ${session.loggedUser.membershipPlan.cardColor != null ? session.loggedUser.membershipPlan.cardColor : '#fbbf24'} + ' !important;'"></i>
+                            <div>
+                                <span class="badge bg-success text-uppercase mb-1">Active Plan</span>
+                                <h2 class="fw-bold mb-0 text-white" th:text="${session.loggedUser.membershipPlan.name}">VIP Member</h2>
+                            </div>
+                        </div>
+                        <p class="text-white-50 fs-5 mb-4" th:text="${session.loggedUser.membershipPlan.description}">Your active benefits details</p>
+                        
+                        <div class="mb-4 mb-md-0">
+                            <p class="small text-muted mb-1"><i class="far fa-calendar-alt me-2"></i>Expiry Date</p>
+                            <h5 class="fw-bold text-white" th:text="${#temporals.format(session.loggedUser.vipExpiryDate, 'dd MMMM yyyy, hh:mm a')}">31-12-2026</h5>
+                        </div>
+                    </div>
+                    <div class="col-md-5 border-start border-secondary ps-md-4 mt-4 mt-md-0">
+                        <h4 class="fw-bold text-white mb-3">Your Benefits:</h4>
+                        <div class="feature-item mb-2">
+                            <i class="fas fa-check-circle" th:style="'color: ' + ${session.loggedUser.membershipPlan.cardColor != null ? session.loggedUser.membershipPlan.cardColor : '#fbbf24'} + ';'"></i>
+                            <strong><span th:text="${session.loggedUser.membershipPlan.discountPercentage}">10</span>% Discount</strong> on all field bookings
+                        </div>
+                        <div th:each="perk : ${session.loggedUser.membershipPlan.perksList}" class="feature-item mb-2">
+                            <i class="fas fa-check-circle" th:style="'color: ' + ${session.loggedUser.membershipPlan.cardColor != null ? session.loggedUser.membershipPlan.cardColor : '#fbbf24'} + ';'"></i>
+                            <span th:text="${perk}">Perk</span>
+                        </div>
+                        <div th:each="svc : ${session.loggedUser.membershipPlan.freeServices}" class="feature-item mb-2">
+                            <i class="fas fa-check-circle" th:style="'color: ' + ${session.loggedUser.membershipPlan.cardColor != null ? session.loggedUser.membershipPlan.cardColor : '#fbbf24'} + ';'"></i>
+                            <span>Free <span th:text="${svc.name}">Service</span></span>
+                        </div>
+                        <div class="feature-item mb-2">
+                            <i class="fas fa-check-circle" th:style="'color: ' + ${session.loggedUser.membershipPlan.cardColor != null ? session.loggedUser.membershipPlan.cardColor : '#fbbf24'} + ';'"></i>
+                            <span>Exclusive Profile Badge</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="row justify-content-center g-4">

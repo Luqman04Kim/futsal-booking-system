@@ -60,6 +60,24 @@ public class CustomerController {
     private com.footballsystem.repository.MembershipPlanRepository membershipPlanRepository;
     @Autowired
     private com.footballsystem.service.ToyyibPayService toyyibPayService;
+    @Autowired
+    private com.footballsystem.repository.SystemSettingRepository systemSettingRepository;
+
+    private double getRequiredDeposit(double totalPrice) {
+        double configDeposit = Double.parseDouble(systemSettingRepository.findById("deposit_amount")
+                .map(com.footballsystem.model.SystemSetting::getSettingValue).orElse("200.0"));
+        boolean halfPriceEnabled = "true".equals(systemSettingRepository.findById("deposit_half_price_enabled")
+                .map(com.footballsystem.model.SystemSetting::getSettingValue).orElse("false"));
+        
+        if (totalPrice < configDeposit) {
+            if (halfPriceEnabled) {
+                return totalPrice / 2.0;
+            } else {
+                return totalPrice;
+            }
+        }
+        return configDeposit;
+    }
 
     // Helper: Security Check
     private boolean isCustomer(HttpSession session) {
@@ -167,9 +185,14 @@ public class CustomerController {
                 model.addAttribute("hasOverduePayments", true);
 
                 // Calculate total due amount (remaining balance after deposit)
-                double totalDue = overdueBookings.stream()
-                        .mapToDouble(b -> b.getPrice() != null ? b.getPrice() - 200.0 : 0.0)
-                        .sum();
+                double totalDue = 0.0;
+                java.util.Map<Long, Double> overdueBalances = new java.util.HashMap<>();
+                for (Booking b : overdueBookings) {
+                    double outstanding = b.getPrice() != null ? b.getPrice() - getRequiredDeposit(b.getPrice()) : 0.0;
+                    overdueBalances.put(b.getBookingId(), outstanding);
+                    totalDue += outstanding;
+                }
+                model.addAttribute("overdueBalances", overdueBalances);
                 model.addAttribute("totalDueAmount", totalDue);
             }
         }
@@ -674,5 +697,14 @@ public class CustomerController {
             return "redirect:/login";
         model.addAttribute("branches", branchRepository.findAll());
         return "contact";
+    }
+
+    // BRANCHES PORTAL PAGE
+    @GetMapping("/customer/branches")
+    public String showCustomerBranches(HttpSession session, Model model) {
+        if (!isCustomer(session))
+            return "redirect:/login";
+        model.addAttribute("branches", branchRepository.findAll());
+        return "customer-branches";
     }
 }

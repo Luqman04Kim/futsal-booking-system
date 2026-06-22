@@ -47,6 +47,8 @@ public class ManagerController {
     private com.footballsystem.repository.MembershipPlanRepository membershipPlanRepository;
     @Autowired
     private com.footballsystem.repository.InventoryItemRepository inventoryItemRepository;
+    @Autowired
+    private com.footballsystem.repository.SystemSettingRepository systemSettingRepository;
 
     // Upload directory — set via application.properties (upload.dir)
     // Defaults to a folder called "uploads" next to the running JAR
@@ -1816,5 +1818,49 @@ public class ManagerController {
         model.addAttribute("chartYear", filterYear);
 
         return "performance";
+    }
+
+    @GetMapping("/deposit-settings")
+    public String showDepositSettings(HttpSession session, Model model) {
+        if (!isManager(session))
+            return "redirect:/login";
+
+        String depositAmount = systemSettingRepository.findById("deposit_amount")
+                .map(SystemSetting::getSettingValue).orElse("200.0");
+        String halfPriceEnabled = systemSettingRepository.findById("deposit_half_price_enabled")
+                .map(SystemSetting::getSettingValue).orElse("false");
+
+        model.addAttribute("depositAmount", depositAmount);
+        model.addAttribute("halfPriceEnabled", halfPriceEnabled);
+        return "manager-deposit-settings";
+    }
+
+    @PostMapping("/deposit-settings/save")
+    public String saveDepositSettings(@RequestParam String depositAmount,
+                                      @RequestParam(required = false) String halfPriceEnabled,
+                                      HttpSession session, RedirectAttributes redirectAttributes) {
+        if (!isManager(session))
+            return "redirect:/login";
+
+        try {
+            double amount = Double.parseDouble(depositAmount);
+            if (amount < 0) {
+                redirectAttributes.addFlashAttribute("error", "Deposit amount cannot be negative.");
+                return "redirect:/manager/deposit-settings";
+            }
+        } catch (NumberFormatException e) {
+            redirectAttributes.addFlashAttribute("error", "Invalid deposit amount format.");
+            return "redirect:/manager/deposit-settings";
+        }
+
+        SystemSetting amountSetting = new SystemSetting("deposit_amount", depositAmount);
+        SystemSetting toggleSetting = new SystemSetting("deposit_half_price_enabled", 
+                (halfPriceEnabled != null && halfPriceEnabled.equals("true")) ? "true" : "false");
+
+        systemSettingRepository.save(amountSetting);
+        systemSettingRepository.save(toggleSetting);
+
+        redirectAttributes.addFlashAttribute("success", "Deposit settings updated successfully!");
+        return "redirect:/manager/deposit-settings";
     }
 }

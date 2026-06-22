@@ -512,6 +512,9 @@
                     <a href="/home" class="btn btn-outline-light btn-sm rounded-pill px-3 w-fit-content">
                         <i class="fas fa-home me-1"></i> Home
                     </a>
+                    <a href="/customer/branches" class="btn btn-outline-light btn-sm rounded-pill px-3 w-fit-content">
+                        <i class="fas fa-map-marker-alt me-1"></i> Branches
+                    </a>
 
                     <!-- VIP STATUS -->
                     <div th:if="${session.loggedUser != null && session.loggedUser.vip}">
@@ -532,6 +535,7 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" href="/home"><i class="fas fa-home me-2"></i> Home</a></li>
+                            <li><a class="dropdown-item" href="/customer/branches"><i class="fas fa-map-marker-alt me-2"></i> Branches</a></li>
                             <li><a class="dropdown-item" href="/profile"><i class="fas fa-user-cog me-2"></i> Manage Profile</a></li>
                             <li><a class="dropdown-item" href="/my-team"><i class="fas fa-users-cog me-2"></i> My Team Info</a></li>
                             <li><a class="dropdown-item" href="/my-bookings"><i class="fas fa-calendar-alt me-2"></i> My Bookings</a></li>
@@ -597,7 +601,7 @@
                                     <td class="fw-bold" th:text="'#' + ${booking.bookingId}">#1</td>
                                     <td th:text="${booking.field != null ? booking.field.name : 'N/A'}">Field A</td>
                                     <td th:text="${booking.date}">2024-01-01</td>
-                                    <td class="text-danger fw-bold" th:text="'RM ' + ${booking.price - 200}">RM 0.00
+                                    <td class="text-danger fw-bold" th:text="'RM ' + ${#numbers.formatDecimal(overdueBalances.get(booking.bookingId), 1, 'COMMA', 2, 'POINT')}">RM 0.00
                                     </td>
                                     <td>
                                         <a th:href="@{/payment/{id}(id=${booking.bookingId})}"
