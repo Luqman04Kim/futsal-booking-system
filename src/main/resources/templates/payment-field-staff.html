@@ -338,17 +338,15 @@
                         </td>
                         <td>
                             <span th:if="${booking.paymentStatus == 'Pay Deposit'}"
-                                class="status-badge status-deposit">Pay
-                                Deposit</span>
+                                class="status-badge status-deposit">Pay Deposit</span>
                             <span th:if="${booking.paymentStatus == 'Full Payment'}"
-                                class="status-badge status-full">Full
-                                Payment</span>
-                            <span th:if="${booking.paymentStatus == null}"
-                                class="status-badge status-unknown">Unknown</span>
+                                class="status-badge status-full">Full Payment</span>
+                            <span th:if="${booking.paymentStatus != 'Pay Deposit' && booking.paymentStatus != 'Full Payment'}"
+                                class="status-badge status-unknown" th:text="${booking.paymentStatus != null ? booking.paymentStatus : 'Unpaid'}">Unpaid</span>
                         </td>
                         <td>
                             <div class="d-flex gap-2">
-                                <button th:if="${booking.paymentStatus == 'Pay Deposit'}" type="button"
+                                <button th:if="${booking.paymentStatus != 'Full Payment'}" type="button"
                                     class="btn btn-success btn-action" th:attr="data-booking-id=${booking.bookingId}"
                                     onclick="confirmUpdate(this)" title="Update to Full Payment">
                                     <i class="fas fa-check-circle"></i>

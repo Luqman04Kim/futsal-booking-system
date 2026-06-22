@@ -780,7 +780,7 @@ public class StaffController {
         if (!isStaff(session))
             return "redirect:/login";
         Booking booking = bookingRepository.findById(bookingId).orElse(null);
-        if (booking != null && "Pay Deposit".equals(booking.getPaymentStatus())) {
+        if (booking != null && !"Full Payment".equals(booking.getPaymentStatus())) {
             booking.setPaymentStatus("Full Payment");
             bookingRepository.save(booking);
         }

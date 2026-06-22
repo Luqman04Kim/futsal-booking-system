@@ -700,21 +700,35 @@
 
                     <div class="d-flex flex-column gap-2 mb-4" th:if="${!#lists.isEmpty(inventoryItems)}">
                         <div th:each="item, iterStat : ${inventoryItems}"
+                             th:with="isFreeByMembership=${userFreeServiceIds != null && #lists.contains(userFreeServiceIds, item.id)}"
                              class="addon-card"
-                             th:classappend="${iterStat.index >= 3 ? 'd-none hidden-addon' : ''}"
-                             th:attr="onclick='toggleInventoryAddon(' + ${item.id} + ', ' + (${item.free} ? 0 : (${item.hasDiscount()} ? ${item.discountedPrice} : ${item.basePrice})) + ', this, \'' + ${#strings.escapeJavaScript(item.name)} + '\')', data-is-referee=${#strings.containsIgnoreCase(item.name, 'Referee')}">
+                             th:classappend="${(iterStat.index >= 3 ? 'd-none hidden-addon' : '') + (isFreeByMembership ? ' selected' : '')}"
+                             th:attr="onclick=${isFreeByMembership} ? '' : 'toggleInventoryAddon(' + ${item.id} + ', ' + (${item.free} ? 0 : (${item.hasDiscount()} ? ${item.discountedPrice} : ${item.basePrice})) + ', this, \'' + ${#strings.escapeJavaScript(item.name)} + '\')', data-is-referee=${#strings.containsIgnoreCase(item.name, 'Referee') && !isFreeByMembership}">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox"
                                        th:id="'inv_check_' + ${item.id}"
+                                       th:checked="${isFreeByMembership}"
+                                       th:disabled="${isFreeByMembership}"
                                        style="pointer-events:none;"/>
                             </div>
+                            <!-- Hidden input to submit free membership service automatically -->
+                            <input th:if="${isFreeByMembership}" type="hidden" name="serviceIds" th:value="${item.id}" />
+
                             <i th:class="${item.iconClass} + ' addon-icon'"></i>
                             <div class="flex-grow-1">
                                 <h6 class="mb-0 fw-bold" th:text="${item.name}">Service</h6>
                                 <small class="text-muted" th:text="${item.description != null ? item.description : ''}"></small>
                             </div>
                             <!-- Price display -->
-                            <span th:if="${item.free}" class="ms-auto text-end">
+                            <span th:if="${isFreeByMembership}" class="ms-auto text-end">
+                                <span th:if="${item.basePrice != null && item.basePrice > 0}" 
+                                      style="text-decoration:line-through;color:#94a3b8;font-size:.85rem;margin-right:4px;"
+                                      th:text="'RM ' + ${#numbers.formatDecimal(item.basePrice,1,'COMMA',2,'POINT')}">RM 0.00</span>
+                                <span class="fw-bold text-success">
+                                    <i class="fas fa-gift me-1"></i>FREE (Membership)
+                                </span>
+                            </span>
+                            <span th:if="${!isFreeByMembership && item.free}" class="ms-auto text-end">
                                 <span th:if="${item.basePrice != null && item.basePrice > 0}" 
                                       style="text-decoration:line-through;color:#94a3b8;font-size:.85rem;margin-right:4px;"
                                       th:text="'RM ' + ${#numbers.formatDecimal(item.basePrice,1,'COMMA',2,'POINT')}">RM 0.00</span>
@@ -722,7 +736,7 @@
                                     <i class="fas fa-gift me-1"></i>FREE
                                 </span>
                             </span>
-                            <span th:if="${!item.free && item.hasDiscount()}" class="ms-auto text-end">
+                            <span th:if="${!isFreeByMembership && !item.free && item.hasDiscount()}" class="ms-auto text-end">
                                 <span style="text-decoration:line-through;color:#94a3b8;font-size:.85rem;margin-right:4px;"
                                       th:text="'RM ' + ${#numbers.formatDecimal(item.basePrice,1,'COMMA',2,'POINT')}">RM 0.00</span>
                                 <span class="fw-bold text-success"
@@ -730,7 +744,7 @@
                                 <span style="background:linear-gradient(135deg,#f59e0b,#d97706);color:white;font-size:.65rem;font-weight:700;padding:2px 7px;border-radius:20px;display:block;width:fit-content;margin-left:auto;margin-top:2px;"
                                       th:text="${item.discountPercentage} + '% OFF'">0% OFF</span>
                             </span>
-                            <span th:if="${!item.free && !item.hasDiscount()}" class="fw-bold text-primary ms-auto"
+                            <span th:if="${!isFreeByMembership && !item.free && !item.hasDiscount()}" class="fw-bold text-primary ms-auto"
                                   th:text="'+ RM ' + ${#numbers.formatDecimal(item.basePrice,1,'COMMA',2,'POINT')}">+ RM 0.00</span>
                         </div>
                         
@@ -751,6 +765,58 @@
                         Confirm Booking <i class="fas fa-check-circle ms-2"></i>
                     </button>
                 </form>
+            </div>
+        </div>
+
+        <!-- Reviews Section -->
+        <div class="card w-100 mt-4 p-4 shadow" style="border-radius: 20px; border: 2px solid var(--barca-blue); background: white; color: #333; margin-bottom: 30px;">
+            <h4 class="section-title mb-4" style="border-bottom: 2px solid #eee; padding-bottom: 10px; color: var(--barca-blue); font-family: 'Chakra Petch'; font-weight: 700; text-transform: uppercase;">
+                <i class="fas fa-comments me-2 text-warning"></i>Customer Reviews (<span th:text="${#lists.size(reviews)}">0</span>)
+            </h4>
+            
+            <!-- Average Rating -->
+            <div class="d-flex align-items-center gap-3 mb-4 p-3 bg-light rounded" style="width: fit-content;">
+                <h2 class="fw-bold mb-0 text-primary" th:text="${#numbers.formatDecimal(averageRating, 1, 1)}">0.0</h2>
+                <div>
+                    <div class="text-warning">
+                        <i th:class="${averageRating >= 1} ? 'fas fa-star' : (${averageRating > 0} ? 'fas fa-star-half-alt' : 'far fa-star')"></i>
+                        <i th:class="${averageRating >= 2} ? 'fas fa-star' : (${averageRating > 1} ? 'fas fa-star-half-alt' : 'far fa-star')"></i>
+                        <i th:class="${averageRating >= 3} ? 'fas fa-star' : (${averageRating > 2} ? 'fas fa-star-half-alt' : 'far fa-star')"></i>
+                        <i th:class="${averageRating >= 4} ? 'fas fa-star' : (${averageRating > 3} ? 'fas fa-star-half-alt' : 'far fa-star')"></i>
+                        <i th:class="${averageRating >= 5} ? 'fas fa-star' : (${averageRating > 4} ? 'fas fa-star-half-alt' : 'far fa-star')"></i>
+                    </div>
+                    <small class="text-muted">Average Rating</small>
+                </div>
+            </div>
+
+            <!-- List of Reviews -->
+            <div th:if="${#lists.isEmpty(reviews)}" class="text-muted py-4 text-center">
+                <i class="far fa-frown fa-2x mb-2 d-block text-muted"></i>
+                No reviews yet for this pitch. Be the first to play and review!
+            </div>
+            
+            <div th:if="${!#lists.isEmpty(reviews)}" class="d-flex flex-column gap-3">
+                <div th:each="rev : ${reviews}" class="p-3 border-bottom" style="border-bottom: 1px solid #f1f5f9 !important;">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <img th:src="${rev.user.imageUrl != null ? rev.user.imageUrl : 'https://ui-avatars.com/api/?name=' + rev.user.username}" 
+                                 class="rounded-circle border border-primary" 
+                                 style="width: 40px; height: 40px; object-fit: cover;" />
+                            <div>
+                                <h6 class="fw-bold mb-0 text-dark" th:text="${rev.user.username}">Player</h6>
+                                <small class="text-muted" th:text="${#temporals.format(rev.createdAt, 'dd MMM yyyy')}">Date</small>
+                            </div>
+                        </div>
+                        <div class="text-warning">
+                            <i th:class="${rev.rating >= 1} ? 'fas fa-star' : 'far fa-star'"></i>
+                            <i th:class="${rev.rating >= 2} ? 'fas fa-star' : 'far fa-star'"></i>
+                            <i th:class="${rev.rating >= 3} ? 'fas fa-star' : 'far fa-star'"></i>
+                            <i th:class="${rev.rating >= 4} ? 'fas fa-star' : 'far fa-star'"></i>
+                            <i th:class="${rev.rating >= 5} ? 'fas fa-star' : 'far fa-star'"></i>
+                        </div>
+                    </div>
+                    <p class="mb-0 text-secondary" style="font-style: italic;" th:text="${rev.comment != null && rev.comment != '' ? '“' + rev.comment + '”' : 'No comment provided.'}"></p>
+                </div>
             </div>
         </div>
     </div>
@@ -789,9 +855,14 @@
     </script>
 
     <script>
-        // Set Min Date to Today
+        // Set Min Date to Today (using local browser timezone)
         const datePicker = document.getElementById('datePicker');
-        datePicker.min = new Date().toISOString().split("T")[0];
+        const localToday = new Date();
+        const year = localToday.getFullYear();
+        const month = String(localToday.getMonth() + 1).padStart(2, '0');
+        const day = String(localToday.getDate()).padStart(2, '0');
+        const localDateString = `${year}-${month}-${day}`;
+        datePicker.min = localDateString;
 
         let selectedSlotPrice = 0;
         let addonTotal = 0;

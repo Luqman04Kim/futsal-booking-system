@@ -204,6 +204,27 @@ public class CustomerController {
             model.addAttribute("selectedDate", (date != null && !date.isEmpty()) ? date : LocalDate.now().toString());
             // Pass active inventory items as add-on services
             model.addAttribute("inventoryItems", inventoryItemRepository.findByActiveTrueOrderByCreatedAtDesc());
+
+            // 1. Load active membership free services
+            List<Long> userFreeServiceIds = new ArrayList<>();
+            if (loggedUser != null) {
+                loggedUser = userRepository.findById(loggedUser.getUserId()).orElse(loggedUser);
+                if (loggedUser.getMembershipPlan() != null && loggedUser.getMembershipPlan().getFreeServices() != null) {
+                    for (InventoryItem item : loggedUser.getMembershipPlan().getFreeServices()) {
+                        userFreeServiceIds.add(item.getId());
+                    }
+                }
+            }
+            model.addAttribute("userFreeServiceIds", userFreeServiceIds);
+
+            // 2. Load reviews for this field
+            List<Review> reviews = reviewRepository.findByField(field);
+            model.addAttribute("reviews", reviews);
+
+            // 3. Load average rating
+            Double avgRating = reviewRepository.getAverageRatingByField(field);
+            model.addAttribute("averageRating", avgRating != null ? avgRating : 0.0);
+
             return "book";
         }
         return "redirect:/home";
@@ -253,6 +274,13 @@ public class CustomerController {
         LocalDate bookingDate = LocalDate.parse(date);
         LocalTime start = LocalTime.parse(startTime);
         LocalTime end = start.plusHours(2);
+
+        LocalDate today = LocalDate.now(java.time.ZoneId.of("Asia/Kuala_Lumpur"));
+        LocalTime now = LocalTime.now(java.time.ZoneId.of("Asia/Kuala_Lumpur"));
+        if (bookingDate.isBefore(today) || (bookingDate.equals(today) && start.isBefore(now))) {
+            redirectAttributes.addFlashAttribute("error", "Cannot book a date or time that has already passed.");
+            return "redirect:/book/" + fieldId;
+        }
 
         // Overlap Check
         boolean overlap = bookingRepository.findAll().stream()
@@ -507,7 +535,9 @@ public class CustomerController {
             boolean isBooked = existingBookings.stream().anyMatch(b -> b.getStartTime().equals(startTime));
 
             // Prevent booking past slots
-            if (selectedDate.equals(LocalDate.now()) && startTime.isBefore(LocalTime.now())) {
+            LocalDate today = LocalDate.now(java.time.ZoneId.of("Asia/Kuala_Lumpur"));
+            LocalTime now = LocalTime.now(java.time.ZoneId.of("Asia/Kuala_Lumpur"));
+            if (selectedDate.isBefore(today) || (selectedDate.equals(today) && startTime.isBefore(now))) {
                 isBooked = true;
             }
 

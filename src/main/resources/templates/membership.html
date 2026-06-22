@@ -602,6 +602,9 @@
                     <div class="plan-header">
                         <h3 class="fw-bold" th:text="${plan.name}">VIP Member</h3>
                         <div class="plan-price">RM <span th:text="${plan.price != null ? #numbers.formatDecimal(plan.price, 1, 0) : '0'}">1000</span></div>
+                        <p class="fw-semibold mb-2" style="color: var(--plan-color); font-size: 0.95rem;">
+                            <i class="far fa-clock me-1"></i> Membership for 1 year
+                        </p>
                         <p class="mb-0 text-white-50" th:text="${plan.description}">For true legends</p>
                     </div>
                     <div class="plan-features">

@@ -81,8 +81,8 @@ public class ChatController {
     // API Key
     private static final String API_KEY = "AIzaSyATamWFVHrr-hWmjrcboPPbLh0Sr7RcUSo";
 
-    // Using 'gemini-2.5-flash' (latest model)
-    private static final String GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key="
+    // Using 'gemini-1.5-flash' (stable model)
+    private static final String GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key="
             + API_KEY;
 
     @PostMapping("/ask")
