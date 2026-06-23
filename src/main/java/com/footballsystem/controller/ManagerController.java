@@ -1818,9 +1818,12 @@ public class ManagerController {
                 .map(SystemSetting::getSettingValue).orElse("200.0");
         String halfPriceEnabled = systemSettingRepository.findById("deposit_half_price_enabled")
                 .map(SystemSetting::getSettingValue).orElse("false");
+        String geminiApiKey = systemSettingRepository.findById("gemini_api_key")
+                .map(SystemSetting::getSettingValue).orElse("");
 
         model.addAttribute("depositAmount", depositAmount);
         model.addAttribute("halfPriceEnabled", halfPriceEnabled);
+        model.addAttribute("geminiApiKey", geminiApiKey);
 
         List<Booking> allBookings = bookingRepository.findAll();
         java.util.stream.Stream<Booking> stream = allBookings.stream()
@@ -1869,6 +1872,19 @@ public class ManagerController {
         systemSettingRepository.save(toggleSetting);
 
         redirectAttributes.addFlashAttribute("success", "Deposit settings updated successfully!");
+        return "redirect:/manager/deposit-settings";
+    }
+
+    @PostMapping("/deposit-settings/save-gemini-key")
+    public String saveGeminiKey(@RequestParam String geminiApiKey,
+                                HttpSession session, RedirectAttributes redirectAttributes) {
+        if (!isManager(session))
+            return "redirect:/login";
+
+        SystemSetting apiSetting = new SystemSetting("gemini_api_key", geminiApiKey.trim());
+        systemSettingRepository.save(apiSetting);
+
+        redirectAttributes.addFlashAttribute("success", "Gemini API key updated successfully!");
         return "redirect:/manager/deposit-settings";
     }
 }

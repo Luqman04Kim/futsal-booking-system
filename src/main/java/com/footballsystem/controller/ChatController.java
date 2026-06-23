@@ -101,6 +101,19 @@ public class ChatController {
             activeApiKey = geminiApiKey;
         }
 
+        if (activeApiKey != null) {
+            activeApiKey = activeApiKey.trim();
+        }
+
+        // Validate API Key presence and pattern (must start with AIzaSy)
+        if (activeApiKey == null || activeApiKey.isEmpty() || !activeApiKey.startsWith("AIzaSy")) {
+            System.err.println("Gemini API Key is not configured or is invalid. Chatbot request aborted.");
+            botResponse = "The Gemini AI Chatbot key is not configured or is invalid. A manager needs to set a valid Gemini API Key (starting with 'AIzaSy') in the Manager Settings panel (Deposit page) before using the chatbot.";
+            Map<String, String> result = new HashMap<>();
+            result.put("answer", botResponse);
+            return result;
+        }
+
         String geminiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + activeApiKey;
 
         System.out.println("Received question: " + userQuestion);
