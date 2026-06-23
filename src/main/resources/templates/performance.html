@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
@@ -679,29 +679,37 @@
             };
         }
 
-        const ctx = document.getElementById('branchChart').getContext('2d');
-        const chart = new Chart(ctx, {
-            type: chartType,
-            data: { labels: MONTHS, datasets: datasets },
-            options: chartOptions
-        });
-
-        // Render toggle buttons (only for LINE CHART - Single Branch view)
-        if (!isAllBranches) {
-            const toggleContainer = document.getElementById('branchToggles');
-            datasets.forEach((ds, i) => {
-                const btn = document.createElement('button');
-                btn.className = 'btn btn-sm';
-                btn.style.cssText = `background:${PALETTE[i % PALETTE.length]}22;color:${PALETTE[i % PALETTE.length]};border:1.5px solid ${PALETTE[i % PALETTE.length]};font-weight:600;`;
-                btn.innerHTML = `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${PALETTE[i % PALETTE.length]};margin-right:6px;"></span>${ds.label}`;
-                btn.addEventListener('click', () => {
-                    const meta = chart.getDatasetMeta(i);
-                    meta.hidden = !meta.hidden;
-                    btn.style.opacity = meta.hidden ? '0.4' : '1';
-                    chart.update();
-                });
-                toggleContainer.appendChild(btn);
+        function initPerformanceChart() {
+            const ctx = document.getElementById('branchChart').getContext('2d');
+            const chart = new Chart(ctx, {
+                type: chartType,
+                data: { labels: MONTHS, datasets: datasets },
+                options: chartOptions
             });
+
+            // Render toggle buttons (only for LINE CHART - Single Branch view)
+            if (!isAllBranches) {
+                const toggleContainer = document.getElementById('branchToggles');
+                datasets.forEach((ds, i) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'btn btn-sm';
+                    btn.style.cssText = `background:${PALETTE[i % PALETTE.length]}22;color:${PALETTE[i % PALETTE.length]};border:1.5px solid ${PALETTE[i % PALETTE.length]};font-weight:600;`;
+                    btn.innerHTML = `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${PALETTE[i % PALETTE.length]};margin-right:6px;"></span>${ds.label}`;
+                    btn.addEventListener('click', () => {
+                        const meta = chart.getDatasetMeta(i);
+                        meta.hidden = !meta.hidden;
+                        btn.style.opacity = meta.hidden ? '0.4' : '1';
+                        chart.update();
+                    });
+                    toggleContainer.appendChild(btn);
+                });
+            }
+        }
+
+        if (document.readyState === 'complete') {
+            initPerformanceChart();
+        } else {
+            window.addEventListener('load', initPerformanceChart);
         }
     </script>
     <script>
