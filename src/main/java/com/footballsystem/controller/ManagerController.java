@@ -1843,6 +1843,7 @@ public class ManagerController {
     @PostMapping("/deposit-settings/save")
     public String saveDepositSettings(@RequestParam String depositAmount,
                                       @RequestParam(required = false) String halfPriceEnabled,
+                                      @RequestParam(required = false) String geminiApiKey,
                                       HttpSession session, RedirectAttributes redirectAttributes) {
         if (!isManager(session))
             return "redirect:/login";
@@ -1861,9 +1862,12 @@ public class ManagerController {
         SystemSetting amountSetting = new SystemSetting("deposit_amount", depositAmount);
         SystemSetting toggleSetting = new SystemSetting("deposit_half_price_enabled", 
                 (halfPriceEnabled != null && halfPriceEnabled.equals("true")) ? "true" : "false");
+        SystemSetting geminiApiKeySetting = new SystemSetting("gemini_api_key", 
+                (geminiApiKey != null) ? geminiApiKey.trim() : "");
 
         systemSettingRepository.save(amountSetting);
         systemSettingRepository.save(toggleSetting);
+        systemSettingRepository.save(geminiApiKeySetting);
 
         redirectAttributes.addFlashAttribute("success", "Deposit settings updated successfully!");
         return "redirect:/manager/deposit-settings";
