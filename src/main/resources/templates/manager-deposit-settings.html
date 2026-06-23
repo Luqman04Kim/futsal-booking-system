@@ -361,20 +361,6 @@
                                 </div>
                             </div>
 
-                            <div class="mb-4">
-                                <label class="form-label fw-bold text-secondary fs-5 mb-2">Gemini AI API Key</label>
-                                <div class="input-group" style="max-width: 600px;">
-                                    <span class="input-group-text bg-light"><i class="fas fa-key text-muted"></i></span>
-                                    <input type="password" id="geminiApiKeyInput" name="geminiApiKey" class="form-control" 
-                                           th:value="${geminiApiKey}" placeholder="Enter Gemini API Key (starts with AIzaSy)">
-                                    <button type="button" class="btn btn-outline-secondary" onclick="togglePasswordVisibility('geminiApiKeyInput')">
-                                        <i class="fas fa-eye" id="geminiEyeIcon"></i>
-                                    </button>
-                                </div>
-                                <small class="text-muted d-block mt-2">Required for the customer-facing AI Chatbot. Leave empty to use system default.</small>
-                            </div>
-
-
                             <button type="submit" class="btn btn-primary fw-bold shadow-sm px-4">
                                 <i class="fas fa-save me-2"></i>Save Configuration
                             </button>
@@ -564,21 +550,6 @@
     <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
 
     <script>
-        // Toggle password visibility
-        function togglePasswordVisibility(inputId) {
-            var input = document.getElementById(inputId);
-            var icon = document.getElementById('geminiEyeIcon');
-            if (input.type === "password") {
-                input.type = "text";
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            } else {
-                input.type = "password";
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-            }
-        }
-
         // Update confirmation modal
         function confirmUpdate(element) {
             const bookingId = element.getAttribute('data-booking-id');
