@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
@@ -396,7 +396,7 @@
                 <h5 class="mb-0 fw-bold" id="chartTitle">
                     <i class="fas fa-chart-bar me-2 text-primary" id="chartIcon"></i>
                     <span id="chartTitleText">Branch Revenue Comparison</span>
-                    <small class="text-muted fw-normal ms-2" th:text="'(' + ${chartYear} + ' â€” Monthly)'"></small>
+                    <small class="text-muted fw-normal ms-2" th:text="'(' + ${chartYear} + ' - Monthly)'"></small>
                 </h5>
                 <div class="d-flex gap-2 flex-wrap" id="branchToggles"></div>
             </div>
@@ -506,7 +506,7 @@
                             <div class="p-3 rounded-3" style="background:#fafafa; border:1px solid #e2e8f0;">
                                 <i class="far fa-calendar me-2 text-muted"></i>
                                 <span class="small text-muted">Period: </span>
-                                <span class="fw-semibold" id="modalDateRange">—</span>
+                                <span class="fw-semibold" id="modalDateRange">ï¿½</span>
                             </div>
                         </div>
                     </div>
@@ -520,7 +520,7 @@
                         </a>
                     </div>
 
-                    <!-- Booking records table — populated from weeklyReport via Thymeleaf fragments -->
+                    <!-- Booking records table ï¿½ populated from weeklyReport via Thymeleaf fragments -->
                     <!-- We embed ALL weeks' booking rows and show/hide based on selection -->
                     <div class="table-responsive" style="max-height: 380px; overflow-y: auto;">
                         <table class="table table-sm table-hover">
@@ -551,7 +551,7 @@
                                             <span class="badge bg-success" th:if="${b.status == 'APPROVED'}">Approved</span>
                                             <span class="badge bg-warning text-dark" th:if="${b.status == 'PENDING'}">Pending</span>
                                             <span class="badge bg-danger" th:if="${b.status == 'CANCELLED'}">Cancelled</span>
-                                            <span class="badge bg-secondary" th:unless="${b.status == 'APPROVED' or b.status == 'PENDING' or b.status == 'CANCELLED'}" th:text="${b.status}">—</span>
+                                            <span class="badge bg-secondary" th:unless="${b.status == 'APPROVED' or b.status == 'PENDING' or b.status == 'CANCELLED'}" th:text="${b.status}">ï¿½</span>
                                         </td>
                                         <td class="text-end fw-bold text-success">RM <span th:text="${b.price != null ? #numbers.formatDecimal(b.price, 1, 'COMMA', 2, 'POINT') : '0.00'}">0.00</span></td>
                                     </tr>
@@ -584,10 +584,8 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script th:inline="javascript">
-        /* [[${branchChartJson}]] */
-        const RAW_DATA = /*[[${branchChartJson}]]*/ '{}';
+        const branchData = /*[[${branchChartData}]]*/ {};
         const SELECTED_BRANCH_ID = /*[[${selectedBranchId}]]*/ null;
-        const branchData = JSON.parse(RAW_DATA);
         const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         const PALETTE = [
             '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6',
@@ -600,9 +598,9 @@
         let chartType, datasets, chartOptions;
 
         if (isAllBranches) {
-            // ====== GROUPED BAR CHART â€” All Branches Comparison ======
+            // ====== GROUPED BAR CHART - All Branches Comparison ======
             document.getElementById('chartIcon').className = 'fas fa-chart-bar me-2 text-primary';
-            document.getElementById('chartTitleText').textContent = 'All Branches â€” Monthly Revenue Comparison';
+            document.getElementById('chartTitleText').textContent = 'All Branches - Monthly Revenue Comparison';
 
             chartType = 'bar';
             datasets = ids.map((id, idx) => ({
@@ -635,7 +633,7 @@
                 }
             };
         } else {
-            // ====== LINE CHART â€” Single Branch ======
+            // ====== LINE CHART - Single Branch ======
             document.getElementById('chartIcon').className = 'fas fa-chart-line me-2 text-primary';
             document.getElementById('chartTitleText').textContent = 'Branch Revenue Comparison';
 
@@ -677,7 +675,7 @@
             options: chartOptions
         });
 
-        // Render toggle buttons (only for line chart / single branch view)
+        // Render toggle buttons (only for LINE CHART - Single Branch view)
         if (!isAllBranches) {
             const toggleContainer = document.getElementById('branchToggles');
             datasets.forEach((ds, i) => {
@@ -723,13 +721,13 @@
             const branchName = button.getAttribute('data-branch');
 
             // Update header
-            document.getElementById('modalWeekLabel').textContent = weekLabel + ' — Booking History';
+            document.getElementById('modalWeekLabel').textContent = weekLabel + ' ï¿½ Booking History';
             document.getElementById('modalBranchLabel').textContent = branchName;
 
             // Update summary cards
             document.getElementById('modalRevenue').textContent = 'RM ' + parseFloat(revenue).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
             document.getElementById('modalCount').textContent = count + ' booking(s)';
-            document.getElementById('modalDateRange').textContent = (startDate !== 'N/A' && endDate !== 'N/A' ? startDate + ' – ' + endDate : 'No date info');
+            document.getElementById('modalDateRange').textContent = (startDate !== 'N/A' && endDate !== 'N/A' ? startDate + ' ï¿½ ' + endDate : 'No date info');
 
             // Update "View in Bookings" link
             document.getElementById('viewAllLink').href = '/manager/bookings';

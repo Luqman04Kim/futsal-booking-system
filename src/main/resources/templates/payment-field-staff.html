@@ -5,7 +5,7 @@
     <link rel="icon" type="image/png" href="/favicon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Field Management - FOOTBALLHUB</title>
+    <title>Deposit & Payments - FOOTBALLHUB</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -242,7 +242,7 @@
         <div class="mt-3">
             <a href="/staff/dashboard"><i class="fas fa-home"></i> Dashboard</a>
             <a href="/staff/bookings"><i class="fas fa-book"></i> Bookings</a>
-            <a href="/staff/payment-field" class="active"><i class="fas fa-credit-card"></i> Payments</a>
+            <a href="/staff/deposit-settings" class="active"><i class="fas fa-credit-card"></i> Deposit</a>
             <a href="/staff/reports"><i class="fas fa-exclamation-circle"></i> Reports</a>
             <a href="/staff/maintenance"><i class="fas fa-tools"></i> Maintenance</a>
             <a href="/staff/scan-qr"><i class="fas fa-qrcode"></i> Scan QR</a>
@@ -256,11 +256,65 @@
     <!-- Main Content -->
     <div class="content">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="fw-bold text-primary">Booking Payments</h2>
+            <h2 class="fw-bold text-primary"><i class="fas fa-credit-card me-2"></i>Deposit & Payments</h2>
+        </div>
+
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i> <span th:text="${success}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i> <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div class="row">
+            <!-- Global Deposit Configuration Card -->
+            <div class="col-12 mb-4">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white py-3 border-bottom">
+                        <h5 class="mb-0 fw-bold"><i class="fas fa-sliders-h me-2 text-primary"></i>Global Deposit Configuration</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <form action="/staff/deposit-settings/save" method="POST">
+                            <div class="mb-4">
+                                <label class="form-label fw-bold text-secondary fs-5 mb-2">Deposit Amount (RM)</label>
+                                <div class="input-group input-group-lg" style="max-width: 400px;">
+                                    <span class="input-group-text bg-light fw-bold">RM</span>
+                                    <input type="number" step="0.01" name="depositAmount" class="form-control fw-bold" 
+                                           th:value="${depositAmount}" required min="0" placeholder="e.g. 200.00">
+                                </div>
+                                <small class="text-muted d-block mt-2">This amount will be required upfront by customers when completing a field booking.</small>
+                            </div>
+
+                            <div class="mb-4 p-3 bg-light border rounded">
+                                <div class="form-check form-switch form-switch-lg d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <label class="form-check-label fw-bold text-dark fs-5 mb-1" for="halfPriceToggle">Enable Half-Price Fallback</label>
+                                        <p class="text-muted small mb-0">If booking total price is LESS than the deposit amount above, charge half instead.</p>
+                                    </div>
+                                    <input class="form-check-input" type="checkbox" id="halfPriceToggle" name="halfPriceEnabled" value="true"
+                                           th:checked="${halfPriceEnabled == 'true'}" style="width: 50px; height: 26px; cursor: pointer;">
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary fw-bold shadow-sm px-4">
+                                <i class="fas fa-save me-2"></i>Save Configuration
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bookings Payment Table Section -->
+        <div class="d-flex justify-content-between align-items-center mt-5 mb-4">
+            <h3 class="fw-bold text-secondary"><i class="fas fa-file-invoice-dollar me-2"></i>Booking Payments</h3>
         </div>
 
         <!-- Search and Filter -->
-        <form action="/staff/payment-field" method="GET" class="search-filter-container">
+        <form action="/staff/deposit-settings" method="GET" class="search-filter-container">
             <div class="search-box">
                 <i class="fas fa-search"></i>
                 <input type="text" name="search" placeholder="Search by Booking ID..." th:value="${param.search}">
@@ -273,7 +327,7 @@
                 </select>
             </div>
             <div th:if="${param.search} or ${selectedBranchId}">
-                <a href="/staff/payment-field" class="btn btn-outline-secondary"><i class="fas fa-times"></i> Reset</a>
+                <a href="/staff/deposit-settings" class="btn btn-outline-secondary"><i class="fas fa-times"></i> Reset</a>
             </div>
         </form>
 

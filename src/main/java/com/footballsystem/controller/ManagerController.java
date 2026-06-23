@@ -1777,9 +1777,8 @@ public class ManagerController {
                         || "Pay Deposit".equals(b.getPaymentStatus()))
                 .collect(Collectors.toList());
 
-        // Build JSON: { branchId: { name: "...", data: [jan,feb,...,dec] }, ... }
-        StringBuilder chartJson = new StringBuilder("{");
-        boolean firstBranch = true;
+        // Build Map: { branchId: { name: "...", data: [jan,feb,...,dec] }, ... }
+        Map<Long, Map<String, Object>> chartData = new LinkedHashMap<>();
         for (Branch br : allBranches) {
             double[] monthly = new double[12];
             for (Booking b : allBookingsForYear) {
@@ -1787,21 +1786,16 @@ public class ManagerController {
                     monthly[b.getDate().getMonthValue() - 1] += b.getPrice();
                 }
             }
-            if (!firstBranch)
-                chartJson.append(",");
-            firstBranch = false;
-            chartJson.append("\"").append(br.getBranchId()).append("\":{")
-                    .append("\"name\":\"").append(br.getName().replace("\"", "\\\"")).append("\",")
-                    .append("\"data\":[");
-            for (int m = 0; m < 12; m++) {
-                if (m > 0)
-                    chartJson.append(",");
-                chartJson.append(String.format("%.2f", monthly[m]));
+            Map<String, Object> branchInfo = new HashMap<>();
+            branchInfo.put("name", br.getName());
+            List<Double> dataList = new ArrayList<>();
+            for (double val : monthly) {
+                dataList.add(val);
             }
-            chartJson.append("]}");
+            branchInfo.put("data", dataList);
+            chartData.put(br.getBranchId(), branchInfo);
         }
-        chartJson.append("}");
-        model.addAttribute("branchChartJson", chartJson.toString());
+        model.addAttribute("branchChartData", chartData);
         model.addAttribute("chartYear", filterYear);
 
         return "performance";
@@ -1875,16 +1869,5 @@ public class ManagerController {
         return "redirect:/manager/deposit-settings";
     }
 
-    @PostMapping("/deposit-settings/save-gemini-key")
-    public String saveGeminiKey(@RequestParam String geminiApiKey,
-                                HttpSession session, RedirectAttributes redirectAttributes) {
-        if (!isManager(session))
-            return "redirect:/login";
 
-        SystemSetting apiSetting = new SystemSetting("gemini_api_key", geminiApiKey.trim());
-        systemSettingRepository.save(apiSetting);
-
-        redirectAttributes.addFlashAttribute("success", "Gemini API key updated successfully!");
-        return "redirect:/manager/deposit-settings";
-    }
 }

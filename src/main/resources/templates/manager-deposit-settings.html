@@ -333,78 +333,39 @@
 
         <div class="row">
             <!-- Global Deposit Configuration Card -->
-            <div class="col-md-6 mb-4">
-                <div class="settings-card h-100 mb-0">
-                    <h4 class="fw-bold text-secondary mb-4"><i class="fas fa-sliders-h me-2"></i>Global Deposit Configuration</h4>
-                    <form action="/manager/deposit-settings/save" method="POST">
-                        <div class="mb-4">
-                            <label class="form-label fw-bold text-secondary fs-5 mb-2">Deposit Amount (RM)</label>
-                            <div class="input-group input-group-lg" style="max-width: 400px;">
-                                <span class="input-group-text bg-light fw-bold">RM</span>
-                                <input type="number" step="0.01" name="depositAmount" class="form-control fw-bold" 
-                                       th:value="${depositAmount}" required min="0" placeholder="e.g. 200.00">
-                            </div>
-                            <small class="text-muted d-block mt-2">This amount will be required upfront by customers when completing a field booking.</small>
-                        </div>
-
-                        <div class="mb-4 p-3 bg-light border rounded">
-                            <div class="form-check form-switch form-switch-lg d-flex align-items-center justify-content-between">
-                                <div>
-                                    <label class="form-check-label fw-bold text-dark fs-5 mb-1" for="halfPriceToggle">Enable Half-Price Fallback</label>
-                                    <p class="text-muted small mb-0">If booking total price is LESS than the deposit amount above, charge half instead.</p>
+            <div class="col-12 mb-4">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white py-3 border-bottom">
+                        <h5 class="mb-0 fw-bold"><i class="fas fa-sliders-h me-2 text-primary"></i>Global Deposit Configuration</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <form action="/manager/deposit-settings/save" method="POST">
+                            <div class="mb-4">
+                                <label class="form-label fw-bold text-secondary fs-5 mb-2">Deposit Amount (RM)</label>
+                                <div class="input-group input-group-lg" style="max-width: 400px;">
+                                    <span class="input-group-text bg-light fw-bold">RM</span>
+                                    <input type="number" step="0.01" name="depositAmount" class="form-control fw-bold" 
+                                           th:value="${depositAmount}" required min="0" placeholder="e.g. 200.00">
                                 </div>
-                                <input class="form-check-input" type="checkbox" id="halfPriceToggle" name="halfPriceEnabled" value="true"
-                                       th:checked="${halfPriceEnabled == 'true'}" style="width: 50px; height: 26px; cursor: pointer;">
+                                <small class="text-muted d-block mt-2">This amount will be required upfront by customers when completing a field booking.</small>
                             </div>
-                        </div>
 
-                        <button type="submit" class="btn btn-primary fw-bold shadow-sm px-4">
-                            <i class="fas fa-save me-2"></i>Save Configuration
-                        </button>
-                    </form>
-                </div>
-            </div>
-
-            <!-- AI Chatbot Configuration Card -->
-            <div class="col-md-6 mb-4">
-                <div class="settings-card h-100 mb-0">
-                    <h4 class="fw-bold text-secondary mb-4"><i class="fas fa-robot me-2"></i>AI Chatbot Configuration</h4>
-                    <form action="/manager/deposit-settings/save-gemini-key" method="POST">
-                        <div class="mb-4">
-                            <label class="form-label fw-bold text-secondary fs-5 mb-2">Gemini API Key</label>
-                            <div class="input-group input-group-lg">
-                                <span class="input-group-text bg-light text-muted"><i class="fas fa-key"></i></span>
-                                <input type="password" id="geminiApiKeyInput" name="geminiApiKey" class="form-control fw-bold" 
-                                       th:value="${geminiApiKey}" placeholder="Enter Gemini API Key (starts with AIzaSy...)">
-                                <button class="btn btn-outline-secondary" type="button" id="toggleApiKeyVisibility">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </div>
-                            <small class="text-muted d-block mt-2">
-                                To enable the AI assistant, enter your Gemini API Key. You can get one from the 
-                                <a href="https://aistudio.google.com/" target="_blank" rel="noopener noreferrer">Google AI Studio <i class="fas fa-external-link-alt" style="font-size:0.75rem;"></i></a>.
-                            </small>
-                        </div>
-
-                        <!-- Info Alert on current key status -->
-                        <div class="mb-4 p-3 bg-light border rounded">
-                            <div class="d-flex align-items-center">
-                                <i class="fas fa-info-circle text-primary fs-4 me-3"></i>
-                                <div>
-                                    <h6 class="fw-bold text-dark mb-1">API Key Status</h6>
-                                    <p class="text-muted small mb-0">
-                                        <span th:if="${#strings.isEmpty(geminiApiKey)}" class="text-danger fw-bold"><i class="fas fa-times-circle"></i> Not Configured</span>
-                                        <span th:if="${not #strings.isEmpty(geminiApiKey) and not #strings.startsWith(geminiApiKey, 'AIzaSy')}" class="text-warning fw-bold"><i class="fas fa-exclamation-triangle"></i> Set to Placeholder/Invalid Key</span>
-                                        <span th:if="${not #strings.isEmpty(geminiApiKey) and #strings.startsWith(geminiApiKey, 'AIzaSy')}" class="text-success fw-bold"><i class="fas fa-check-circle"></i> Active & Configured</span>
-                                    </p>
+                            <div class="mb-4 p-3 bg-light border rounded">
+                                <div class="form-check form-switch form-switch-lg d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <label class="form-check-label fw-bold text-dark fs-5 mb-1" for="halfPriceToggle">Enable Half-Price Fallback</label>
+                                        <p class="text-muted small mb-0">If booking total price is LESS than the deposit amount above, charge half instead.</p>
+                                    </div>
+                                    <input class="form-check-input" type="checkbox" id="halfPriceToggle" name="halfPriceEnabled" value="true"
+                                           th:checked="${halfPriceEnabled == 'true'}" style="width: 50px; height: 26px; cursor: pointer;">
                                 </div>
                             </div>
-                        </div>
 
-                        <button type="submit" class="btn btn-primary fw-bold shadow-sm px-4">
-                            <i class="fas fa-save me-2"></i>Save AI Settings
-                        </button>
-                    </form>
+                            <button type="submit" class="btn btn-primary fw-bold shadow-sm px-4">
+                                <i class="fas fa-save me-2"></i>Save Configuration
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -618,21 +579,7 @@
                 window.history.replaceState({}, document.title, url);
             }
 
-            // Toggle Gemini API Key Visibility
-            const toggleBtn = document.getElementById('toggleApiKeyVisibility');
-            const keyInput = document.getElementById('geminiApiKeyInput');
-            if (toggleBtn && keyInput) {
-                toggleBtn.addEventListener('click', function() {
-                    const type = keyInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                    keyInput.setAttribute('type', type);
-                    const icon = this.querySelector('i');
-                    if (type === 'password') {
-                        icon.className = 'fas fa-eye';
-                    } else {
-                        icon.className = 'fas fa-eye-slash';
-                    }
-                });
-            }
+
         });
     </script>
     <script>

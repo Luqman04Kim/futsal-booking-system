@@ -29,6 +29,8 @@ public class StaffController {
     @Autowired
     private TaskRepository taskRepository;
     @Autowired
+    private SystemSettingRepository systemSettingRepository;
+    @Autowired
     private ProblemReportRepository problemReportRepository;
     @Autowired
     private BookingRepository bookingRepository;
@@ -739,12 +741,20 @@ public class StaffController {
     }
 
     // --- 8. PAYMENTS (Read-Only/Manage) ---
-    @GetMapping("/payment-field")
+    @GetMapping({"/payment-field", "/deposit-settings"})
     public String showPaymentFieldPage(@RequestParam(required = false) String search,
             @RequestParam(required = false) Long branchId,
             HttpSession session, Model model) {
         if (!isStaff(session))
             return "redirect:/login";
+
+        String depositAmount = systemSettingRepository.findById("deposit_amount")
+                .map(SystemSetting::getSettingValue).orElse("200.0");
+        String halfPriceEnabled = systemSettingRepository.findById("deposit_half_price_enabled")
+                .map(SystemSetting::getSettingValue).orElse("false");
+
+        model.addAttribute("depositAmount", depositAmount);
+        model.addAttribute("halfPriceEnabled", halfPriceEnabled);
 
         List<Booking> bookings = bookingRepository.findAll().stream()
                 .filter(b -> b.getField() != null)
@@ -775,6 +785,35 @@ public class StaffController {
         return "payment-field-staff";
     }
 
+    @PostMapping("/deposit-settings/save")
+    public String saveDepositSettings(@RequestParam String depositAmount,
+                                      @RequestParam(required = false) String halfPriceEnabled,
+                                      HttpSession session, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        if (!isStaff(session))
+            return "redirect:/login";
+
+        try {
+            double amount = Double.parseDouble(depositAmount);
+            if (amount < 0) {
+                redirectAttributes.addFlashAttribute("error", "Deposit amount cannot be negative.");
+                return "redirect:/staff/deposit-settings";
+            }
+        } catch (NumberFormatException e) {
+            redirectAttributes.addFlashAttribute("error", "Invalid deposit amount format.");
+            return "redirect:/staff/deposit-settings";
+        }
+
+        SystemSetting amountSetting = new SystemSetting("deposit_amount", depositAmount);
+        SystemSetting toggleSetting = new SystemSetting("deposit_half_price_enabled", 
+                (halfPriceEnabled != null && halfPriceEnabled.equals("true")) ? "true" : "false");
+
+        systemSettingRepository.save(amountSetting);
+        systemSettingRepository.save(toggleSetting);
+
+        redirectAttributes.addFlashAttribute("success", "Deposit settings updated successfully!");
+        return "redirect:/staff/deposit-settings";
+    }
+
     @PostMapping("/payment/update")
     public String updatePaymentStatus(@RequestParam Long bookingId, HttpSession session) {
         if (!isStaff(session))
@@ -784,7 +823,7 @@ public class StaffController {
             booking.setPaymentStatus("Full Payment");
             bookingRepository.save(booking);
         }
-        return "redirect:/staff/payment-field";
+        return "redirect:/staff/deposit-settings";
     }
 
     @GetMapping("/payment/delete/{id}")
@@ -792,7 +831,7 @@ public class StaffController {
         if (!isStaff(session))
             return "redirect:/login";
         bookingRepository.deleteById(id);
-        return "redirect:/staff/payment-field?deleted=true";
+        return "redirect:/staff/deposit-settings?deleted=true";
     }
 
     @GetMapping("/attendance")
