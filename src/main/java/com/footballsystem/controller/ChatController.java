@@ -105,10 +105,11 @@ public class ChatController {
             activeApiKey = activeApiKey.trim();
         }
 
-        // Fallback to default key if still invalid or not configured
-        if (activeApiKey == null || activeApiKey.isEmpty() || !activeApiKey.startsWith("AIzaSy")) {
-            activeApiKey = "AIzaSyD0nhnsOL2SkJ6hxky-5I8PcLN3az3Wiv0";
+        if (activeApiKey == null || activeApiKey.trim().isEmpty()) {
+            throw new RuntimeException("Gemini API key not configured");
         }
+
+        System.out.println("Using Gemini Key: " + activeApiKey.substring(0, 10));
 
         String geminiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + activeApiKey;
 
