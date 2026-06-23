@@ -1,12 +1,12 @@
-<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <link rel="icon" type="image/png" href="/favicon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rate Your Experience – FOOTBALLHUB</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Rate Your Experience ï¿½ FOOTBALLHUB</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Chakra+Petch:wght@700&display=swap"
@@ -142,7 +142,7 @@
             </div>
             <div class="mt-1 text-muted">
                 <i class="fas fa-clock me-1"></i>
-                <span th:text="${booking.startTime}">10:00</span> –
+                <span th:text="${booking.startTime}">10:00</span> ï¿½
                 <span th:text="${booking.endTime}">12:00</span>
                 &nbsp;|&nbsp; Booking
                 <strong th:text="'#' + ${booking.bookingId}"></strong>
@@ -178,7 +178,7 @@
                         class="text-muted fw-normal">(optional)</span>
                 </label>
                 <textarea name="comment" class="form-control" rows="3" maxlength="500"
-                    placeholder="Tell us what you liked or what we can improve…"></textarea>
+                    placeholder="Tell us what you liked or what we can improveï¿½"></textarea>
             </div>
 
             <!-- Buttons -->
@@ -193,7 +193,7 @@
         </form>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
     <script>
         const hints = { 1: 'Terrible ??', 2: 'Poor ??', 3: 'Average ??', 4: 'Good ??', 5: 'Excellent! ??' };
         document.querySelectorAll('input[name="rating"]').forEach(r => {
