@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
@@ -191,6 +191,13 @@
                 white-space: nowrap;
                 padding: 8px 10px;
             }
+        }
+
+        .chart-canvas-container {
+            position: relative;
+            height: 380px !important;
+            min-height: 380px;
+            width: 100%;
         }
     </style>
 </head>
@@ -401,7 +408,9 @@
                 <div class="d-flex gap-2 flex-wrap" id="branchToggles"></div>
             </div>
             <div class="card-body">
-                <canvas id="branchChart" height="90"></canvas>
+                <div class="chart-canvas-container">
+                    <canvas id="branchChart"></canvas>
+                </div>
             </div>
         </div>
 
@@ -614,6 +623,7 @@
             }));
             chartOptions = {
                 responsive: true,
+                maintainAspectRatio: false,
                 interaction: { mode: 'index', intersect: false },
                 plugins: {
                     legend: { display: true, position: 'top', labels: { usePointStyle: true, padding: 16 } },
@@ -650,6 +660,7 @@
             }));
             chartOptions = {
                 responsive: true,
+                maintainAspectRatio: false,
                 interaction: { mode: 'index', intersect: false },
                 plugins: {
                     legend: { display: false },
