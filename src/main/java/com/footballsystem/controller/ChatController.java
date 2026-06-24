@@ -111,7 +111,7 @@ public class ChatController {
 
         System.out.println("Using Gemini Key: " + activeApiKey.substring(0, 10));
 
-        String geminiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + activeApiKey;
+        String geminiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + activeApiKey;
 
         System.out.println("Received question: " + userQuestion);
 
