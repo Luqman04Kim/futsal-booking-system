@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
@@ -369,6 +369,17 @@
         /* Scrollbar */
         .sidebar::-webkit-scrollbar { width: 4px; }
         .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
+
+        /* Nested modal stacking fix */
+        .modal-backdrop.show ~ .modal-backdrop.show {
+            z-index: 1060;
+        }
+        #addMaintStaffModal {
+            z-index: 1065 !important;
+        }
+        #addMaintStaffModal + .modal-backdrop {
+            z-index: 1060 !important;
+        }
     </style>
 </head>
 
@@ -833,8 +844,8 @@
         </div>
     </div>
 
-    <!-- View & Select Staff popup for Add Maintenance -->
-    <div class="modal fade" id="addMaintStaffModal" tabindex="-1">
+    <!-- View & Select Staff popup for Add Maintenance (nested modal with backdrop fix) -->
+    <div class="modal fade" id="addMaintStaffModal" tabindex="-1" data-bs-backdrop="false">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg" style="border-radius:16px;overflow:hidden;">
                 <div class="modal-header text-white" style="background:linear-gradient(135deg,#0f172a,#1e3a5f);">
@@ -852,7 +863,7 @@
                 <div class="modal-footer py-2 d-flex justify-content-between align-items-center">
                     <small class="text-muted"><i class="fas fa-info-circle me-1"></i>Click a row or checkbox to select.</small>
                     <div>
-                        <button type="button" class="btn btn-secondary btn-sm me-2" data-bs-dismiss="modal" style="border-radius:6px;">Cancel</button>
+                        <button type="button" class="btn btn-secondary btn-sm me-2" onclick="closeStaffModal()" style="border-radius:6px;">Cancel</button>
                         <button type="button" class="btn btn-success btn-sm" onclick="confirmAddMaintSelection()" style="border-radius:6px;">
                             <i class="fas fa-check me-1"></i> Confirm Selection
                         </button>
@@ -886,12 +897,7 @@
     </div>
 
     <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
-    <script th:inline="javascript">
-        /*<![CDATA[*/
-
-        // Thymeleaf-rendered maps for branch-scoped staff and fields
-        var branchMaintStaffMap = /*[[${branchMaintStaffMap}]]*/ {};
-        var fieldsByBranch = /*[[${fieldsByBranch}]]*/ {};
+    <script>
 
         /* ---- Count stats by status ---- */
         (function() {
@@ -928,80 +934,108 @@
             card.classList.toggle('selected', cb.checked);
         }
 
-        /* ---- Load fields for selected branch ---- */
+        /* ---- Load fields via AJAX for selected branch ---- */
         function loadAddMaintFields(branchId) {
             var sel = document.getElementById('addMaintFieldSelect');
             sel.options.length = 0;
             sel.add(new Option('-- General / All Fields --', ''));
-            
+
             if (!branchId) return;
 
-            var branchFields = fieldsByBranch[String(branchId)] || fieldsByBranch[branchId] || [];
-            if (branchFields.length > 0) {
-                branchFields.forEach(function(field) {
-                    var fName = field.name ? field.name : 'Unnamed Field';
-                    var opt = new Option(fName, field.id);
-                    sel.add(opt);
+            fetch('/manager/api/branches/' + encodeURIComponent(branchId) + '/fields')
+                .then(function(res) { return res.json(); })
+                .then(function(fields) {
+                    fields.forEach(function(f) {
+                        sel.add(new Option(f.name || 'Unnamed Field', f.fieldId));
+                    });
+                })
+                .catch(function(err) {
+                    console.error('Failed to load fields:', err);
                 });
-                return;
-            }
-
-            // Fallback for older rendered pages that still rely on hidden DOM data
-            var spans = document.querySelectorAll('#allFieldsData span[data-branch-id="' + branchId + '"]');
-            spans.forEach(function(span) {
-                var fName = span.getAttribute('data-field-name') || 'Unnamed Field';
-                var opt = new Option(fName, span.getAttribute('data-field-id'));
-                sel.add(opt);
-            });
         }
 
         /* ---- Enable/disable View Staff button based on branch selection ---- */
         function refreshAddMaintStaffBtn(branchId) {
             var btn = document.getElementById('addMaintViewStaffBtn');
             btn.disabled = !branchId;
-            // Uncheck all staff when branch changes
+            // Clear any previously selected staff checkboxes when branch changes
             document.querySelectorAll('#addMaintHiddenStaff input[type="checkbox"]').forEach(function(cb) {
                 cb.checked = false;
+            });
+            // Remove dynamically added hidden inputs from previous selections
+            document.querySelectorAll('#addMaintHiddenStaff input[data-dynamic="true"]').forEach(function(el) {
+                el.remove();
             });
             updateAddMaintBadges();
         }
 
-        /* ---- Open the staff popup, pre-check already selected staff ---- */
+        /* ---- Staff modal management ---- */
+        var staffModalInstance = null;
+
+        function closeStaffModal() {
+            if (staffModalInstance) {
+                staffModalInstance.hide();
+            }
+        }
+
+        /* ---- Open the staff popup via AJAX, pre-check already selected staff ---- */
         function openAddMaintStaff() {
             var branchSelect = document.getElementById('addMaintBranchSelect');
-            var branchId = parseInt(branchSelect.value);
+            var branchId = branchSelect.value;
             var branchName = branchSelect.options[branchSelect.selectedIndex].text;
 
+            if (!branchId) return;
+
             document.getElementById('addMaintBranchLabel').textContent = branchName;
-
-            var staffList = branchMaintStaffMap[branchId] || [];
             var body = document.getElementById('addMaintStaffBody');
+            body.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary" role="status"></div><p class="mt-2 text-muted">Loading staff...</p></div>';
 
-            if (staffList.length === 0) {
-                body.innerHTML = '<div class="text-center text-muted py-5"><i class="fas fa-user-slash fa-2x mb-2 d-block" style="opacity:0.4;"></i><p class="fw-semibold mb-1">No maintenance staff</p><p class="small">No maintenance staff available at this branch.</p></div>';
-            } else {
-                var html = '<table class="table table-hover mb-0" style="font-size:0.92rem;">';
-                html += '<thead style="background:#f1f5f9;"><tr>';
-                html += '<th class="ps-3" style="width:44px;">Assign</th><th>Staff ID</th><th>Name</th><th>Phone</th>';
-                html += '</tr></thead><tbody>';
-                staffList.forEach(function(s) {
-                    var checked = document.getElementById('amStaff_' + s.userId) &&
-                                  document.getElementById('amStaff_' + s.userId).checked;
-                    var rowBg = checked ? 'class="table-success"' : '';
-                    html += '<tr ' + rowBg + ' style="cursor:pointer;" onclick="toggleAddMaintRow(this,' + s.userId + ')">';
-                    html += '<td class="ps-3 text-center"><input type="checkbox" class="form-check-input" ';
-                    html += 'id="amPopup_' + s.userId + '" ';
-                    html += (checked ? 'checked' : '') + ' onclick="event.stopPropagation();toggleAddMaintCheckbox(this,' + s.userId + ')"></td>';
-                    html += '<td><span class="badge bg-secondary">' + (s.staffId || 'N/A') + '</span></td>';
-                    html += '<td><i class="fas fa-user-circle me-1 text-primary"></i>' + s.username + '</td>';
-                    html += '<td class="text-muted">' + (s.phoneNumber || '&mdash;') + '</td>';
-                    html += '</tr>';
-                });
-                html += '</tbody></table>';
-                body.innerHTML = html;
+            // Show the nested modal
+            var staffModalEl = document.getElementById('addMaintStaffModal');
+            if (!staffModalInstance) {
+                staffModalInstance = new bootstrap.Modal(staffModalEl, { backdrop: false, keyboard: true });
             }
+            staffModalInstance.show();
 
-            new bootstrap.Modal(document.getElementById('addMaintStaffModal')).show();
+            // Fetch staff from API
+            fetch('/manager/api/maint-staff-by-branch?branchId=' + encodeURIComponent(branchId))
+                .then(function(res) { return res.json(); })
+                .then(function(staffList) {
+                    if (staffList.length === 0) {
+                        body.innerHTML = '<div class="text-center text-muted py-5"><i class="fas fa-user-slash fa-2x mb-2 d-block" style="opacity:0.4;"></i><p class="fw-semibold mb-1">No maintenance staff</p><p class="small">No maintenance staff assigned to this branch.</p></div>';
+                        return;
+                    }
+
+                    // Get currently selected staff IDs from hidden inputs
+                    var selectedIds = {};
+                    document.querySelectorAll('#addMaintHiddenStaff input[type="checkbox"]:checked').forEach(function(cb) {
+                        selectedIds[cb.value] = true;
+                    });
+
+                    var html = '<table class="table table-hover mb-0" style="font-size:0.92rem;">';
+                    html += '<thead style="background:#f1f5f9;"><tr>';
+                    html += '<th class="ps-3" style="width:44px;">Assign</th><th>Staff ID</th><th>Name</th><th>Phone</th>';
+                    html += '</tr></thead><tbody>';
+                    staffList.forEach(function(s) {
+                        var isChecked = !!selectedIds[s.userId];
+                        var rowClass = isChecked ? 'class="table-success"' : '';
+                        html += '<tr ' + rowClass + ' style="cursor:pointer;" onclick="toggleAddMaintRow(this,' + s.userId + ')">';
+                        html += '<td class="ps-3 text-center"><input type="checkbox" class="form-check-input" ';
+                        html += 'id="amPopup_' + s.userId + '" ';
+                        html += 'data-name="' + (s.username || '') + '" ';
+                        html += (isChecked ? 'checked' : '') + ' onclick="event.stopPropagation();toggleAddMaintCheckbox(this,' + s.userId + ')"></td>';
+                        html += '<td><span class="badge bg-secondary">' + (s.staffId || 'N/A') + '</span></td>';
+                        html += '<td><i class="fas fa-user-circle me-1 text-primary"></i>' + (s.username || '') + '</td>';
+                        html += '<td class="text-muted">' + (s.phoneNumber || '&mdash;') + '</td>';
+                        html += '</tr>';
+                    });
+                    html += '</tbody></table>';
+                    body.innerHTML = html;
+                })
+                .catch(function(err) {
+                    body.innerHTML = '<div class="text-center text-danger py-4"><i class="fas fa-exclamation-triangle fa-2x mb-2 d-block"></i>Failed to load staff. Please try again.</div>';
+                    console.error('Staff load error:', err);
+                });
         }
 
         /* ---- Toggle row via row click ---- */
@@ -1018,17 +1052,45 @@
             if (row) row.classList.toggle('table-success', cb.checked);
         }
 
-        /* ---- Confirm selection: copy popup ? hidden inputs, update badges, close popup ---- */
+        /* ---- Confirm selection: update hidden inputs and badges, close popup ---- */
         function confirmAddMaintSelection() {
-            document.querySelectorAll('#addMaintStaffBody input[type="checkbox"]').forEach(function(popupCb) {
-                var staffId = popupCb.id.replace('amPopup_', '');
-                var hidden = document.getElementById('amStaff_' + staffId);
-                if (hidden) hidden.checked = popupCb.checked;
+            // Remove all dynamic hidden inputs
+            document.querySelectorAll('#addMaintHiddenStaff input[data-dynamic="true"]').forEach(function(el) {
+                el.remove();
             });
+
+            // Add fresh hidden inputs for checked popup checkboxes
+            var hiddenDiv = document.getElementById('addMaintHiddenStaff');
+            document.querySelectorAll('#addMaintStaffBody input[type="checkbox"]:checked').forEach(function(popupCb) {
+                var staffId = popupCb.id.replace('amPopup_', '');
+                var staffName = popupCb.getAttribute('data-name') || staffId;
+
+                // Update existing hidden input if it exists, or create a new one
+                var existing = document.getElementById('amStaff_' + staffId);
+                if (existing) {
+                    existing.checked = true;
+                } else {
+                    var input = document.createElement('input');
+                    input.type = 'checkbox';
+                    input.name = 'assignedStaffIds';
+                    input.value = staffId;
+                    input.id = 'amStaff_' + staffId;
+                    input.checked = true;
+                    input.setAttribute('data-name', staffName);
+                    input.setAttribute('data-dynamic', 'true');
+                    hiddenDiv.appendChild(input);
+                }
+            });
+
+            // Uncheck hidden inputs for unchecked popup checkboxes
+            document.querySelectorAll('#addMaintStaffBody input[type="checkbox"]:not(:checked)').forEach(function(popupCb) {
+                var staffId = popupCb.id.replace('amPopup_', '');
+                var existing = document.getElementById('amStaff_' + staffId);
+                if (existing) existing.checked = false;
+            });
+
             updateAddMaintBadges();
-            var modalEl = document.getElementById('addMaintStaffModal');
-            var modal = bootstrap.Modal.getInstance(modalEl);
-            if (modal) modal.hide();
+            if (staffModalInstance) staffModalInstance.hide();
         }
 
         /* ---- Render selected staff badges ---- */
@@ -1056,12 +1118,31 @@
             fieldSel.add(new Option('-- General / All Fields --', ''));
             document.getElementById('addMaintViewStaffBtn').disabled = true;
             document.querySelectorAll('#addMaintHiddenStaff input[type="checkbox"]').forEach(function(cb) { cb.checked = false; });
+            document.querySelectorAll('#addMaintHiddenStaff input[data-dynamic="true"]').forEach(function(el) { el.remove(); });
             document.querySelectorAll('.maint-type-card').forEach(function(c) { c.classList.remove('selected'); });
             document.querySelectorAll('[id^="typeCut"],[id^="typeMarking"],[id^="typeFert"]').forEach(function(cb) { cb.checked = false; });
             updateAddMaintBadges();
+            staffModalInstance = null;
         });
 
-        /*]]>*/
+        /* ---- Overlay backdrop for nested modal ---- */
+        document.getElementById('addMaintStaffModal').addEventListener('show.bs.modal', function() {
+            document.body.classList.add('modal-open');
+            // Create a semi-transparent overlay over the first modal to dim it
+            var overlay = document.getElementById('staffModalOverlay');
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.id = 'staffModalOverlay';
+                overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1060;';
+                overlay.onclick = function() { if (staffModalInstance) staffModalInstance.hide(); };
+                document.body.appendChild(overlay);
+            }
+            overlay.style.display = 'block';
+        });
+        document.getElementById('addMaintStaffModal').addEventListener('hidden.bs.modal', function() {
+            var overlay = document.getElementById('staffModalOverlay');
+            if (overlay) overlay.style.display = 'none';
+        });
 
         /* ---- Delete confirmation ---- */
         let formToSubmit = null;

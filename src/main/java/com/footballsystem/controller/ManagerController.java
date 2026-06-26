@@ -185,6 +185,26 @@ public class ManagerController {
         return Collections.singletonMap("nextId", generateManagerId());
     }
 
+    @GetMapping("/api/maint-staff-by-branch")
+    @ResponseBody
+    public List<Map<String, Object>> getMaintStaffByBranch(@RequestParam Long branchId) {
+        List<User> staff = userRepository.findAll().stream()
+                .filter(u -> "STAFF".equalsIgnoreCase(u.getRole())
+                        && "MAINTENANCE TEAM".equalsIgnoreCase(u.getPosition())
+                        && u.getBranch() != null && u.getBranch().getBranchId().equals(branchId))
+                .collect(Collectors.toList());
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (User u : staff) {
+            Map<String, Object> m = new HashMap<>();
+            m.put("userId", u.getUserId());
+            m.put("staffId", u.getStaffId());
+            m.put("username", u.getUsername());
+            m.put("phoneNumber", u.getPhoneNumber());
+            result.add(m);
+        }
+        return result;
+    }
+
     // =========================
     // DASHBOARD
     // =========================
@@ -449,9 +469,15 @@ public class ManagerController {
 
     @GetMapping("/api/branches/{branchId}/fields")
     @ResponseBody
-    public List<Field> getFieldsByBranch(@PathVariable Long branchId) {
+    public List<Map<String, Object>> getFieldsByBranch(@PathVariable Long branchId) {
         return fieldRepository.findAll().stream()
                 .filter(f -> f.getBranch() != null && f.getBranch().getBranchId().equals(branchId))
+                .map(f -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("fieldId", f.getFieldId());
+                    map.put("name", f.getName());
+                    return map;
+                })
                 .collect(Collectors.toList());
     }
 
@@ -1223,10 +1249,15 @@ public class ManagerController {
         model.addAttribute("assignedStaffIdsMap", assignedStaffIdsMap);
 
         // Build branch -> maintenance staff map for the "View Staff" popup
-        Map<Long, List<User>> branchMaintStaffMap = new HashMap<>();
+        Map<Long, List<Map<String, Object>>> branchMaintStaffMap = new HashMap<>();
         for (User u : maintenanceStaff) {
             if (u.getBranch() != null) {
-                branchMaintStaffMap.computeIfAbsent(u.getBranch().getBranchId(), k -> new ArrayList<>()).add(u);
+                Map<String, Object> staffData = new HashMap<>();
+                staffData.put("userId", u.getUserId());
+                staffData.put("staffId", u.getStaffId());
+                staffData.put("username", u.getUsername());
+                staffData.put("phoneNumber", u.getPhoneNumber());
+                branchMaintStaffMap.computeIfAbsent(u.getBranch().getBranchId(), k -> new ArrayList<>()).add(staffData);
             }
         }
         model.addAttribute("branchMaintStaffMap", branchMaintStaffMap);
@@ -1469,10 +1500,15 @@ public class ManagerController {
         model.addAttribute("maintenanceStaff", maintenanceStaff);
 
         // Branch -> staff map for the View & Select Staff popup
-        Map<Long, List<User>> branchMaintStaffMap = new HashMap<>();
+        Map<Long, List<Map<String, Object>>> branchMaintStaffMap = new HashMap<>();
         for (User u : maintenanceStaff) {
             if (u.getBranch() != null) {
-                branchMaintStaffMap.computeIfAbsent(u.getBranch().getBranchId(), k -> new ArrayList<>()).add(u);
+                Map<String, Object> staffData = new HashMap<>();
+                staffData.put("userId", u.getUserId());
+                staffData.put("staffId", u.getStaffId());
+                staffData.put("username", u.getUsername());
+                staffData.put("phoneNumber", u.getPhoneNumber());
+                branchMaintStaffMap.computeIfAbsent(u.getBranch().getBranchId(), k -> new ArrayList<>()).add(staffData);
             }
         }
         model.addAttribute("branchMaintStaffMap", branchMaintStaffMap);
