@@ -1,7 +1,22 @@
 package com.footballsystem.controller;
 
-import com.footballsystem.model.*;
-import com.footballsystem.repository.*;
+import com.footballsystem.model.Booking;
+import com.footballsystem.model.Branch;
+import com.footballsystem.model.Field;
+import com.footballsystem.model.ProblemReport;
+import com.footballsystem.model.ReportActivity;
+import com.footballsystem.model.SystemSetting;
+import com.footballsystem.model.Task;
+import com.footballsystem.model.User;
+
+import com.footballsystem.repository.BookingRepository;
+import com.footballsystem.repository.BranchRepository;
+import com.footballsystem.repository.FieldRepository;
+import com.footballsystem.repository.ProblemReportRepository;
+import com.footballsystem.repository.ReportActivityRepository;
+import com.footballsystem.repository.SystemSettingRepository;
+import com.footballsystem.repository.TaskRepository;
+import com.footballsystem.repository.UserRepository;
 import com.footballsystem.service.CloudinaryService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
