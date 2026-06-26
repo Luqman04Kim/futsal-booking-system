@@ -2,19 +2,15 @@ package com.footballsystem.controller;
 
 import com.footballsystem.model.*;
 import com.footballsystem.repository.*;
+import com.footballsystem.service.CloudinaryService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -50,10 +46,8 @@ public class ManagerController {
     @Autowired
     private com.footballsystem.repository.SystemSettingRepository systemSettingRepository;
 
-    // Upload directory — set via application.properties (upload.dir)
-    // Defaults to a folder called "uploads" next to the running JAR
-    @Value("${upload.dir:uploads}")
-    private String uploadDirProperty;
+    @Autowired
+    private CloudinaryService cloudinaryService;
 
     // Helper: Check if user is Manager
     private boolean isManager(HttpSession session) {
@@ -61,56 +55,29 @@ public class ManagerController {
         return role != null && role.equalsIgnoreCase("MANAGER");
     }
 
-    // Helper: Resolve the absolute upload directory
-    private Path getUploadDir() throws Exception {
-        Path dir = Paths.get(uploadDirProperty).toAbsolutePath();
-        if (!Files.exists(dir)) {
-            Files.createDirectories(dir);
-        }
-        return dir;
+    // Helper: Upload image to Cloudinary (persistent across Railway redeploys)
+    private String saveImage(MultipartFile file, String folder) {
+        if (file == null || file.isEmpty()) return null;
+        return cloudinaryService.uploadImage(file, folder);
     }
 
-    // Helper: Save Image to external upload directory
-    private String saveImage(MultipartFile file, String prefix) {
-        if (file.isEmpty())
-            return null;
-        try {
-            Path uploadDir = getUploadDir();
-            String fileName = prefix + "_" + UUID.randomUUID().toString() + ".png";
-            Path dest = uploadDir.resolve(fileName);
-            Files.copy(file.getInputStream(), dest, StandardCopyOption.REPLACE_EXISTING);
-            return "/uploads/" + fileName;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    // Helper: Save up to 5 field images
+    // Helper: Upload up to 5 field images to Cloudinary
     private void saveFieldImages(List<MultipartFile> files, Field field) {
-        if (files == null)
-            return;
+        if (files == null) return;
         String[] slots = new String[5];
         int saved = 0;
         for (MultipartFile f : files) {
-            if (saved >= 5)
-                break;
+            if (saved >= 5) break;
             if (f != null && !f.isEmpty()) {
-                String url = saveImage(f, "field");
-                if (url != null)
-                    slots[saved++] = url;
+                String url = cloudinaryService.uploadImage(f, "fields");
+                if (url != null) slots[saved++] = url;
             }
         }
-        if (saved > 0)
-            field.setImageUrl(slots[0]);
-        if (saved > 1)
-            field.setImageUrl2(slots[1]);
-        if (saved > 2)
-            field.setImageUrl3(slots[2]);
-        if (saved > 3)
-            field.setImageUrl4(slots[3]);
-        if (saved > 4)
-            field.setImageUrl5(slots[4]);
+        if (saved > 0) field.setImageUrl(slots[0]);
+        if (saved > 1) field.setImageUrl2(slots[1]);
+        if (saved > 2) field.setImageUrl3(slots[2]);
+        if (saved > 3) field.setImageUrl4(slots[3]);
+        if (saved > 4) field.setImageUrl5(slots[4]);
     }
 
     // Helper: Generate Staff ID (S001, S002, S003...)

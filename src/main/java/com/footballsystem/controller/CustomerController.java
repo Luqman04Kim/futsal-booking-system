@@ -14,19 +14,15 @@ import com.footballsystem.repository.InventoryItemRepository;
 import com.footballsystem.repository.ReviewRepository;
 import com.footballsystem.repository.UserRepository;
 import com.footballsystem.repository.PriceMatrixRepository;
+import com.footballsystem.service.CloudinaryService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -36,7 +32,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.UUID;
 import java.time.LocalDateTime;
 
 @Controller
@@ -62,6 +57,8 @@ public class CustomerController {
     private com.footballsystem.service.ToyyibPayService toyyibPayService;
     @Autowired
     private com.footballsystem.repository.SystemSettingRepository systemSettingRepository;
+    @Autowired
+    private CloudinaryService cloudinaryService;
 
     private double getRequiredDeposit(double totalPrice) {
         double configDeposit = Double.parseDouble(systemSettingRepository.findById("deposit_amount")
@@ -85,32 +82,10 @@ public class CustomerController {
         return roleObj != null && "CUSTOMER".equals(roleObj.toString());
     }
 
-    @Value("${upload.dir:uploads}")
-    private String uploadDirProperty;
-
-    // Helper: Resolve the absolute upload directory
-    private Path getUploadDir() throws Exception {
-        Path dir = Paths.get(uploadDirProperty).toAbsolutePath();
-        if (!Files.exists(dir)) {
-            Files.createDirectories(dir);
-        }
-        return dir;
-    }
-
-    // Helper: Save Image
-    private String saveImage(MultipartFile file, String prefix) {
-        if (file.isEmpty())
-            return null;
-        try {
-            Path uploadDir = getUploadDir();
-            String fileName = prefix + "_" + UUID.randomUUID().toString() + ".png";
-            Path dest = uploadDir.resolve(fileName);
-            Files.copy(file.getInputStream(), dest, StandardCopyOption.REPLACE_EXISTING);
-            return "/uploads/" + fileName;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+    // Helper: Upload image to Cloudinary (persistent across Railway redeploys)
+    private String saveImage(MultipartFile file, String folder) {
+        if (file == null || file.isEmpty()) return null;
+        return cloudinaryService.uploadImage(file, folder);
     }
 
     // Helper: Find overdue deposit bookings (paid deposit but match has ended

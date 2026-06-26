@@ -2,21 +2,16 @@ package com.footballsystem.controller;
 
 import com.footballsystem.model.*;
 import com.footballsystem.repository.*;
+import com.footballsystem.service.CloudinaryService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 import java.util.Map;
@@ -49,32 +44,13 @@ public class StaffController {
         return role != null && role.equalsIgnoreCase("STAFF");
     }
 
-    @Value("${upload.dir:uploads}")
-    private String uploadDirProperty;
+    @Autowired
+    private CloudinaryService cloudinaryService;
 
-    // Helper: Resolve the absolute upload directory
-    private Path getUploadDir() throws Exception {
-        Path dir = Paths.get(uploadDirProperty).toAbsolutePath();
-        if (!Files.exists(dir)) {
-            Files.createDirectories(dir);
-        }
-        return dir;
-    }
-
-    // Helper: Save Image to external upload directory
-    private String saveImage(MultipartFile file, String prefix) {
-        if (file.isEmpty())
-            return null;
-        try {
-            Path uploadDir = getUploadDir();
-            String fileName = prefix + "_" + UUID.randomUUID().toString() + ".png";
-            Path dest = uploadDir.resolve(fileName);
-            Files.copy(file.getInputStream(), dest, StandardCopyOption.REPLACE_EXISTING);
-            return "/uploads/" + fileName;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+    // Helper: Upload image to Cloudinary (persistent across Railway redeploys)
+    private String saveImage(MultipartFile file, String folder) {
+        if (file == null || file.isEmpty()) return null;
+        return cloudinaryService.uploadImage(file, folder);
     }
 
     // --- 1. DASHBOARD (View Tasks) ---
