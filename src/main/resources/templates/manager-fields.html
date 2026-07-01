@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
@@ -411,19 +411,23 @@
                         <div class="row">
                             <div class="col-6 mb-3">
                                 <label class="small font-weight-bold text-secondary">Size</label>
-                                <select name="size" class="form-control">
+                                <input type="text" name="size" class="form-control" list="sizeOptions"
+                                    placeholder="e.g. 5v5" value="5v5">
+                                <datalist id="sizeOptions">
                                     <option value="5v5">5 vs 5</option>
                                     <option value="7v7">7 vs 7</option>
                                     <option value="11v11">11 vs 11</option>
-                                </select>
+                                </datalist>
                             </div>
                             <div class="col-6 mb-3">
                                 <label class="small font-weight-bold text-secondary">Type</label>
-                                <select name="type" class="form-control">
+                                <input type="text" name="type" class="form-control" list="typeOptions"
+                                    placeholder="e.g. Grass" value="Grass">
+                                <datalist id="typeOptions">
                                     <option value="Grass">Grass</option>
                                     <option value="Turf">Turf</option>
                                     <option value="Indoor">Indoor</option>
-                                </select>
+                                </datalist>
                             </div>
                         </div>
                         <div class="mb-3">
@@ -483,19 +487,23 @@
                         <div class="row">
                             <div class="col-6 mb-3">
                                 <label class="small font-weight-bold text-secondary">Size</label>
-                                <select name="size" id="editFieldSize" class="form-control">
+                                <input type="text" name="size" id="editFieldSize" class="form-control" list="editSizeOptions"
+                                    placeholder="e.g. 5v5">
+                                <datalist id="editSizeOptions">
                                     <option value="5v5">5 vs 5</option>
                                     <option value="7v7">7 vs 7</option>
                                     <option value="11v11">11 vs 11</option>
-                                </select>
+                                </datalist>
                             </div>
                             <div class="col-6 mb-3">
                                 <label class="small font-weight-bold text-secondary">Type</label>
-                                <select name="type" id="editFieldType" class="form-control">
+                                <input type="text" name="type" id="editFieldType" class="form-control" list="editTypeOptions"
+                                    placeholder="e.g. Grass">
+                                <datalist id="editTypeOptions">
                                     <option value="Grass">Grass</option>
                                     <option value="Turf">Turf</option>
                                     <option value="Indoor">Indoor</option>
-                                </select>
+                                </datalist>
                             </div>
                         </div>
                         <div class="mb-3">

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
@@ -421,35 +421,46 @@
                             <span th:if="${booking.createdAt == null}">-</span>
                         </td>
                         <td>
-                            <span th:if="${booking.matchStatus == 'Finished'}" class="badge-finished">Finished</span>
-                            <span th:if="${booking.matchStatus == 'In Match'}" class="badge-in-match">In Match</span>
-                            <span th:if="${booking.matchStatus == 'Upcoming'}" class="badge-upcoming">Upcoming</span>
+                            <span th:if="${booking.status == 'REJECTED'}" class="badge-rejected">Rejected</span>
+                            <span th:if="${booking.status != 'REJECTED' && booking.matchStatus == 'Finished'}" class="badge-finished">Finished</span>
+                            <span th:if="${booking.status != 'REJECTED' && booking.matchStatus == 'In Match'}" class="badge-in-match">In Match</span>
+                            <span th:if="${booking.status != 'REJECTED' && booking.matchStatus == 'Upcoming'}" class="badge-upcoming">Upcoming</span>
                         </td>
                         <!-- Result column -->
                         <td>
-                            <span th:text="${booking.result != null ? booking.result : '-'}">-</span>
-                            <button class="btn btn-sm btn-link p-0 ms-2" th:data-id="${booking.bookingId}"
-                                th:data-result="${booking.result}"
-                                onclick="openResultModal(this.getAttribute('data-id'), this.getAttribute('data-result'))">
-                                <i class="fas fa-edit"></i>
-                            </button>
+                            <!-- If REJECTED, just show a dash with no edit button -->
+                            <span th:if="${booking.status == 'REJECTED'}" class="text-muted">—</span>
+                            <!-- Otherwise show normal result + edit -->
+                            <th:block th:if="${booking.status != 'REJECTED'}">
+                                <span th:text="${booking.result != null ? booking.result : '-'}">-</span>
+                                <button class="btn btn-sm btn-link p-0 ms-2" th:data-id="${booking.bookingId}"
+                                    th:data-result="${booking.result}"
+                                    onclick="openResultModal(this.getAttribute('data-id'), this.getAttribute('data-result'))">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            </th:block>
                         </td>
                         <!-- Photos column -->
                         <td>
-                            <div th:if="${booking.photoLink != null}" class="d-flex align-items-center gap-1">
-                                <a th:href="${booking.photoLink}" target="_blank"
-                                    class="btn btn-sm btn-info text-white" title="Open album">
-                                    <i class="fas fa-images"></i>
-                                </a>
-                            </div>
-                            <span th:if="${booking.photoLink == null}" class="text-muted small">—</span>
-                            <button class="btn btn-sm btn-link p-0 ms-1 text-secondary"
-                                th:data-id="${booking.bookingId}"
-                                th:data-link="${booking.photoLink}"
-                                title="Set photo link"
-                                onclick="openPhotoModal(this.getAttribute('data-id'), this.getAttribute('data-link'))">
-                                <i class="fas fa-camera-retro"></i>
-                            </button>
+                            <!-- If REJECTED, just show a dash with no edit button -->
+                            <span th:if="${booking.status == 'REJECTED'}" class="text-muted">—</span>
+                            <!-- Otherwise show normal photo link + edit -->
+                            <th:block th:if="${booking.status != 'REJECTED'}">
+                                <div th:if="${booking.photoLink != null}" class="d-flex align-items-center gap-1">
+                                    <a th:href="${booking.photoLink}" target="_blank"
+                                        class="btn btn-sm btn-info text-white" title="Open album">
+                                        <i class="fas fa-images"></i>
+                                    </a>
+                                </div>
+                                <span th:if="${booking.photoLink == null}" class="text-muted small">—</span>
+                                <button class="btn btn-sm btn-link p-0 ms-1 text-secondary"
+                                    th:data-id="${booking.bookingId}"
+                                    th:data-link="${booking.photoLink}"
+                                    title="Set photo link"
+                                    onclick="openPhotoModal(this.getAttribute('data-id'), this.getAttribute('data-link'))">
+                                    <i class="fas fa-camera-retro"></i>
+                                </button>
+                            </th:block>
                         </td>
                         <td>
                             <span th:if="${booking.status == 'PENDING'}" class="badge-pending">Pending</span>

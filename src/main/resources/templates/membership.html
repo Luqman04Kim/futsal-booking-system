@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
@@ -617,7 +617,13 @@
                     <div class="plan-footer">
                         <!-- Action: Show 'Upgrade' if user does NOT have this specific plan -->
                         <a th:if="${session.loggedUser.membershipPlan == null || session.loggedUser.membershipPlan.id != plan.id}" 
-                           th:href="@{/payment/membership(planId=${plan.id})}" class="btn-upgrade">
+                           th:href="@{/payment/membership(planId=${plan.id})}"
+                           th:data-planid="${plan.id}"
+                           th:data-planname="${plan.name}"
+                           th:data-hascurrent="${session.loggedUser.membershipPlan != null}"
+                           th:data-currentplan="${session.loggedUser.membershipPlan != null ? session.loggedUser.membershipPlan.name : ''}"
+                           class="btn-upgrade membership-subscribe-btn"
+                           onclick="handleSubscribeClick(event, this)">
                             SUBSCRIBE NOW <i class="fas fa-arrow-right ms-2"></i>
                         </a>
 
@@ -667,7 +673,54 @@
         </div>
     </div>
 
+    <!-- MEMBERSHIP REPLACEMENT CONFIRMATION MODAL -->
+    <div class="modal fade" id="membershipConfirmModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="background: #1e293b; color: white; border: 2px solid #f59e0b;">
+                <div class="modal-header" style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    <h5 class="modal-title fw-bold"><i class="fas fa-exclamation-triangle text-warning me-2"></i>Confirm Membership Change</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center p-4">
+                    <i class="fas fa-crown fa-3x text-warning mb-3"></i>
+                    <p class="fs-5 mb-2">You already have an active membership:</p>
+                    <p class="fw-bold fs-4 mb-3" id="currentPlanNameDisplay" style="color: #f59e0b;">Current Plan</p>
+                    <div class="alert" style="background: rgba(239,68,68,0.15); border: 1px solid #ef4444; border-radius: 10px; color: #fca5a5;">
+                        <i class="fas fa-info-circle me-2"></i>
+                        If you buy the new plan, your current <strong id="currentPlanNameInAlert">plan</strong> membership will be <strong>immediately expired and replaced</strong>.
+                    </div>
+                    <p class="text-white-50 small">Are you sure you want to proceed?</p>
+                </div>
+                <div class="modal-footer justify-content-center" style="border-top: 1px solid rgba(255,255,255,0.1);">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <a href="#" id="confirmSubscribeBtn" class="btn btn-warning fw-bold px-4">
+                        <i class="fas fa-check me-1"></i> Yes, Replace My Plan
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+    <script>
+        // Handle Subscribe Now click — show confirmation if user already has an active plan
+        function handleSubscribeClick(event, el) {
+            var hasCurrent = el.getAttribute('data-hascurrent') === 'true';
+            var currentPlan = el.getAttribute('data-currentplan') || '';
+            var targetUrl = el.getAttribute('href');
+
+            if (hasCurrent && currentPlan) {
+                event.preventDefault();
+                // Populate the confirmation modal
+                document.getElementById('currentPlanNameDisplay').textContent = currentPlan;
+                document.getElementById('currentPlanNameInAlert').textContent = currentPlan;
+                document.getElementById('confirmSubscribeBtn').setAttribute('href', targetUrl);
+                new bootstrap.Modal(document.getElementById('membershipConfirmModal')).show();
+            }
+            // If no current plan, allow default navigation
+        }
+    </script>
+
 </body>
 
 </html>

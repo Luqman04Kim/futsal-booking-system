@@ -561,6 +561,7 @@ public class ManagerController {
     @GetMapping("/staff")
     public String showStaffPage(@RequestParam(required = false) String search,
             @RequestParam(required = false) String filter,
+            @RequestParam(required = false) Long branchFilter,
             HttpSession session, Model model) {
         if (!isManager(session))
             return "redirect:/login";
@@ -595,6 +596,13 @@ public class ManagerController {
             }
         }
 
+        // Filter by branch
+        if (branchFilter != null) {
+            staffList = staffList.stream()
+                    .filter(u -> u.getBranch() != null && u.getBranch().getBranchId().equals(branchFilter))
+                    .collect(Collectors.toList());
+        }
+
         staffList.sort(Comparator.comparing(User::getRole).thenComparing(User::getUsername));
 
         // Calculate Task Statistics
@@ -627,6 +635,7 @@ public class ManagerController {
         model.addAttribute("staffList", staffList);
         model.addAttribute("branches", branchRepository.findAll());
         model.addAttribute("selectedFilter", filter != null ? filter : "ALL");
+        model.addAttribute("selectedBranchFilter", branchFilter);
         model.addAttribute("staffTaskCounts", staffTaskCounts);
         model.addAttribute("staffTotalTaskCounts", staffTotalTaskCounts);
         model.addAttribute("staffTaskPercentages", staffTaskPercentages);
@@ -1075,6 +1084,32 @@ public class ManagerController {
         Booking booking = bookingRepository.findById(bookingId).orElse(null);
         if (booking != null) {
             booking.setStatus(status);
+            bookingRepository.save(booking);
+        }
+        return "redirect:/manager/bookings";
+    }
+
+    @GetMapping("/approve-booking/{id}")
+    public String approveBooking(@PathVariable Long id, HttpSession session) {
+        if (!isManager(session))
+            return "redirect:/login";
+        Booking booking = bookingRepository.findById(id).orElse(null);
+        if (booking != null) {
+            booking.setStatus("APPROVED");
+            bookingRepository.save(booking);
+        }
+        return "redirect:/manager/bookings";
+    }
+
+    @GetMapping("/reject-booking/{id}")
+    public String rejectBooking(@PathVariable Long id, HttpSession session) {
+        if (!isManager(session))
+            return "redirect:/login";
+        Booking booking = bookingRepository.findById(id).orElse(null);
+        if (booking != null) {
+            booking.setStatus("REJECTED");
+            // Auto-set match status to Rejected so Result and Photos are not needed
+            booking.setMatchStatus("Rejected");
             bookingRepository.save(booking);
         }
         return "redirect:/manager/bookings";

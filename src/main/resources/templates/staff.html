@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
@@ -290,8 +290,8 @@
 
         <!-- SEARCH & FILTER BAR -->
         <div class="row mb-4">
-            <div class="col-md-8">
-                <form action="/manager/staff" method="GET" class="d-flex gap-2">
+            <div class="col-md-10">
+                <form action="/manager/staff" method="GET" class="d-flex gap-2 flex-wrap">
                     <div class="input-group">
                         <input type="text" name="search" class="form-control" placeholder="Search by name or email..."
                             th:value="${param.search}" />
@@ -299,18 +299,26 @@
                             Search</button>
                     </div>
 
-                    <!-- Filter Dropdown -->
+                    <!-- Filter by Role Dropdown -->
                     <select name="filter" class="form-select w-auto" onchange="this.form.submit()">
                         <option value="ALL" th:selected="${selectedFilter == 'ALL'}">All Roles</option>
                         <option value="MAINTENANCE TEAM" th:selected="${selectedFilter == 'MAINTENANCE TEAM'}">Maintenance Team</option>
                         <option value="OTHER" th:selected="${selectedFilter == 'OTHER'}">Other Staff</option>
                     </select>
 
+                    <!-- Filter by Branch Dropdown -->
+                    <select name="branchFilter" class="form-select w-auto" onchange="this.form.submit()">
+                        <option value="">All Branches</option>
+                        <option th:each="branch : ${branches}" th:value="${branch.branchId}" th:text="${branch.name}"
+                            th:selected="${branch.branchId == selectedBranchFilter}">Branch</option>
+                    </select>
+
                     <a href="/manager/staff" class="btn btn-outline-secondary"
-                        th:if="${param.search} or ${selectedFilter != 'ALL'}"><i class="fas fa-times"></i> Clear</a>
+                        th:if="${param.search} or ${selectedFilter != 'ALL'} or ${selectedBranchFilter != null}"><i class="fas fa-times"></i> Clear</a>
                 </form>
             </div>
         </div>
+
 
         <!-- STAFF GRID -->
         <div class="row g-4">
