@@ -411,23 +411,25 @@
                         <div class="row">
                             <div class="col-6 mb-3">
                                 <label class="small font-weight-bold text-secondary">Size</label>
-                                <input type="text" name="size" class="form-control" list="sizeOptions"
-                                    placeholder="e.g. 5v5" value="5v5">
-                                <datalist id="sizeOptions">
+                                <select name="size" class="form-control" onchange="toggleCustomInput(this, 'addSizeCustom')">
                                     <option value="5v5">5 vs 5</option>
                                     <option value="7v7">7 vs 7</option>
                                     <option value="11v11">11 vs 11</option>
-                                </datalist>
+                                    <option value="__custom__">Other (type here)...</option>
+                                </select>
+                                <input type="text" id="addSizeCustom" name="size" class="form-control mt-1"
+                                    placeholder="Enter custom size" style="display:none;">
                             </div>
                             <div class="col-6 mb-3">
                                 <label class="small font-weight-bold text-secondary">Type</label>
-                                <input type="text" name="type" class="form-control" list="typeOptions"
-                                    placeholder="e.g. Grass" value="Grass">
-                                <datalist id="typeOptions">
+                                <select name="type" class="form-control" onchange="toggleCustomInput(this, 'addTypeCustom')">
                                     <option value="Grass">Grass</option>
                                     <option value="Turf">Turf</option>
                                     <option value="Indoor">Indoor</option>
-                                </datalist>
+                                    <option value="__custom__">Other (type here)...</option>
+                                </select>
+                                <input type="text" id="addTypeCustom" name="type" class="form-control mt-1"
+                                    placeholder="Enter custom type" style="display:none;">
                             </div>
                         </div>
                         <div class="mb-3">
@@ -487,23 +489,31 @@
                         <div class="row">
                             <div class="col-6 mb-3">
                                 <label class="small font-weight-bold text-secondary">Size</label>
-                                <input type="text" name="size" id="editFieldSize" class="form-control" list="editSizeOptions"
-                                    placeholder="e.g. 5v5">
-                                <datalist id="editSizeOptions">
+                                <select id="editFieldSizeSelect" class="form-control" onchange="toggleCustomInputEdit(this, 'editSizeCustom', 'editFieldSize')">
                                     <option value="5v5">5 vs 5</option>
                                     <option value="7v7">7 vs 7</option>
                                     <option value="11v11">11 vs 11</option>
-                                </datalist>
+                                    <option value="__custom__">Other (type here)...</option>
+                                </select>
+                                <input type="text" name="size" id="editFieldSize" class="form-control mt-1"
+                                    placeholder="Enter custom size" style="display:none;">
+                                <input type="text" id="editSizeCustom" class="form-control mt-1"
+                                    placeholder="Enter custom size" style="display:none;"
+                                    oninput="document.getElementById('editFieldSize').value = this.value">
                             </div>
                             <div class="col-6 mb-3">
                                 <label class="small font-weight-bold text-secondary">Type</label>
-                                <input type="text" name="type" id="editFieldType" class="form-control" list="editTypeOptions"
-                                    placeholder="e.g. Grass">
-                                <datalist id="editTypeOptions">
+                                <select id="editFieldTypeSelect" class="form-control" onchange="toggleCustomInputEdit(this, 'editTypeCustom', 'editFieldType')">
                                     <option value="Grass">Grass</option>
                                     <option value="Turf">Turf</option>
                                     <option value="Indoor">Indoor</option>
-                                </datalist>
+                                    <option value="__custom__">Other (type here)...</option>
+                                </select>
+                                <input type="text" name="type" id="editFieldType" class="form-control mt-1"
+                                    placeholder="Enter custom type" style="display:none;">
+                                <input type="text" id="editTypeCustom" class="form-control mt-1"
+                                    placeholder="Enter custom type" style="display:none;"
+                                    oninput="document.getElementById('editFieldType').value = this.value">
                             </div>
                         </div>
                         <div class="mb-3">
@@ -538,6 +548,58 @@
     </div>
 
     <script>
+        // Toggle custom text input when "Other (type here)..." is chosen
+        function toggleCustomInput(selectEl, customInputId) {
+            var customInput = document.getElementById(customInputId);
+            if (selectEl.value === '__custom__') {
+                selectEl.removeAttribute('name'); // stop select from submitting
+                customInput.style.display = '';
+                customInput.setAttribute('name', selectEl.getAttribute('data-field-name') || customInputId.replace('add','').replace('Custom','').toLowerCase());
+                customInput.focus();
+            } else {
+                selectEl.setAttribute('name', selectEl.getAttribute('data-field-name') || customInputId.replace('add','').replace('Custom','').toLowerCase());
+                customInput.style.display = 'none';
+                customInput.removeAttribute('name');
+            }
+        }
+
+        // Toggle custom text input for the Edit modal
+        function toggleCustomInputEdit(selectEl, customInputId, hiddenInputId) {
+            var customInput = document.getElementById(customInputId);
+            var hiddenInput = document.getElementById(hiddenInputId);
+            if (selectEl.value === '__custom__') {
+                customInput.style.display = '';
+                hiddenInput.style.display = '';
+                customInput.focus();
+            } else {
+                hiddenInput.value = selectEl.value;
+                customInput.style.display = 'none';
+                hiddenInput.style.display = 'none';
+            }
+        }
+
+        // Helper: set select value, or switch to custom if value not in list
+        function setSelectOrCustom(selectId, customInputId, hiddenId, value) {
+            var sel = document.getElementById(selectId);
+            var opt = Array.from(sel.options).find(o => o.value === value);
+            if (opt) {
+                sel.value = value;
+                document.getElementById(customInputId).style.display = 'none';
+                if (hiddenId) document.getElementById(hiddenId).style.display = 'none';
+                if (hiddenId) document.getElementById(hiddenId).value = value;
+            } else {
+                sel.value = '__custom__';
+                var customInput = document.getElementById(customInputId);
+                customInput.style.display = '';
+                customInput.value = value;
+                if (hiddenId) {
+                    var hi = document.getElementById(hiddenId);
+                    hi.style.display = '';
+                    hi.value = value;
+                }
+            }
+        }
+
         function openEditFieldModal(button) {
             var id = button.getAttribute('data-id');
             var name = button.getAttribute('data-name');
@@ -549,15 +611,26 @@
 
             document.getElementById('editFieldId').value = id;
             document.getElementById('editFieldName').value = name;
-            document.getElementById('editFieldSize').value = size;
-            document.getElementById('editFieldType').value = type;
             document.getElementById('editFieldStatus').value = status;
             document.getElementById('editFieldBranch').value = branch;
             document.getElementById('editFieldSupervisor').value = supervisor;
 
+            // Populate size select or show custom input
+            setSelectOrCustom('editFieldSizeSelect', 'editSizeCustom', 'editFieldSize', size);
+            setSelectOrCustom('editFieldTypeSelect', 'editTypeCustom', 'editFieldType', type);
+
             var modal = new bootstrap.Modal(document.getElementById('editFieldModal'));
             modal.show();
         }
+
+        // Fix Add form: ensure 'name' attribute is correct on selects on load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add form size select — ensure name is set initially
+            var addSizeSelect = document.querySelector('[onchange*="addSizeCustom"]');
+            if (addSizeSelect) addSizeSelect.setAttribute('data-field-name', 'size');
+            var addTypeSelect = document.querySelector('[onchange*="addTypeCustom"]');
+            if (addTypeSelect) addTypeSelect.setAttribute('data-field-name', 'type');
+        });
 
         // Delete confirmation modal
         function confirmDelete(element, itemName) {
