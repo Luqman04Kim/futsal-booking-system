@@ -314,8 +314,8 @@
     <div class="content">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
-                <h2 class="fw-bold" style="color: #1a1a1a;">
-                    <i class="fas fa-credit-card me-2 text-primary"></i>Deposit & Payments
+                <h2 class="fw-bold text-primary">
+                    <i class="fas fa-credit-card me-2"></i>DEPOSIT &amp; PAYMENTS
                 </h2>
                 <p class="text-muted mb-0">Configure global futsal booking deposit rates and manage customer pitch payments.</p>
             </div>
@@ -421,6 +421,7 @@
                             <th>Date / Time</th>
                             <th>Booked At</th>
                             <th>Total Pay</th>
+                            <th>Type</th>
                             <th>Payment Status</th>
                             <th>Action</th>
                         </tr>
@@ -434,7 +435,7 @@
                             <td>
                                 <span th:if="${booking.field != null}" th:text="${booking.field.name}">Field A</span>
                                 <span th:if="${booking.field == null}" class="badge bg-warning text-dark"><i
-                                        class="fas fa-crown me-1"></i> VIP</span>
+                                         class="fas fa-crown me-1"></i> VIP</span>
                             </td>
                             <td>
                                 <div class="fw-bold" th:text="${booking.date}">2023-01-01</div>
@@ -450,6 +451,11 @@
                             </td>
                             <td>
                                 <span class="fw-bold text-success">RM <span th:text="${booking.price}">0.00</span></span>
+                            </td>
+                            <td>
+                                <span th:if="${booking.paymentStatus == 'Full Payment'}" class="badge bg-success text-white">Full Payment</span>
+                                <span th:if="${booking.paymentStatus != 'Full Payment' && booking.paymentStatus != null && booking.paymentStatus.contains('Subscription')}" class="badge bg-warning text-dark">Membership</span>
+                                <span th:if="${booking.paymentStatus != 'Full Payment' && (booking.paymentStatus == null || !booking.paymentStatus.contains('Subscription'))}" class="badge bg-info text-white">Deposit</span>
                             </td>
                             <td>
                                 <span th:if="${booking.paymentStatus == 'Pay Deposit'}"
@@ -479,7 +485,7 @@
                             </td>
                         </tr>
                         <tr th:if="${#lists.isEmpty(bookings)}">
-                            <td colspan="10" class="text-center py-5 text-muted">
+                            <td colspan="11" class="text-center py-5 text-muted">
                                 <i class="fas fa-credit-card fa-3x mb-3"></i>
                                 <p>No bookings found.</p>
                             </td>
