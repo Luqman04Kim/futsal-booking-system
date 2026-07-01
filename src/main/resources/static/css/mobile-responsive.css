@@ -24,6 +24,20 @@ img {
 }
 
 /* ==========================================
+   GLOBAL SCROLLABLE TABLES (Desktop & Mobile)
+   ========================================== */
+.table-scroll-wrapper {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    width: 100% !important;
+}
+
+.table-scroll-wrapper table th,
+.table-scroll-wrapper table td {
+    white-space: nowrap !important;
+}
+
+/* ==========================================
    MOBILE HAMBURGER MENU BUTTON
    ========================================== */
 .mobile-menu-btn {

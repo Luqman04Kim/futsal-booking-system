@@ -154,6 +154,17 @@
             overflow: hidden; /* keeps border-radius on desktop */
         }
 
+        .table-scroll-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            width: 100%;
+        }
+
+        .table-scroll-wrapper table th,
+        .table-scroll-wrapper table td {
+            white-space: nowrap;
+        }
+
         /* =====================================================
            MOBILE: horizontal scroll for transactions table
            The inner wrapper scrolls; outer keeps the card look
@@ -164,9 +175,6 @@
                 border-radius: 15px;
             }
             .table-scroll-wrapper {
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-                width: 100%;
                 border-radius: 15px;
             }
             .table-scroll-wrapper table {
@@ -176,7 +184,6 @@
             .table-scroll-wrapper table th,
             .table-scroll-wrapper table td {
                 padding: 8px 6px;
-                white-space: nowrap;
             }
             .search-filter-container {
                 flex-direction: column !important;
