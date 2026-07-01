@@ -1108,8 +1108,6 @@ public class ManagerController {
         Booking booking = bookingRepository.findById(id).orElse(null);
         if (booking != null) {
             booking.setStatus("REJECTED");
-            // Auto-set match status to Rejected so Result and Photos are not needed
-            booking.setMatchStatus("Rejected");
             bookingRepository.save(booking);
         }
         return "redirect:/manager/bookings";
