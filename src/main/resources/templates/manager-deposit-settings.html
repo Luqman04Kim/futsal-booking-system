@@ -232,6 +232,11 @@
             color: #856404;
         }
 
+        .status-deposit-overdue {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
         .status-full {
             background-color: #d4edda;
             color: #155724;
@@ -458,7 +463,11 @@
                                 <span th:if="${booking.paymentStatus != 'Full Payment' && (booking.paymentStatus == null || !booking.paymentStatus.contains('Subscription'))}" class="badge bg-info text-white">Deposit</span>
                             </td>
                             <td>
-                                <span th:if="${booking.paymentStatus == 'Pay Deposit' || booking.paymentStatus == 'Only Deposit'}"
+                                <!-- If only deposit paid and session is Finished, render red badge -->
+                                <span th:if="${(booking.paymentStatus == 'Pay Deposit' || booking.paymentStatus == 'Only Deposit') && booking.matchStatus == 'Finished'}"
+                                    class="status-badge status-deposit-overdue">Only Deposit</span>
+                                <!-- If only deposit paid and session is NOT Finished, render yellow badge -->
+                                <span th:if="${(booking.paymentStatus == 'Pay Deposit' || booking.paymentStatus == 'Only Deposit') && booking.matchStatus != 'Finished'}"
                                     class="status-badge status-deposit">Only Deposit</span>
                                 <span th:if="${booking.paymentStatus == 'Full Payment'}"
                                     class="status-badge status-full">Full Payment</span>
