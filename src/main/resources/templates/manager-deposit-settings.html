@@ -458,11 +458,11 @@
                                 <span th:if="${booking.paymentStatus != 'Full Payment' && (booking.paymentStatus == null || !booking.paymentStatus.contains('Subscription'))}" class="badge bg-info text-white">Deposit</span>
                             </td>
                             <td>
-                                <span th:if="${booking.paymentStatus == 'Pay Deposit'}"
-                                    class="status-badge status-deposit">Pay Deposit</span>
+                                <span th:if="${booking.paymentStatus == 'Pay Deposit' || booking.paymentStatus == 'Only Deposit'}"
+                                    class="status-badge status-deposit">Only Deposit</span>
                                 <span th:if="${booking.paymentStatus == 'Full Payment'}"
                                     class="status-badge status-full">Full Payment</span>
-                                <span th:if="${booking.paymentStatus != 'Pay Deposit' && booking.paymentStatus != 'Full Payment'}"
+                                <span th:if="${booking.paymentStatus != 'Pay Deposit' && booking.paymentStatus != 'Only Deposit' && booking.paymentStatus != 'Full Payment'}"
                                     class="status-badge status-unknown" th:text="${booking.paymentStatus != null ? booking.paymentStatus : 'Unpaid'}">Unpaid</span>
                             </td>
                             <td>
